@@ -10,12 +10,13 @@ import (
 
 type ProgrammingConfig struct {
 	ServerPort int
-	DBPort     string
+	DBPort     int
 	DBHost     string
 	DBUser     string
 	DBPass     string
 	DBName     string
 	Secret     string
+	RefSecret  string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -49,7 +50,13 @@ func loadConfig() *ProgrammingConfig {
 	}
 
 	if val, found := os.LookupEnv("DBPORT"); found {
-		res.DBPort = val
+		port, err := strconv.Atoi(val)
+		if err != nil {
+			logrus.Error("Config : Invalid port value,", err.Error())
+			return nil
+		}
+
+		res.DBPort = port
 	}
 
 	if val, found := os.LookupEnv("DBHOST"); found {
@@ -70,6 +77,10 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.Secret = val
+	}
+
+	if val, found := os.LookupEnv("REFSECRET"); found {
+		res.RefSecret = val
 	}
 
 	return res
