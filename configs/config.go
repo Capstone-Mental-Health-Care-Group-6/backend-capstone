@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,11 +33,11 @@ func InitConfig() *ProgrammingConfig {
 
 func loadConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
-	err := godotenv.Load(".env")
+	// err := godotenv.Load(".env")
 
-	if err != nil {
-		logrus.Error("Config : Cannot load config file,", err.Error())
-	}
+	// if err != nil {
+	// 	logrus.Error("Config : Cannot load config file,", err.Error())
+	// }
 
 	if val, found := os.LookupEnv("SERVER"); found {
 		port, err := strconv.Atoi(val)
