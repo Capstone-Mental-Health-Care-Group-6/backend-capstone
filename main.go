@@ -6,6 +6,10 @@ import (
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
 
+	dataTransaksi "FinalProject/features/transaction/data"
+	handlerTransaksi "FinalProject/features/transaction/handler"
+	serviceTransaksi "FinalProject/features/transaction/service"
+
 	dataUser "FinalProject/features/users/data"
 	handlerUser "FinalProject/features/users/handler"
 	serviceUser "FinalProject/features/users/service"
@@ -35,6 +39,10 @@ func main() {
 	userServices := serviceUser.New(userModel, jwtInterface)
 	userController := handlerUser.NewHandler(userServices)
 
+	transaksiModel := dataTransaksi.New(db)
+	transaksiServices := serviceTransaksi.New(transaksiModel)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
+
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
 	articleController := handlerArticle.NewHandler(articleServices)
@@ -52,6 +60,7 @@ func main() {
 		}))
 
 	routes.RouteUser(e, userController, *config)
+	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 

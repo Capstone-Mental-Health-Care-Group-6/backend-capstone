@@ -4,6 +4,7 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
+	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -13,6 +14,10 @@ import (
 func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.POST("/register", uh.Register())
 	e.POST("/login", uh.Login())
+}
+
+func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.POST("/transaksi", th.CreateTransaction())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
