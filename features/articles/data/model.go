@@ -16,5 +16,5 @@ type Article struct {
 }
 
 func (Article) TableName() string {
-	return "article_categories"
+	return "articles"
 }
