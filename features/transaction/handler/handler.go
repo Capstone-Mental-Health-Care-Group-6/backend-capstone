@@ -162,6 +162,15 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			return err
 		}
 
+		serviceInput.UserID = input.UserID
+		serviceInput.MidtransID = chargeResp.TransactionID
+		serviceInput.PaymentStatus = 0
+		serviceInput.PaymentType = "Bank BCA"
+
+		fmt.Println("This is the data", chargeResp.TransactionID, serviceInput.PaymentStatus, serviceInput.PaymentType)
+
+		th.s.CreateTransaction(*serviceInput)
+
 		var vaAccount string
 		for _, va := range chargeResp.VaNumbers {
 			if va.Bank == "bca" {
@@ -169,13 +178,6 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				break
 			}
 		}
-
-		serviceInput.UserID = 1
-		serviceInput.MidtransID = chargeResp.TransactionID
-		serviceInput.PaymentStatus = 0
-		serviceInput.PaymentType = "Bank BCA"
-
-		th.s.CreateTransaction(*serviceInput)
 
 		response := make(map[string]interface{})
 		response["va_account"] = vaAccount

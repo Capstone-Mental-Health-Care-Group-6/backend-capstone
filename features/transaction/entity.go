@@ -35,16 +35,20 @@ type TransactionInfo struct {
 	UserName       uint   `json:"user_name"`
 	MidtransID     string `json:"midtrans_id"`
 
-	CounselingSession uint   `gorm:"column:counseling_session" json:"counseling_session"`
-	CounselingType    string `gorm:"column:counseling_type;type:enum('A','B','C')" json:"counseling_type"`
+	CounselingSession uint   `json:"counseling_session"`
+	CounselingType    string `json:"counseling_type"`
 
-	PriceMethod     uint `gorm:"column:price_method" json:"price_method"`
-	PriceDuration   uint `gorm:"column:price_duration" json:"price_duration"`
-	PriceCounseling uint `gorm:"column:price_counseling" json:"price_counseling"`
-	PriceResult     uint `gorm:"column:price_result" json:"price_result"`
+	PriceMethod     uint `json:"price_method"`
+	PriceDuration   uint `json:"price_duration"`
+	PriceCounseling uint `json:"price_counseling"`
+	PriceResult     uint `json:"price_result"`
 
-	PaymentStatus uint   `gorm:"column:payment_status" json:"payment_status"`
-	PaymentType   string `gorm:"column:payment_type" json:"payment_type"`
+	PaymentStatus uint   `json:"payment_status"`
+	PaymentType   string `json:"payment_type"`
+}
+
+type UpdateTransaction struct {
+	PaymentStatus uint `json:"payment_status"`
 }
 
 type TransactionHandlerInterface interface {

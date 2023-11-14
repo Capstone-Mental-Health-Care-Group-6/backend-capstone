@@ -3,6 +3,7 @@ package service
 import (
 	transaction "FinalProject/features/transaction"
 	"errors"
+	"fmt"
 )
 
 type TransactionService struct {
@@ -33,6 +34,7 @@ func (as *TransactionService) GetTransaction(id int) ([]transaction.TransactionI
 
 func (as *TransactionService) CreateTransaction(newData transaction.Transaction) (*transaction.Transaction, error) {
 	result, err := as.d.Insert(newData)
+	fmt.Println("Ini new data: ", newData)
 	if err != nil {
 		return nil, errors.New("Insert Process Failed")
 	}
