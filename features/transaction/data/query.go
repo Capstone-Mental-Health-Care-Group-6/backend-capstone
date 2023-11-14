@@ -21,7 +21,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 
 	var transaction Transaction
 	db := ad.db
-	db.Where("midtrans_id = ?", id).First(transaction)
+	db.Where("midtrans_id = ?", id).First(&transaction)
 	fmt.Println("This is the id: ", transaction.ID)
 	transactionID := transaction.ID
 
