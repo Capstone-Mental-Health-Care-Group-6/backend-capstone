@@ -56,6 +56,7 @@ type TransactionHandlerInterface interface {
 	GetTransaction() echo.HandlerFunc
 	CreateTransaction() echo.HandlerFunc
 	NotifTransaction() echo.HandlerFunc
+	DeleteTransaction() echo.HandlerFunc
 }
 
 type TransactionServiceInterface interface {
@@ -63,6 +64,7 @@ type TransactionServiceInterface interface {
 	GetTransaction(id int) ([]TransactionInfo, error)
 	CreateTransaction(newData Transaction) (*Transaction, error)
 	UpdateTransaction(newData UpdateTransaction, id string) (bool, error)
+	DeleteTransaction(id int) (bool, error)
 }
 
 type TransactionDataInterface interface {
@@ -71,4 +73,5 @@ type TransactionDataInterface interface {
 	Insert(newData Transaction) (*Transaction, error)
 	// Update(newData Transaction, id int) (bool, error)
 	GetAndUpdate(newData UpdateTransaction, id string) (bool, error)
+	Delete(id int) (bool, error)
 }

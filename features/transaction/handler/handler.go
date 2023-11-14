@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
@@ -133,7 +134,11 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.PriceMethod = input.PriceMethod
 		serviceInput.PriceDuration = input.PriceDuration
 		serviceInput.PriceCounseling = input.PriceCounseling
+
 		serviceInput.PriceResult = input.PriceMethod + input.PriceDuration + input.PriceCounseling
+
+		serviceInput.UserID = input.UserID
+		serviceInput.PaymentStatus = 0
 
 		serviceInput.TopicID = input.TopicID
 		serviceInput.PatientID = input.PatientID
@@ -150,7 +155,39 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		response := make(map[string]interface{})
 
-		if input.PaymentType == "gopay" {
+		if input.PaymentType == "qris" {
+			chargeReq := &coreapi.ChargeReq{
+				Qris: &coreapi.QrisDetails{
+					Acquirer: "EmpathiCare",
+				},
+				PaymentType: "qris",
+				TransactionDetails: midtrans.TransactionDetails{
+					OrderID:  "Q-" + example.Random(),
+					GrossAmt: int64(result),
+				},
+			}
+
+			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
+			if err != nil {
+				fmt.Println("Error: ", err)
+				return err
+			}
+
+			serviceInput.MidtransID = chargeResp.OrderID
+
+			if len(chargeResp.Actions) > 0 {
+				for _, action := range chargeResp.Actions {
+					if action.Name == "deeplink-redirect" {
+						deepLinkURL := action.URL
+						response["callback_url"] = deepLinkURL
+						// c.DepositService.InsertPaymentToken(Deposit.ID, chargeResp.TransactionID, "-", deepLinkURL)
+						break
+					}
+				}
+			}
+			response["payment_type"] = input.PaymentType
+
+		} else if input.PaymentType == "gopay" {
 			chargeReq := &coreapi.ChargeReq{
 				Gopay: &coreapi.GopayDetails{
 					EnableCallback: true,
@@ -168,9 +205,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				return err
 			}
 
-			serviceInput.UserID = input.UserID
 			serviceInput.MidtransID = chargeResp.OrderID
-			serviceInput.PaymentStatus = 0
 
 			if len(chargeResp.Actions) > 0 {
 				for _, action := range chargeResp.Actions {
@@ -213,9 +248,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				return err
 			}
 
-			serviceInput.UserID = input.UserID
 			serviceInput.MidtransID = chargeResp.OrderID
-			serviceInput.PaymentStatus = 0
 
 			fmt.Println("This is the data", chargeResp.OrderID, serviceInput.PaymentStatus, serviceInput.PaymentType)
 
@@ -241,10 +274,57 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 }
 
 func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
-	return nil
+	return func(c echo.Context) error {
+		result, err := th.s.GetTransactions()
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
 }
 
 func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
 
-	return nil
+		result, err := th.s.GetTransaction(id)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (th *TransactionHandler) DeleteTransaction() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		result, err := th.s.DeleteTransaction(id)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Delete Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		fmt.Println(result)
+
+		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success", result))
+	}
 }

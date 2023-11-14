@@ -19,6 +19,9 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.POST("/transaksi", th.CreateTransaction())
 	e.POST("/transaksi/notif", th.NotifTransaction())
+	e.GET("/transaksi/:id", th.GetTransaction())
+	e.GET("/transaksi", th.GetTransactions())
+	e.DELETE("/transaksi/:id", th.DeleteTransaction())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
