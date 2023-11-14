@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/midtrans/midtrans-go"
@@ -29,18 +28,15 @@ func NewTransactionHandler(service transaction.TransactionServiceInterface) tran
 func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		//GET DATABASE AND UPDATE
 		midtrans.ServerKey = "SB-Mid-server-VXw9IjVeH_fZSL4IZykw3LR4"
-		// change value to `midtrans.Production`, if you want change the env to production
 		midtrans.Environment = midtrans.Sandbox
 
 		cApi.New(midtrans.ServerKey, midtrans.Sandbox)
 
 		var notificationPayload map[string]interface{}
-		// 2. Parse JSON request body and use it to set json to payload
+
 		err := json.NewDecoder(c.Request().Body).Decode(&notificationPayload)
 		if err != nil {
-			// do something on error when decode
 			return err
 		}
 
@@ -51,25 +47,19 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 
 		fmt.Println("Notification Payload:", notificationPayload)
 
-		// 3. Get order-id from payload
 		orderId, exists := notificationPayload["order_id"].(string)
 		if !exists {
-			// do something when key `order_id` not found
 			return echo.NewHTTPError(http.StatusBadRequest, "order_id not found")
 		}
 
-		// 4. Check transaction to Midtrans with param orderId
 		transactionStatusResp, e := cApi.CheckTransaction(orderId)
 		if e != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, e.GetMessage())
 		} else {
 			if transactionStatusResp != nil {
-				// 5. Do set transaction status based on response from check transaction status
 				if transactionStatusResp.TransactionStatus == "capture" {
 
 					if transactionStatusResp.FraudStatus == "challenge" {
-						// TODO set transaction status on your database to 'challenge'
-						// e.g: 'Payment status challenged. Please take action on your Merchant Administration Portal
 						fmt.Println("Payment status challenged")
 						var serviceUpdate = new(transaction.Transaction)
 						serviceUpdate.PaymentStatus = 1 //CHALLENGE
@@ -130,15 +120,39 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		midtrans.ServerKey = "SB-Mid-server-VXw9IjVeH_fZSL4IZykw3LR4"
 		midtrans.ClientKey = "SB-Mid-client-hNK8kns-lS0o6nFn"
-		// change value to `midtrans.Production`, if you want change the env to production
 		midtrans.Environment = midtrans.Sandbox
+
+		var input = new(InputRequest)
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		var serviceInput = new(transaction.Transaction)
+
+		serviceInput.PriceMethod = input.PriceMethod
+		serviceInput.PriceDuration = input.PriceDuration
+		serviceInput.PriceCounseling = input.PriceCounseling
+		serviceInput.PriceResult = input.PriceMethod + input.PriceDuration + input.PriceCounseling
+
+		serviceInput.TopicID = input.TopicID
+		serviceInput.PatientID = input.PatientID
+		serviceInput.DoctorID = input.DoctorID
+		serviceInput.MethodID = input.MethodID
+		serviceInput.DurationID = input.DurationID
+
+		serviceInput.CounselingID = input.CounselingID
+		serviceInput.CounselingSession = input.CounselingSession
+		serviceInput.CounselingType = input.CounselingType
+
+		result := input.PriceMethod + input.PriceDuration + input.PriceCounseling
 
 		chargeReq := &coreapi.ChargeReq{
 			PaymentType:  "bank_transfer",
 			BankTransfer: &coreapi.BankTransferDetails{Bank: midtrans.BankBca},
 			TransactionDetails: midtrans.TransactionDetails{
 				OrderID:  example.Random(),
-				GrossAmt: 100000,
+				GrossAmt: int64(result),
 			},
 		}
 
@@ -156,28 +170,8 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			}
 		}
 
-		var serviceInput = new(transaction.Transaction)
-		serviceInput.TopicID = nil
-		serviceInput.PatientID = nil
-		serviceInput.DoctorID = nil
-		serviceInput.MethodID = nil
-		serviceInput.DurationID = nil
-		serviceInput.CounselingID = nil
 		serviceInput.UserID = 1
-		serviceInput.MidtransID = &chargeResp.TransactionID
-		// Assuming chargeResp.GrossAmount is *string
-		grossAmount, _ := strconv.Atoi(chargeResp.GrossAmount)
-		// Assuming serviceInput.PriceResult is *int
-		result := grossAmount
-		serviceInput.PriceResult = &result
-
-		serviceInput.CounselingSession = nil
-		serviceInput.CounselingType = nil
-
-		serviceInput.PriceMethod = nil
-		serviceInput.PriceDuration = nil
-		serviceInput.PriceCounseling = nil
-
+		serviceInput.MidtransID = chargeResp.TransactionID
 		serviceInput.PaymentStatus = 0
 		serviceInput.PaymentType = "Bank BCA"
 
@@ -185,7 +179,6 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		response := make(map[string]interface{})
 		response["va_account"] = vaAccount
-		// response["data"] = serviceInput
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
 	}
