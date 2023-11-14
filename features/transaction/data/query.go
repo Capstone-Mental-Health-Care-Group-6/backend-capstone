@@ -43,12 +43,25 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 }
 
 func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
+	var listTransactions []transaction.TransactionInfo
+	var qry = ad.db.Find(&listTransactions) // Fetch all transactions data from the table
 
-	return nil, nil
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	return listTransactions, nil
 }
 
 func (ad *TransactionData) GetByID(id int) ([]transaction.TransactionInfo, error) {
-	return nil, nil
+	var transactionInfo transaction.TransactionInfo
+	var qry = ad.db.Table("transactions").Where("id = ?", id).First(&transactionInfo)
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	return []transaction.TransactionInfo{transactionInfo}, nil
 }
 
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
@@ -81,4 +94,14 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	}
 
 	return &newData, nil
+}
+
+func (ad *TransactionData) Delete(id int) (bool, error) {
+	var deleteData = new(Transaction)
+
+	if err := ad.db.Where("id = ?", id).Delete(&deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

@@ -50,3 +50,13 @@ func (as *TransactionService) UpdateTransaction(newData transaction.UpdateTransa
 
 	return result, nil
 }
+
+func (as *TransactionService) DeleteTransaction(id int) (bool, error) {
+	result, err := as.d.Delete(id)
+
+	if err != nil {
+		return false, errors.New("Delete Process Failed")
+	}
+
+	return result, nil
+}
