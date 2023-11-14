@@ -144,45 +144,97 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.CounselingID = input.CounselingID
 		serviceInput.CounselingSession = input.CounselingSession
 		serviceInput.CounselingType = input.CounselingType
+		serviceInput.PaymentType = input.PaymentType
 
 		result := input.PriceMethod + input.PriceDuration + input.PriceCounseling
 
-		chargeReq := &coreapi.ChargeReq{
-			PaymentType:  "bank_transfer",
-			BankTransfer: &coreapi.BankTransferDetails{Bank: midtrans.BankBca},
-			TransactionDetails: midtrans.TransactionDetails{
-				OrderID:  example.Random(),
-				GrossAmt: int64(result),
-			},
-		}
-
-		chargeResp, err := coreapi.ChargeTransaction(chargeReq)
-		if err != nil {
-			fmt.Println("Error: ", err)
-			return err
-		}
-
-		serviceInput.UserID = input.UserID
-		serviceInput.MidtransID = chargeResp.TransactionID
-		serviceInput.PaymentStatus = 0
-		serviceInput.PaymentType = "Bank BCA"
-
-		fmt.Println("This is the data", chargeResp.TransactionID, serviceInput.PaymentStatus, serviceInput.PaymentType)
-
-		th.s.CreateTransaction(*serviceInput)
-
-		var vaAccount string
-		for _, va := range chargeResp.VaNumbers {
-			if va.Bank == "bca" {
-				vaAccount = va.VANumber
-				break
-			}
-		}
-
 		response := make(map[string]interface{})
-		response["va_account"] = vaAccount
+
+		if input.PaymentType == "gopay" {
+			chargeReq := &coreapi.ChargeReq{
+				Gopay: &coreapi.GopayDetails{
+					EnableCallback: true,
+				},
+				PaymentType: "gopay",
+				TransactionDetails: midtrans.TransactionDetails{
+					OrderID:  "G-" + example.Random(),
+					GrossAmt: int64(result),
+				},
+			}
+
+			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
+			if err != nil {
+				fmt.Println("Error: ", err)
+				return err
+			}
+
+			serviceInput.UserID = input.UserID
+			serviceInput.MidtransID = chargeResp.TransactionID
+			serviceInput.PaymentStatus = 0
+
+			if len(chargeResp.Actions) > 0 {
+				for _, action := range chargeResp.Actions {
+					if action.Name == "deeplink-redirect" {
+						deepLinkURL := action.URL
+						response["callback_url"] = deepLinkURL
+						// c.DepositService.InsertPaymentToken(Deposit.ID, chargeResp.TransactionID, "-", deepLinkURL)
+						break
+					}
+				}
+			}
+
+		} else if input.PaymentType == "bca" || input.PaymentType == "bni" || input.PaymentType == "bri" {
+
+			var midtransBank midtrans.Bank
+			switch input.PaymentType {
+			case "bca":
+				midtransBank = midtrans.BankBca
+			case "bri":
+				midtransBank = midtrans.BankBri
+			case "bni":
+				midtransBank = midtrans.BankBni
+			default:
+				midtransBank = midtrans.BankBca
+			}
+
+			chargeReq := &coreapi.ChargeReq{
+				PaymentType:  "bank_transfer",
+				BankTransfer: &coreapi.BankTransferDetails{Bank: midtransBank},
+				TransactionDetails: midtrans.TransactionDetails{
+					OrderID:  example.Random(),
+					GrossAmt: int64(result),
+				},
+			}
+
+			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
+			if err != nil {
+				fmt.Println("Error: ", err)
+				return err
+			}
+
+			serviceInput.UserID = input.UserID
+			serviceInput.MidtransID = chargeResp.TransactionID
+			serviceInput.PaymentStatus = 0
+
+			fmt.Println("This is the data", chargeResp.TransactionID, serviceInput.PaymentStatus, serviceInput.PaymentType)
+
+			th.s.CreateTransaction(*serviceInput)
+
+			var vaAccount string
+			for _, va := range chargeResp.VaNumbers {
+				if va.Bank == "bca" {
+					vaAccount = va.VANumber
+					break
+				}
+			}
+
+			response["va_account"] = vaAccount
+		} else {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Unsupported payment type", nil))
+		}
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
+
 	}
 }
 

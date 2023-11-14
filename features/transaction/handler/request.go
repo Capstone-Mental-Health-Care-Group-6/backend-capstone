@@ -14,4 +14,5 @@ type InputRequest struct {
 	PriceDuration     uint   `json:"price_duration"`
 	PriceCounseling   uint   `json:"price_counseling"`
 	PriceResult       uint   `json:"price_result"`
+	PaymentType       string `json:"payment_type"`
 }
