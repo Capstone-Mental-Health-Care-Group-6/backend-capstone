@@ -182,6 +182,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 					}
 				}
 			}
+			response["payment_type"] = input.PaymentType
 
 		} else if input.PaymentType == "bca" || input.PaymentType == "bni" || input.PaymentType == "bri" {
 
@@ -213,10 +214,10 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			}
 
 			serviceInput.UserID = input.UserID
-			serviceInput.MidtransID = chargeResp.TransactionID
+			serviceInput.MidtransID = chargeResp.OrderID
 			serviceInput.PaymentStatus = 0
 
-			fmt.Println("This is the data", chargeResp.TransactionID, serviceInput.PaymentStatus, serviceInput.PaymentType)
+			fmt.Println("This is the data", chargeResp.OrderID, serviceInput.PaymentStatus, serviceInput.PaymentType)
 
 			th.s.CreateTransaction(*serviceInput)
 
@@ -227,7 +228,9 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 					break
 				}
 			}
+			response["payment_type"] = input.PaymentType
 			response["va_account"] = vaAccount
+
 		} else {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Unsupported payment type", nil))
 		}
