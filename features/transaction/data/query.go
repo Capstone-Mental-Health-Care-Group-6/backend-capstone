@@ -54,13 +54,21 @@ func (ad *TransactionData) GetByID(id int) ([]transaction.TransactionInfo, error
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
 	var dbData = new(Transaction)
 
+	dbData.TopicID = newData.TopicID
+	dbData.PatientID = newData.PatientID
+	dbData.DoctorID = newData.DoctorID
+	dbData.MethodID = newData.MethodID
+	dbData.DurationID = newData.DurationID
+	dbData.CounselingID = newData.CounselingID
 	dbData.UserID = newData.UserID
-	dbData.MidtransID = newData.MidtransID
-
+	dbData.CounselingSession = newData.CounselingSession
+	dbData.CounselingType = newData.CounselingType
+	dbData.PriceMethod = newData.PriceMethod
+	dbData.PriceDuration = newData.PriceDuration
+	dbData.PriceCounseling = newData.PriceCounseling
 	dbData.PriceResult = newData.PriceResult
-
-	dbData.PaymentStatus = *&newData.PaymentStatus
-	dbData.PaymentType = *&newData.PaymentType
+	dbData.PaymentStatus = newData.PaymentStatus
+	dbData.PaymentType = newData.PaymentType
 
 	if err := ad.db.Create(dbData).Error; err != nil {
 		return nil, err
