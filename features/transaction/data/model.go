@@ -21,6 +21,6 @@ type Transaction struct {
 	PriceCounseling uint `gorm:"default:null;column:price_counseling"`
 	PriceResult     uint `gorm:"column:price_result"`
 
-	PaymentStatus uint   `gorm:"default:null;column:payment_status"`
-	PaymentType   string `gorm:"default:null;column:payment_type"`
+	PaymentStatus uint   `gorm:"column:payment_status"`
+	PaymentType   string `gorm:"column:payment_type"`
 }

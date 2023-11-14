@@ -17,7 +17,7 @@ func New(db *gorm.DB) transaction.TransactionDataInterface {
 	}
 }
 
-func (ad *TransactionData) GetAndUpdate(newData transaction.Transaction, id string) (bool, error) {
+func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, id string) (bool, error) {
 
 	var transaction Transaction
 	db := ad.db

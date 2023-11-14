@@ -62,7 +62,7 @@ type TransactionServiceInterface interface {
 	GetTransactions() ([]TransactionInfo, error)
 	GetTransaction(id int) ([]TransactionInfo, error)
 	CreateTransaction(newData Transaction) (*Transaction, error)
-	UpdateTransaction(newData Transaction, id string) (bool, error)
+	UpdateTransaction(newData UpdateTransaction, id string) (bool, error)
 }
 
 type TransactionDataInterface interface {
@@ -70,5 +70,5 @@ type TransactionDataInterface interface {
 	GetByID(id int) ([]TransactionInfo, error)
 	Insert(newData Transaction) (*Transaction, error)
 	// Update(newData Transaction, id int) (bool, error)
-	GetAndUpdate(newData Transaction, id string) (bool, error)
+	GetAndUpdate(newData UpdateTransaction, id string) (bool, error)
 }
