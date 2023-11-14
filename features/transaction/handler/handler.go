@@ -64,13 +64,13 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 						var serviceUpdate = new(transaction.UpdateTransaction)
 						serviceUpdate.PaymentStatus = 1 //CHALLENGE
 
-						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 
 					} else if transactionStatusResp.FraudStatus == "accept" {
 						var serviceUpdate = new(transaction.UpdateTransaction)
 						serviceUpdate.PaymentStatus = 2 //ACCEPT
 
-						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 						fmt.Println("Payment received")
 						// TODO set transaction status on your database to 'success'
 					}
@@ -78,7 +78,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 2 //ACCEPT
 
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 					fmt.Println("Payment status settlement")
 
 					// TODO set transaction status on your databaase to 'success'
@@ -88,7 +88,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 3 //DENIED
 
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 
 					// TODO you can ignore 'deny', because most of the time it allows payment retries
 					// and later can become success
@@ -98,7 +98,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 4 //FAILURE
 
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 
 					// TODO set transaction status on your databaase to 'failure'
 				} else if transactionStatusResp.TransactionStatus == "pending" {
@@ -106,7 +106,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 5 //WAITING
 
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
+					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
 				}
 			}
 		}
@@ -169,7 +169,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			}
 
 			serviceInput.UserID = input.UserID
-			serviceInput.MidtransID = chargeResp.TransactionID
+			serviceInput.MidtransID = chargeResp.OrderID
 			serviceInput.PaymentStatus = 0
 
 			if len(chargeResp.Actions) > 0 {
@@ -201,7 +201,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				PaymentType:  "bank_transfer",
 				BankTransfer: &coreapi.BankTransferDetails{Bank: midtransBank},
 				TransactionDetails: midtrans.TransactionDetails{
-					OrderID:  example.Random(),
+					OrderID:  "B-" + example.Random(),
 					GrossAmt: int64(result),
 				},
 			}
@@ -222,12 +222,11 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 			var vaAccount string
 			for _, va := range chargeResp.VaNumbers {
-				if va.Bank == "bca" {
+				if va.Bank == input.PaymentType {
 					vaAccount = va.VANumber
 					break
 				}
 			}
-
 			response["va_account"] = vaAccount
 		} else {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Unsupported payment type", nil))
@@ -246,20 +245,3 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 
 	return nil
 }
-
-// func (h *TransactionHandler) ChargeTransaction(c echo.Context) error {
-// 	// Get the request body
-// 	request := ChargeTransactionRequest{}
-// 	if err := c.Bind(request); err != nil {
-// 		return err
-// 	}
-
-// 	// Charge the transaction
-// 	response, err := h.transactionService.ChargeTransaction(context.Background(), request)
-// 	if err != nil {
-// 		return c.JSON(http.StatusInternalServerError, err)
-// 	}
-
-// 	// Return the response
-// 	return c.JSON(http.StatusOK, response)
-// }
