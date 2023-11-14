@@ -171,6 +171,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			serviceInput.UserID = input.UserID
 			serviceInput.MidtransID = chargeResp.OrderID
 			serviceInput.PaymentStatus = 0
+			th.s.CreateTransaction(*serviceInput)
 
 			if len(chargeResp.Actions) > 0 {
 				for _, action := range chargeResp.Actions {
