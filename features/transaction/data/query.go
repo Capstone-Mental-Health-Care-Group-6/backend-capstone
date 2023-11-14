@@ -2,6 +2,7 @@ package data
 
 import (
 	"FinalProject/features/transaction"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -16,36 +17,48 @@ func New(db *gorm.DB) transaction.TransactionDataInterface {
 	}
 }
 
-func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
-	// var listTransaction = []transaction.ArticleInfo{}
-	// var qry = ad.db.Table("articles").Select("transaction.*,users.name as user_name,article_categories.name as category_name").
-	// 	Joins("JOIN users on users.id = transaction.user_id").
-	// 	Joins("JOIN article_categories ON article_categories.id = transaction.category_id").
-	// 	Where("transaction.deleted_at is null").
-	// 	Scan(&listArticle)
+func (ad *TransactionData) GetAndUpdate(newData transaction.Transaction, id string) (bool, error) {
 
-	// if err := qry.Error; err != nil {
-	// 	logrus.Info("DB error : ", err.Error())
-	// 	return nil, err
+	var transaction Transaction
+	db := ad.db // Assuming ad.db is the GORM database instance
+	db.Where("midtrans_id = ?", id).First(&transaction)
+	// If you want to get the ID specifically, you can access it like this:
+	fmt.Println("This is the id: ", transaction.ID)
+	transactionID := transaction.ID
+
+	fmt.Println("This is the new payment status: ", newData.PaymentStatus)
+
+	// Now you can use transactionID in your update query
+	qry := db.Table("transactions").Where("id = ?", transactionID).Updates(Transaction{
+		// MidtransID: newData.MidtransID,
+		// PriceResult: newData.PriceResult,
+		PaymentStatus: newData.PaymentStatus,
+	})
+
+	// Check for errors in the update query
+	if qry.Error != nil {
+		// Handle the error
+		return false, nil
+	}
+	// var qry = ad.db.Table("transaction").Where("id = ?", id).Updates(Transaction{nil})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	// if dataCount := qry.RowsAffected; dataCount < 1 {
+	// 	return false, nil
 	// }
 
-	// return listArticle, nil
+	return true, nil
+}
+
+func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
+
 	return nil, nil
 }
 
 func (ad *TransactionData) GetByID(id int) ([]transaction.TransactionInfo, error) {
-	// var listArticle = []transaction.ArticleInfo{}
-	// var qry = ad.db.Table("articles").Select("transaction.*,users.name as user_name,article_categories.name as category_name").
-	// 	Joins("LEFT JOIN users on users.id = transaction.user_id").Joins("LEFT JOIN article_categories ON article_categories.id = transaction.category_id").
-	// 	Where("transaction.id = ?", id).
-	// 	Where("transaction.deleted_at is null").
-	// 	Scan(&listArticle)
-
-	// if err := qry.Error; err != nil {
-	// 	logrus.Info("DB error : ", err.Error())
-	// 	return nil, err
-	// }
-	// return listArticle, nil
 	return nil, nil
 }
 

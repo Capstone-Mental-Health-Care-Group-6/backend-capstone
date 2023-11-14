@@ -21,7 +21,7 @@ import (
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
-	"fmt"
+	// "fmt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -64,5 +64,5 @@ func main() {
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
+	e.Logger.Fatal(e.Start(":8080").Error())
 }
