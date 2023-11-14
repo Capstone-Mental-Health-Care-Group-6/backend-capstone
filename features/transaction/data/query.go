@@ -17,7 +17,7 @@ func New(db *gorm.DB) transaction.TransactionDataInterface {
 	}
 }
 
-func (ad *TransactionData) GetAndUpdate(newData transaction.Transaction, id string) (bool, error) {
+func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, id string) (bool, error) {
 
 	var transaction Transaction
 	db := ad.db
@@ -61,14 +61,20 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.DurationID = newData.DurationID
 	dbData.CounselingID = newData.CounselingID
 	dbData.UserID = newData.UserID
+	dbData.MidtransID = newData.MidtransID
+
 	dbData.CounselingSession = newData.CounselingSession
 	dbData.CounselingType = newData.CounselingType
+
 	dbData.PriceMethod = newData.PriceMethod
 	dbData.PriceDuration = newData.PriceDuration
 	dbData.PriceCounseling = newData.PriceCounseling
 	dbData.PriceResult = newData.PriceResult
+
 	dbData.PaymentStatus = newData.PaymentStatus
 	dbData.PaymentType = newData.PaymentType
+
+	fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
 
 	if err := ad.db.Create(dbData).Error; err != nil {
 		return nil, err

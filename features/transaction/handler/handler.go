@@ -61,13 +61,13 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 
 					if transactionStatusResp.FraudStatus == "challenge" {
 						fmt.Println("Payment status challenged")
-						var serviceUpdate = new(transaction.Transaction)
+						var serviceUpdate = new(transaction.UpdateTransaction)
 						serviceUpdate.PaymentStatus = 1 //CHALLENGE
 
 						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
 
 					} else if transactionStatusResp.FraudStatus == "accept" {
-						var serviceUpdate = new(transaction.Transaction)
+						var serviceUpdate = new(transaction.UpdateTransaction)
 						serviceUpdate.PaymentStatus = 2 //ACCEPT
 
 						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
@@ -75,7 +75,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 						// TODO set transaction status on your database to 'success'
 					}
 				} else if transactionStatusResp.TransactionStatus == "settlement" {
-					var serviceUpdate = new(transaction.Transaction)
+					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 2 //ACCEPT
 
 					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
@@ -85,7 +85,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 				} else if transactionStatusResp.TransactionStatus == "deny" {
 					fmt.Println("Payment status denied")
 
-					var serviceUpdate = new(transaction.Transaction)
+					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 3 //DENIED
 
 					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
@@ -95,7 +95,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 				} else if transactionStatusResp.TransactionStatus == "cancel" || transactionStatusResp.TransactionStatus == "expire" {
 					fmt.Println("Payment status failure")
 
-					var serviceUpdate = new(transaction.Transaction)
+					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 4 //FAILURE
 
 					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
@@ -103,7 +103,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 					// TODO set transaction status on your databaase to 'failure'
 				} else if transactionStatusResp.TransactionStatus == "pending" {
 					fmt.Println("Payment status pending")
-					var serviceUpdate = new(transaction.Transaction)
+					var serviceUpdate = new(transaction.UpdateTransaction)
 					serviceUpdate.PaymentStatus = 5 //WAITING
 
 					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.TransactionID)
@@ -162,6 +162,15 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			return err
 		}
 
+		serviceInput.UserID = input.UserID
+		serviceInput.MidtransID = chargeResp.TransactionID
+		serviceInput.PaymentStatus = 0
+		serviceInput.PaymentType = "Bank BCA"
+
+		fmt.Println("This is the data", chargeResp.TransactionID, serviceInput.PaymentStatus, serviceInput.PaymentType)
+
+		th.s.CreateTransaction(*serviceInput)
+
 		var vaAccount string
 		for _, va := range chargeResp.VaNumbers {
 			if va.Bank == "bca" {
@@ -169,13 +178,6 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				break
 			}
 		}
-
-		serviceInput.UserID = 1
-		serviceInput.MidtransID = chargeResp.TransactionID
-		serviceInput.PaymentStatus = 0
-		serviceInput.PaymentType = "Bank BCA"
-
-		th.s.CreateTransaction(*serviceInput)
 
 		response := make(map[string]interface{})
 		response["va_account"] = vaAccount

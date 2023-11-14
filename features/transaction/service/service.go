@@ -39,7 +39,7 @@ func (as *TransactionService) CreateTransaction(newData transaction.Transaction)
 	return result, nil
 }
 
-func (as *TransactionService) UpdateTransaction(newData transaction.Transaction, id string) (bool, error) {
+func (as *TransactionService) UpdateTransaction(newData transaction.UpdateTransaction, id string) (bool, error) {
 	result, err := as.d.GetAndUpdate(newData, id)
 
 	if err != nil {
