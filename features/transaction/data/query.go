@@ -68,7 +68,7 @@ func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
 
 func (ad *TransactionData) GetByID(id int) ([]transaction.Transaction, error) {
 	var transactionInfo []transaction.Transaction
-	var qry = ad.db.Table("transactions").Where("user_id = ?", id).First(&transactionInfo)
+	var qry = ad.db.Table("transactions").Where("user_id = ?", id).Find(&transactionInfo)
 
 	if qry.Error != nil {
 		return nil, qry.Error
