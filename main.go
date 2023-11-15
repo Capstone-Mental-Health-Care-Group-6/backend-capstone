@@ -6,6 +6,10 @@ import (
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
 
+	dataTransaksi "FinalProject/features/transaction/data"
+	handlerTransaksi "FinalProject/features/transaction/handler"
+	serviceTransaksi "FinalProject/features/transaction/service"
+
 	dataUser "FinalProject/features/users/data"
 	handlerUser "FinalProject/features/users/handler"
 	serviceUser "FinalProject/features/users/service"
@@ -17,7 +21,8 @@ import (
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
-	"fmt"
+
+	// "fmt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -34,6 +39,10 @@ func main() {
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
 	userController := handlerUser.NewHandler(userServices)
+
+	transaksiModel := dataTransaksi.New(db)
+	transaksiServices := serviceTransaksi.New(transaksiModel)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, *config)
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
@@ -52,8 +61,9 @@ func main() {
 		}))
 
 	routes.RouteUser(e, userController, *config)
+	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
+	e.Logger.Fatal(e.Start(":8080").Error())
 }
