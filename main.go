@@ -21,6 +21,7 @@ import (
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
+
 	// "fmt"
 
 	"github.com/labstack/echo/v4"
@@ -41,7 +42,7 @@ func main() {
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel)
-	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, *config)
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)

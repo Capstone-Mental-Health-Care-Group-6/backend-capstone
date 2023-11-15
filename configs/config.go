@@ -9,14 +9,17 @@ import (
 )
 
 type ProgrammingConfig struct {
-	ServerPort int
-	DBPort     int
-	DBHost     string
-	DBUser     string
-	DBPass     string
-	DBName     string
-	Secret     string
-	RefSecret  string
+	ServerPort          int
+	DBPort              int
+	DBHost              string
+	DBUser              string
+	DBPass              string
+	DBName              string
+	Secret              string
+	RefSecret           string
+	MidtransServerKey   string
+	MidtransClientKey   string
+	MidtransEnvironment string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -33,11 +36,6 @@ func InitConfig() *ProgrammingConfig {
 
 func loadConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
-	// err := godotenv.Load(".env")
-
-	// if err != nil {
-	// 	logrus.Error("Config : Cannot load config file,", err.Error())
-	// }
 
 	if val, found := os.LookupEnv("SERVER"); found {
 		port, err := strconv.Atoi(val)
@@ -81,6 +79,18 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("REFSECRET"); found {
 		res.RefSecret = val
+	}
+
+	if val, found := os.LookupEnv("MT_SERVER_KEY"); found {
+		res.MidtransServerKey = val
+	}
+
+	if val, found := os.LookupEnv("MT_CLIENT_KEY"); found {
+		res.MidtransClientKey = val
+	}
+
+	if val, found := os.LookupEnv("MT_ENV"); found {
+		res.MidtransEnvironment = val
 	}
 
 	return res

@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"FinalProject/configs"
 	"FinalProject/features/transaction"
 	"FinalProject/helper"
+	"FinalProject/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -20,17 +22,16 @@ type TransactionHandler struct {
 	s transaction.TransactionServiceInterface
 }
 
-func NewTransactionHandler(service transaction.TransactionServiceInterface) transaction.TransactionHandlerInterface {
+func NewTransactionHandler(service transaction.TransactionServiceInterface, c configs.ProgrammingConfig) transaction.TransactionHandlerInterface {
+	utils.InitMidtrans(c)
 	return &TransactionHandler{
+
 		s: service,
 	}
 }
 
 func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
-
-		midtrans.ServerKey = "SB-Mid-server-VXw9IjVeH_fZSL4IZykw3LR4"
-		midtrans.Environment = midtrans.Sandbox
 
 		cApi.New(midtrans.ServerKey, midtrans.Sandbox)
 
@@ -118,10 +119,6 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 
 func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
-
-		midtrans.ServerKey = "SB-Mid-server-VXw9IjVeH_fZSL4IZykw3LR4"
-		midtrans.ClientKey = "SB-Mid-client-hNK8kns-lS0o6nFn"
-		midtrans.Environment = midtrans.Sandbox
 
 		var input = new(InputRequest)
 		if err := c.Bind(&input); err != nil {
