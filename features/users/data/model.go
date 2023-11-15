@@ -16,3 +16,7 @@ type User struct {
 	TokenResetPass string         `gorm:"column:token_reset_pass;type:varchar(255)"`
 	Articles       []data.Article `gorm:"foreignKey:UserID"`
 }
+
+func (User) TableName() string {
+	return "users"
+}
