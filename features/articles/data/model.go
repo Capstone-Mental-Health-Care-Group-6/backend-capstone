@@ -14,3 +14,7 @@ type Article struct {
 	Status     string `gorm:"column:status;type:enum('Active','Inactive','Suspend')"`
 	Slug       string `gorm:"column:slug;type:varchar(255)"`
 }
+
+func (Article) TableName() string {
+	return "articles"
+}
