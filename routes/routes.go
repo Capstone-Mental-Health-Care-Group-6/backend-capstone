@@ -22,6 +22,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi/:id", th.GetTransaction())
 	e.GET("/transaksi", th.GetTransactions())
 	e.DELETE("/transaksi/:id", th.DeleteTransaction())
+	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {

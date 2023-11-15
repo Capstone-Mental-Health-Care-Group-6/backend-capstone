@@ -157,9 +157,6 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		if input.PaymentType == "qris" {
 			chargeReq := &coreapi.ChargeReq{
-				Qris: &coreapi.QrisDetails{
-					Acquirer: "EmpathiCare",
-				},
 				PaymentType: "qris",
 				TransactionDetails: midtrans.TransactionDetails{
 					OrderID:  "Q-" + example.Random(),
@@ -176,9 +173,12 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			serviceInput.MidtransID = chargeResp.OrderID
 			th.s.CreateTransaction(*serviceInput)
 
+			fmt.Println("Map qris: ", chargeResp)
+			fmt.Println("Map qris actions: ", chargeResp.Actions)
+
 			if len(chargeResp.Actions) > 0 {
 				for _, action := range chargeResp.Actions {
-					if action.Name == "deeplink-redirect" {
+					if action.Name == "generate-qr-code" {
 						deepLinkURL := action.URL
 						response["callback_url"] = deepLinkURL
 						// c.DepositService.InsertPaymentToken(Deposit.ID, chargeResp.TransactionID, "-", deepLinkURL)
@@ -308,6 +308,26 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 	}
 }
 
+func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		// id, err := strconv.Atoi(paramID)
+		// if err != nil {
+		// 	c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		// }
+
+		result, err := th.s.GetByIDMidtrans(paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
 func (th *TransactionHandler) DeleteTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var paramID = c.Param("id")
@@ -327,6 +347,11 @@ func (th *TransactionHandler) DeleteTransaction() echo.HandlerFunc {
 
 		fmt.Println(result)
 
-		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success", result))
+		if result {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Transaction deleted success", nil))
+		} else {
+			return c.JSON(http.StatusNotFound, helper.FormatResponse("Transaction not found", result))
+		}
+
 	}
 }

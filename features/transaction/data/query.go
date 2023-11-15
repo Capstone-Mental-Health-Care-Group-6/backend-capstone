@@ -42,9 +42,22 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 	return true, nil
 }
 
+func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.TransactionInfo, error) {
+	var transactionInfos []transaction.TransactionInfo
+	var qry = ad.db.Table("transactions").Select("user_id, payment_status, payment_type, midtrans_id, price_result").Where("midtrans_id = ?", id).Find(&transactionInfos)
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	fmt.Println("Json Response for query:", &qry)
+
+	return transactionInfos, nil
+}
+
 func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
-	var listTransactions []transaction.TransactionInfo
-	var qry = ad.db.Find(&listTransactions) // Fetch all transactions data from the table
+	var listTransactions []transaction.TransactionInfo            // Change to a slice to hold multiple transactions
+	var qry = ad.db.Table("transactions").Find(&listTransactions) // Fetch all transactions data from the table
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -53,15 +66,15 @@ func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
 	return listTransactions, nil
 }
 
-func (ad *TransactionData) GetByID(id int) ([]transaction.TransactionInfo, error) {
-	var transactionInfo transaction.TransactionInfo
-	var qry = ad.db.Table("transactions").Where("id = ?", id).First(&transactionInfo)
+func (ad *TransactionData) GetByID(id int) ([]transaction.Transaction, error) {
+	var transactionInfo []transaction.Transaction
+	var qry = ad.db.Table("transactions").Where("user_id = ?", id).First(&transactionInfo)
 
 	if qry.Error != nil {
 		return nil, qry.Error
 	}
 
-	return []transaction.TransactionInfo{transactionInfo}, nil
+	return transactionInfo, nil
 }
 
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
@@ -97,10 +110,11 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 }
 
 func (ad *TransactionData) Delete(id int) (bool, error) {
-	var deleteData = new(Transaction)
+	var transactionInfo transaction.Transaction
+	var qry = ad.db.Table("transactions").Where("id = ?", id).Delete(&transactionInfo)
 
-	if err := ad.db.Where("id = ?", id).Delete(&deleteData).Error; err != nil {
-		return false, err
+	if qry.Error != nil {
+		return false, qry.Error
 	}
 
 	return true, nil

@@ -24,10 +24,18 @@ func (as *TransactionService) GetTransactions() ([]transaction.TransactionInfo, 
 	return result, nil
 }
 
-func (as *TransactionService) GetTransaction(id int) ([]transaction.TransactionInfo, error) {
+func (as *TransactionService) GetTransaction(id int) ([]transaction.Transaction, error) {
 	result, err := as.d.GetByID(id)
 	if err != nil {
 		return nil, errors.New("Get By ID Process Failed")
+	}
+	return result, nil
+}
+
+func (as *TransactionService) GetByIDMidtrans(id string) ([]transaction.TransactionInfo, error) {
+	result, err := as.d.GetByIDMidtrans(id)
+	if err != nil {
+		return nil, errors.New("Get By ID Midtrans Process Failed")
 	}
 	return result, nil
 }
