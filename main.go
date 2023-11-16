@@ -11,13 +11,13 @@ import (
 	handlerUser "FinalProject/features/users/handler"
 	serviceUser "FinalProject/features/users/service"
 
+	dataPatient "FinalProject/features/users/data"
+	handlerPatient "FinalProject/features/users/handler"
+	servicePatient "FinalProject/features/users/service"
+
 	dataArticleCategory "FinalProject/features/article_categories/data"
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
 	serviceArticleCategory "FinalProject/features/article_categories/service"
-
-	dataPatient "FinalProject/features/patients/data"
-	handlerPatient "FinalProject/features/patients/handler"
-	servicePatient "FinalProject/features/patients/service"
 
 	"FinalProject/helper"
 	"FinalProject/routes"
@@ -50,9 +50,9 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
-	patientModel := dataPatient.New(db)
-	patientServices := servicePatient.New(patientModel, cld)
-	patientController := handlerPatient.NewHandler(patientServices)
+	patientModel := dataPatient.NewPatient(db)
+	patientServices := servicePatient.NewPatient(patientModel, cld)
+	patientController := handlerPatient.NewHandlerPatient(patientServices)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 

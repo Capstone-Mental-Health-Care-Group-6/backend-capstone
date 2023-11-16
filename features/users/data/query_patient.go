@@ -1,7 +1,7 @@
 package data
 
 import (
-	"FinalProject/features/patients"
+	"FinalProject/features/users"
 	"gorm.io/gorm"
 )
 
@@ -9,14 +9,14 @@ type PatientData struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) patients.PatientDataInterface {
+func NewPatient(db *gorm.DB) users.PatientDataInterface {
 	return &PatientData{
 		db: db,
 	}
 }
 
-func (pdata *PatientData) GetAll() ([]patients.Patiententity, error) {
-	var listPatient = []patients.Patiententity{}
+func (pdata *PatientData) GetAll() ([]users.Patiententity, error) {
+	var listPatient = []users.Patiententity{}
 	var qry = pdata.db.Table("patients").Select("patients.*").
 		Where("patients.deleted_at is null").
 		Scan(&listPatient)
@@ -28,8 +28,8 @@ func (pdata *PatientData) GetAll() ([]patients.Patiententity, error) {
 	return listPatient, nil
 }
 
-func (pdata *PatientData) GetByID(id int) ([]patients.Patiententity, error) {
-	var listPatient = []patients.Patiententity{}
+func (pdata *PatientData) GetByID(id int) ([]users.Patiententity, error) {
+	var listPatient = []users.Patiententity{}
 	var qry = pdata.db.Table("patients").Select("patients.*").
 		Where("patients.id = ?", id).
 		Where("patients.deleted_at is null").
@@ -41,7 +41,7 @@ func (pdata *PatientData) GetByID(id int) ([]patients.Patiententity, error) {
 	return listPatient, nil
 }
 
-func (pdata *PatientData) Insert(newData patients.Patiententity) (*patients.Patiententity, error) {
+func (pdata *PatientData) Insert(newData users.Patiententity) (*users.Patiententity, error) {
 	var dbData = new(Patient)
 	dbData.Name = newData.Name
 	dbData.UserID = newData.UserID

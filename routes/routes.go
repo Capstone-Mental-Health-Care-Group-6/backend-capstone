@@ -4,7 +4,6 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
-	"FinalProject/features/patients"
 	"FinalProject/features/users"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -32,7 +31,7 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
-func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
+func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/patients", ph.GetPatients())
 	e.GET("/patients/:id", ph.GetPatient())
 	e.POST("/patients/register", ph.CreatePatient())

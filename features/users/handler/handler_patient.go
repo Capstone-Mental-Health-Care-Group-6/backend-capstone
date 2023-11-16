@@ -1,7 +1,7 @@
-package handlerimport
+package handler
 
 import (
-	"FinalProject/features/patients"
+	"FinalProject/features/users"
 	"FinalProject/helper"
 	"net/http"
 	"strconv"
@@ -10,10 +10,10 @@ import (
 )
 
 type PatientHandler struct {
-	svc patients.PatientServiceInterface
+	svc users.PatientServiceInterface
 }
 
-func NewHandler(service patients.PatientServiceInterface) patients.PatientHandlerInterface {
+func NewHandlerPatient(service users.PatientServiceInterface) users.PatientHandlerInterface {
 	return &PatientHandler{
 		svc: service,
 	}
@@ -75,12 +75,12 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed", nil))
 		}
 
-		uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
+		uploadUrlPhoto, err := mdl.svc.PhotoUpload(users.AvatarPhoto{Avatar: formPhoto})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed", nil))
 		}
 
-		var serviceInput = new(patients.Patiententity)
+		var serviceInput = new(users.Patiententity)
 		serviceInput.Name = input.Name
 		serviceInput.UserID = input.UserID
 		serviceInput.DateOfBirth = input.DateOfBirth

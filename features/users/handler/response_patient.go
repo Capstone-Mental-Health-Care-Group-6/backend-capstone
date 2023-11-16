@@ -1,4 +1,4 @@
-package handlerimport
+package handler
 
 type PatientResponse struct {
 	ID             uint   `json:"id"`

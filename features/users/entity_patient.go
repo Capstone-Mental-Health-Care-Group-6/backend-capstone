@@ -1,4 +1,4 @@
-package patients
+package users
 
 import (
 	"github.com/labstack/echo/v4"
