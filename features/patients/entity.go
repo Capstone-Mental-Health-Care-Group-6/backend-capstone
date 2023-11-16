@@ -6,6 +6,7 @@ import (
 )
 
 type Patiententity struct {
+	ID             uint   `json:"id"`
 	Name           string `json:"name"`
 	UserID         uint   `json:"user_id"`
 	DateOfBirth    string `json:"date_of_birth"`

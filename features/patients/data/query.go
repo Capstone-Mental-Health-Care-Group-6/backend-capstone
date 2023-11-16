@@ -42,10 +42,10 @@ func (pdata *PatientData) GetByID(id int) ([]patients.Patiententity, error) {
 }
 
 func (pdata *PatientData) Insert(newData patients.Patiententity) (*patients.Patiententity, error) {
-
 	var dbData = new(Patient)
 	dbData.Name = newData.Name
 	dbData.UserID = newData.UserID
+	dbData.DateOfBirth = newData.DateOfBirth
 	dbData.PlaceOfBirth = newData.PlaceOfBirth
 	dbData.Gender = newData.Gender
 	dbData.MarriageStatus = newData.MarriageStatus
