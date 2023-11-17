@@ -3,9 +3,8 @@ package database
 import (
 	"FinalProject/configs"
 	"fmt"
-	// "fmt"
-	"log"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -16,7 +15,7 @@ func InitDB(c configs.ProgrammingConfig) *gorm.DB {
 
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Cannot connect database : ", err.Error())
+		logrus.Fatal("Cannot connect database : ", err.Error())
 	}
 
 	return db

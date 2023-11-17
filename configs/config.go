@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	// "github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/sirupsen/logrus"
 )
 
