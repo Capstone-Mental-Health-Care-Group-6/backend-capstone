@@ -12,4 +12,5 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataUser.User{})
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
 	db.AutoMigrate(DataArticle.Article{})
+	db.AutoMigrate(DataUser.Patient{})
 }

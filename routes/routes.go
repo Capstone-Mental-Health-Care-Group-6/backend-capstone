@@ -30,3 +30,9 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
+
+func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/patients", ph.GetPatients())
+	e.GET("/patients/:id", ph.GetPatient())
+	e.POST("/patients/register", ph.CreatePatient())
+}

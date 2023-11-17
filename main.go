@@ -5,10 +5,15 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	"FinalProject/utils/cloudinary"
 
 	dataUser "FinalProject/features/users/data"
 	handlerUser "FinalProject/features/users/handler"
 	serviceUser "FinalProject/features/users/service"
+
+	dataPatient "FinalProject/features/users/data"
+	handlerPatient "FinalProject/features/users/handler"
+	servicePatient "FinalProject/features/users/service"
 
 	dataArticleCategory "FinalProject/features/article_categories/data"
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
@@ -25,10 +30,12 @@ import (
 
 func main() {
 	e := echo.New()
-	var config = configs.InitConfig()
+	config := configs.InitConfig()
 
-	db := database.InitDB(*config)
+	var db = database.InitDB(*config)
 	database.Migrate(db)
+
+	var cld = cloudinary.InitCloud(*config)
 
 	userModel := dataUser.New(db)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
@@ -43,6 +50,10 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
+	patientModel := dataPatient.NewPatient(db)
+	patientServices := servicePatient.NewPatient(patientModel, cld)
+	patientController := handlerPatient.NewHandlerPatient(patientServices)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -54,6 +65,7 @@ func main() {
 	routes.RouteUser(e, userController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
+	routes.RoutePatient(e, patientController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
