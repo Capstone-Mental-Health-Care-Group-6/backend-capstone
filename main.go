@@ -5,6 +5,7 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
 	handlerTransaksi "FinalProject/features/transaction/handler"
@@ -21,6 +22,7 @@ import (
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
+	"FinalProject/utils/midtrans"
 
 	// "fmt"
 
@@ -35,14 +37,16 @@ func main() {
 	db := database.InitDB(*config)
 	database.Migrate(db)
 
+	midtrans := midtrans.InitMidtrans(*config)
+
 	userModel := dataUser.New(db)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
 	userController := handlerUser.NewHandler(userServices)
 
 	transaksiModel := dataTransaksi.New(db)
-	transaksiServices := serviceTransaksi.New(transaksiModel)
-	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, *config)
+	transaksiServices := serviceTransaksi.New(transaksiModel, midtrans)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
@@ -65,5 +69,5 @@ func main() {
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 
-	e.Logger.Fatal(e.Start(":8080").Error())
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

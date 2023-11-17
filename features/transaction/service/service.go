@@ -2,17 +2,20 @@ package service
 
 import (
 	transaction "FinalProject/features/transaction"
+	"FinalProject/utils/midtrans"
 	"errors"
 	"fmt"
 )
 
 type TransactionService struct {
-	d transaction.TransactionDataInterface
+	d  transaction.TransactionDataInterface
+	mt midtrans.MidtransService
 }
 
-func New(data transaction.TransactionDataInterface) transaction.TransactionServiceInterface {
+func New(data transaction.TransactionDataInterface, mid midtrans.MidtransService) transaction.TransactionServiceInterface {
 	return &TransactionService{
-		d: data,
+		d:  data,
+		mt: mid,
 	}
 }
 
@@ -40,17 +43,31 @@ func (as *TransactionService) GetByIDMidtrans(id string) ([]transaction.Transact
 	return result, nil
 }
 
-func (as *TransactionService) CreateTransaction(newData transaction.Transaction) (*transaction.Transaction, error) {
+func (as *TransactionService) CreateTransaction(newData transaction.Transaction) (*transaction.Transaction, map[string]interface{}, error) {
+	totalPrice := newData.PriceMethod + newData.PriceDuration + newData.PriceCounseling
+
+	chargeResp, response, err := as.mt.GenerateTransaction(int(totalPrice), newData.PaymentType)
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return nil, nil, errors.New("Generate Transaction Failed")
+	}
+
+	newData.MidtransID = chargeResp.OrderID
+
 	result, err := as.d.Insert(newData)
+
 	fmt.Println("Ini new data: ", newData)
 	if err != nil {
-		return nil, errors.New("Insert Process Failed")
+		return nil, nil, errors.New("Insert Process Failed")
 	}
-	return result, nil
+	return result, response, nil
 }
 
-func (as *TransactionService) UpdateTransaction(newData transaction.UpdateTransaction, id string) (bool, error) {
-	result, err := as.d.GetAndUpdate(newData, id)
+func (as *TransactionService) UpdateTransaction(notificationPayload map[string]interface{}, newData transaction.UpdateTransaction) (bool, error) {
+	paymentStatus, orderId, err := as.mt.TransactionStatus(notificationPayload)
+	newData.PaymentStatus = uint(paymentStatus)
+	result, err := as.d.GetAndUpdate(newData, orderId)
 
 	if err != nil {
 		return false, errors.New("Update Process Failed")

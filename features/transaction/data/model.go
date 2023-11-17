@@ -24,3 +24,7 @@ type Transaction struct {
 	PaymentStatus uint   `gorm:"column:payment_status"`
 	PaymentType   string `gorm:"column:payment_type"`
 }
+
+func (Transaction) TableName() string {
+	return "transactions"
+}

@@ -1,40 +1,30 @@
 package handler
 
 import (
-	"FinalProject/configs"
 	"FinalProject/features/transaction"
 	"FinalProject/helper"
-	"FinalProject/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/midtrans/midtrans-go"
-	"github.com/midtrans/midtrans-go/coreapi"
-	"github.com/midtrans/midtrans-go/example"
 )
-
-var cApi coreapi.Client
 
 type TransactionHandler struct {
 	s transaction.TransactionServiceInterface
 }
 
-func NewTransactionHandler(service transaction.TransactionServiceInterface, c configs.ProgrammingConfig) transaction.TransactionHandlerInterface {
-	utils.InitMidtrans(c)
+func NewTransactionHandler(service transaction.TransactionServiceInterface) transaction.TransactionHandlerInterface {
+	// mt.InitMidtrans(c)
 	return &TransactionHandler{
-
 		s: service,
 	}
 }
 
 func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
-
-		cApi.New(midtrans.ServerKey, midtrans.Sandbox)
-
 		var notificationPayload map[string]interface{}
 
 		err := json.NewDecoder(c.Request().Body).Decode(&notificationPayload)
@@ -49,71 +39,22 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 
 		fmt.Println("Notification Payload:", notificationPayload)
 
-		orderId, exists := notificationPayload["order_id"].(string)
-		if !exists {
-			return echo.NewHTTPError(http.StatusBadRequest, "order_id not found")
-		}
-
-		transactionStatusResp, e := cApi.CheckTransaction(orderId)
-		if e != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, e.GetMessage())
-		} else {
-			if transactionStatusResp != nil {
-				if transactionStatusResp.TransactionStatus == "capture" {
-
-					if transactionStatusResp.FraudStatus == "challenge" {
-						fmt.Println("Payment status challenged")
-						var serviceUpdate = new(transaction.UpdateTransaction)
-						serviceUpdate.PaymentStatus = 1 //CHALLENGE
-
-						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-
-					} else if transactionStatusResp.FraudStatus == "accept" {
-						var serviceUpdate = new(transaction.UpdateTransaction)
-						serviceUpdate.PaymentStatus = 2 //ACCEPT
-
-						th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-						fmt.Println("Payment received")
-						// TODO set transaction status on your database to 'success'
-					}
-				} else if transactionStatusResp.TransactionStatus == "settlement" {
-					var serviceUpdate = new(transaction.UpdateTransaction)
-					serviceUpdate.PaymentStatus = 2 //ACCEPT
-
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-					fmt.Println("Payment status settlement")
-
-					// TODO set transaction status on your databaase to 'success'
-				} else if transactionStatusResp.TransactionStatus == "deny" {
-					fmt.Println("Payment status denied")
-
-					var serviceUpdate = new(transaction.UpdateTransaction)
-					serviceUpdate.PaymentStatus = 3 //DENIED
-
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-
-					// TODO you can ignore 'deny', because most of the time it allows payment retries
-					// and later can become success
-				} else if transactionStatusResp.TransactionStatus == "cancel" || transactionStatusResp.TransactionStatus == "expire" {
-					fmt.Println("Payment status failure")
-
-					var serviceUpdate = new(transaction.UpdateTransaction)
-					serviceUpdate.PaymentStatus = 4 //FAILURE
-
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-
-					// TODO set transaction status on your databaase to 'failure'
-				} else if transactionStatusResp.TransactionStatus == "pending" {
-					fmt.Println("Payment status pending")
-					var serviceUpdate = new(transaction.UpdateTransaction)
-					serviceUpdate.PaymentStatus = 5 //WAITING
-
-					th.s.UpdateTransaction(*serviceUpdate, transactionStatusResp.OrderID)
-				}
+		if err != nil {
+			if strings.Contains(err.Error(), "Order ID Not Found") {
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Order ID Not Found", nil))
 			}
+
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.String(http.StatusOK, "ok")
+		var serviceUpdate = new(transaction.UpdateTransaction)
+
+		res, err := th.s.UpdateTransaction(notificationPayload, *serviceUpdate)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
 	}
 }
 
@@ -148,126 +89,13 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.CounselingType = input.CounselingType
 		serviceInput.PaymentType = input.PaymentType
 
-		result := input.PriceMethod + input.PriceDuration + input.PriceCounseling
+		_, response, err := th.s.CreateTransaction(*serviceInput)
 
-		response := make(map[string]interface{})
-
-		if input.PaymentType == "qris" {
-			chargeReq := &coreapi.ChargeReq{
-				PaymentType: "qris",
-				TransactionDetails: midtrans.TransactionDetails{
-					OrderID:  "Q-" + example.Random(),
-					GrossAmt: int64(result),
-				},
-			}
-
-			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
-			if err != nil {
-				fmt.Println("Error: ", err)
-				return err
-			}
-
-			serviceInput.MidtransID = chargeResp.OrderID
-			th.s.CreateTransaction(*serviceInput)
-
-			fmt.Println("Map qris: ", chargeResp)
-			fmt.Println("Map qris actions: ", chargeResp.Actions)
-
-			if len(chargeResp.Actions) > 0 {
-				for _, action := range chargeResp.Actions {
-					if action.Name == "generate-qr-code" {
-						deepLinkURL := action.URL
-						response["callback_url"] = deepLinkURL
-						// c.DepositService.InsertPaymentToken(Deposit.ID, chargeResp.TransactionID, "-", deepLinkURL)
-						break
-					}
-				}
-			}
-			response["payment_type"] = input.PaymentType
-
-		} else if input.PaymentType == "gopay" {
-			chargeReq := &coreapi.ChargeReq{
-				Gopay: &coreapi.GopayDetails{
-					EnableCallback: true,
-				},
-				PaymentType: "gopay",
-				TransactionDetails: midtrans.TransactionDetails{
-					OrderID:  "G-" + example.Random(),
-					GrossAmt: int64(result),
-				},
-			}
-
-			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
-			if err != nil {
-				fmt.Println("Error: ", err)
-				return err
-			}
-
-			serviceInput.MidtransID = chargeResp.OrderID
-			th.s.CreateTransaction(*serviceInput)
-
-			if len(chargeResp.Actions) > 0 {
-				for _, action := range chargeResp.Actions {
-					if action.Name == "deeplink-redirect" {
-						deepLinkURL := action.URL
-						response["callback_url"] = deepLinkURL
-						// c.DepositService.InsertPaymentToken(Deposit.ID, chargeResp.TransactionID, "-", deepLinkURL)
-						break
-					}
-				}
-			}
-			response["payment_type"] = input.PaymentType
-
-		} else if input.PaymentType == "bca" || input.PaymentType == "bni" || input.PaymentType == "bri" {
-
-			var midtransBank midtrans.Bank
-			switch input.PaymentType {
-			case "bca":
-				midtransBank = midtrans.BankBca
-			case "bri":
-				midtransBank = midtrans.BankBri
-			case "bni":
-				midtransBank = midtrans.BankBni
-			default:
-				midtransBank = midtrans.BankBca
-			}
-
-			chargeReq := &coreapi.ChargeReq{
-				PaymentType:  "bank_transfer",
-				BankTransfer: &coreapi.BankTransferDetails{Bank: midtransBank},
-				TransactionDetails: midtrans.TransactionDetails{
-					OrderID:  "B-" + example.Random(),
-					GrossAmt: int64(result),
-				},
-			}
-
-			chargeResp, err := coreapi.ChargeTransaction(chargeReq)
-			if err != nil {
-				fmt.Println("Error: ", err)
-				return err
-			}
-
-			serviceInput.MidtransID = chargeResp.OrderID
-
-			fmt.Println("This is the data", chargeResp.OrderID, serviceInput.PaymentStatus, serviceInput.PaymentType)
-
-			th.s.CreateTransaction(*serviceInput)
-
-			var vaAccount string
-			for _, va := range chargeResp.VaNumbers {
-				if va.Bank == input.PaymentType {
-					vaAccount = va.VANumber
-					break
-				}
-			}
-			response["payment_type"] = input.PaymentType
-			response["va_account"] = vaAccount
-
-		} else {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Unsupported payment type", nil))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Transaction", response))
 
 	}
 }

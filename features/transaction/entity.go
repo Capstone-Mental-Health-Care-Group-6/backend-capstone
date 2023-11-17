@@ -49,9 +49,9 @@ type TransactionHandlerInterface interface {
 type TransactionServiceInterface interface {
 	GetTransactions() ([]TransactionInfo, error)
 	GetTransaction(id int) ([]Transaction, error)
-	CreateTransaction(newData Transaction) (*Transaction, error)
+	CreateTransaction(newData Transaction) (*Transaction, map[string]interface{}, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
-	UpdateTransaction(newData UpdateTransaction, id string) (bool, error)
+	UpdateTransaction(notificationPayload map[string]interface{}, newData UpdateTransaction) (bool, error)
 	DeleteTransaction(id int) (bool, error)
 }
 
