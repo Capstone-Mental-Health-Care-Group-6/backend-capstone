@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type TransactionHandler struct {
@@ -33,7 +34,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		}
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			logrus.Info("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -63,7 +64,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		var input = new(InputRequest)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			logrus.Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -105,7 +106,7 @@ func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 		result, err := th.s.GetTransactions()
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
+			logrus.Info("Handler : Get All Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -118,14 +119,14 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			logrus.Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		result, err := th.s.GetTransaction(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -138,14 +139,14 @@ func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		// id, err := strconv.Atoi(paramID)
 		// if err != nil {
-		// 	c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+		// 	logrus.Info("Handler : Param ID Error : ", err.Error())
 		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		// }
 
 		result, err := th.s.GetByIDMidtrans(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -159,14 +160,14 @@ func (th *TransactionHandler) DeleteTransaction() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			logrus.Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		result, err := th.s.DeleteTransaction(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Delete Process Error : ", err.Error())
+			logrus.Info("Handler : Delete Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
