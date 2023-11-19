@@ -160,7 +160,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		var serviceInput = new(doctor.Doctor)
 
-		serviceInput.UserID = 3
+		serviceInput.UserID = input.UserID
 		serviceInput.DoctorName = input.DoctorName
 		serviceInput.DoctorExperience = input.DoctorExperience
 		serviceInput.DoctorDescription = input.DoctorDescription
