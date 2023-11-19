@@ -4,6 +4,7 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
+	"FinalProject/features/doctor"
 	"FinalProject/features/users"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -35,4 +36,10 @@ func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.Pr
 	e.GET("/patients", ph.GetPatients())
 	e.GET("/patients/:id", ph.GetPatient())
 	e.POST("/patients/register", ph.CreatePatient())
+}
+
+func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/doctor", ph.GetDoctors())
+	e.GET("/doctor/:id", ph.GetDoctor())
+	e.POST("/doctor/register", ph.CreateDoctor())
 }

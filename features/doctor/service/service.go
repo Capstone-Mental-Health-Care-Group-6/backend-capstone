@@ -5,6 +5,10 @@ import (
 	"FinalProject/helper"
 	"FinalProject/utils/cloudinary"
 	"errors"
+	"os"
+	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type DoctorService struct {
@@ -82,4 +86,26 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 		return "", errors.New("Upload Ijazah Failed")
 	}
 	return uploadUrl, nil
+}
+
+func (psvc *DoctorService) JwtExtractToken(authorizationHeader string) (doctor.JwtMapClaims, error) {
+	tokenString := strings.TrimPrefix(authorizationHeader, "Bearer ")
+	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return os.Getenv("SECRET"), nil
+	})
+
+	if err != nil {
+		return doctor.JwtMapClaims{}, err
+	}
+
+	if token.Valid {
+		var claims = token.Claims.(jwt.MapClaims)
+		result := doctor.JwtMapClaims{}
+		result.ID = claims["id"].(uint)
+		result.Role = claims["role"].(uint)
+		result.Status = claims["status"].(uint)
+		return result, nil
+	}
+
+	return doctor.JwtMapClaims{}, nil
 }

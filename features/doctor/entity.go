@@ -29,6 +29,12 @@ type Doctor struct {
 	DoctorStatus   string `json:"doctor_status"`
 }
 
+type JwtMapClaims struct {
+	ID     uint `json:"id"`
+	Role   uint `json:"role"`
+	Status uint `json:"status"`
+}
+
 type DoctorAvatarPhoto struct {
 	DoctorAvatar multipart.File `json:"doctor_avatar"`
 }
@@ -64,6 +70,7 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+	JwtExtractToken(authorizationHeader string) (JwtMapClaims, error)
 }
 
 type DoctorDataInterface interface {
