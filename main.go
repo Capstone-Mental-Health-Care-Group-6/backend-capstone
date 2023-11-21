@@ -15,6 +15,10 @@ import (
 	handlerPatient "FinalProject/features/users/handler"
 	servicePatient "FinalProject/features/users/service"
 
+	dataDoctor "FinalProject/features/doctor/data"
+	handlerDoctor "FinalProject/features/doctor/handler"
+	serviceDoctor "FinalProject/features/doctor/service"
+
 	dataArticleCategory "FinalProject/features/article_categories/data"
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
 	serviceArticleCategory "FinalProject/features/article_categories/service"
@@ -54,6 +58,10 @@ func main() {
 	patientServices := servicePatient.NewPatient(patientModel, cld)
 	patientController := handlerPatient.NewHandlerPatient(patientServices)
 
+	doctorModel := dataDoctor.NewDoctor(db)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
+	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -66,6 +74,7 @@ func main() {
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 	routes.RoutePatient(e, patientController, *config)
+	routes.RouteDoctor(e, doctorController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
