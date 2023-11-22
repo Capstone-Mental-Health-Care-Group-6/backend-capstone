@@ -26,16 +26,24 @@ func New(data transaction.TransactionDataInterface, cloudinary cloudinary.Cloudi
 	}
 }
 
-func (as *TransactionService) GetTransactions() ([]transaction.TransactionInfo, error) {
-	result, err := as.d.GetAll()
+func (as *TransactionService) GetTransactions(sort string) ([]transaction.TransactionInfo, error) {
+	result, err := as.d.GetAll(sort)
 	if err != nil {
 		return nil, errors.New("Get All Transactions Failed")
 	}
 	return result, nil
 }
 
-func (as *TransactionService) GetTransaction(id int) ([]transaction.Transaction, error) {
-	result, err := as.d.GetByID(id)
+// func (as *TransactionService) GetTransactionsSort(sort string) ([]transaction.TransactionInfo, error) {
+// 	result, err := as.d.GetAllSort(sort)
+// 	if err != nil {
+// 		return nil, errors.New("Get All Transactions with Sort Failed")
+// 	}
+// 	return result, nil
+// }
+
+func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.Transaction, error) {
+	result, err := as.d.GetByID(id, sort)
 	if err != nil {
 		return nil, errors.New("Get By ID Process Failed")
 	}

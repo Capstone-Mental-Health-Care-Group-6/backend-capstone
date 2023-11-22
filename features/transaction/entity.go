@@ -66,8 +66,9 @@ type TransactionHandlerInterface interface {
 }
 
 type TransactionServiceInterface interface {
-	GetTransactions() ([]TransactionInfo, error)
-	GetTransaction(id int) ([]Transaction, error)
+	GetTransactions(sort string) ([]TransactionInfo, error)
+	// GetTransactionsSort(sort string) ([]TransactionInfo, error)
+	GetTransaction(id int, sort string) ([]Transaction, error)
 	CreateTransaction(newData Transaction) (*Transaction, map[string]interface{}, error)
 	CreateManualTransaction(newData Transaction) (*Transaction, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
@@ -78,8 +79,9 @@ type TransactionServiceInterface interface {
 }
 
 type TransactionDataInterface interface {
-	GetAll() ([]TransactionInfo, error)
-	GetByID(id int) ([]Transaction, error)
+	GetAll(sort string) ([]TransactionInfo, error)
+	// GetAllSort(sort string) ([]TransactionInfo, error)
+	GetByID(id int, sort string) ([]Transaction, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
 	Insert(newData Transaction) (*Transaction, error)
 	Update(newData UpdateTransactionManual, id int) (bool, error)

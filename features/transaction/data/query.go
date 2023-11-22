@@ -56,9 +56,26 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 	return transactionInfos, nil
 }
 
-func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
-	var listTransactions []transaction.TransactionInfo            // Change to a slice to hold multiple transactions
-	var qry = ad.db.Table("transactions").Find(&listTransactions) // Fetch all transactions data from the table
+// func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
+// 	var listTransactions []transaction.TransactionInfo            // Change to a slice to hold multiple transactions
+// 	var qry = ad.db.Table("transactions").Find(&listTransactions) // Fetch all transactions data from the table
+
+// 	if qry.Error != nil {
+// 		return nil, qry.Error
+// 	}
+
+// 	return listTransactions, nil
+// }
+
+func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, error) {
+	var listTransactions []transaction.TransactionInfo
+	var qry = ad.db.Table("transactions")
+
+	if sort != "" {
+		qry = qry.Where("payment_type = ?", sort)
+	}
+
+	qry = qry.Find(&listTransactions)
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -67,9 +84,15 @@ func (ad *TransactionData) GetAll() ([]transaction.TransactionInfo, error) {
 	return listTransactions, nil
 }
 
-func (ad *TransactionData) GetByID(id int) ([]transaction.Transaction, error) {
+func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transaction, error) {
 	var transactionInfo []transaction.Transaction
-	var qry = ad.db.Table("transactions").Where("user_id = ?", id).Find(&transactionInfo)
+	var qry = ad.db.Table("transactions").Where("user_id = ?", id)
+
+	if sort != "" {
+		qry = qry.Where("payment_type = ?", sort)
+	}
+
+	qry = qry.Find(&transactionInfo)
 
 	if qry.Error != nil {
 		return nil, qry.Error

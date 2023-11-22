@@ -77,7 +77,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.PriceResult = input.PriceMethod + input.PriceDuration + input.PriceCounseling
 
 		serviceInput.UserID = input.UserID
-		serviceInput.PaymentStatus = 0
+		serviceInput.PaymentStatus = 5
 
 		serviceInput.TopicID = input.TopicID
 		serviceInput.PatientID = input.PatientID
@@ -145,7 +145,23 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		result, err := th.s.GetTransactions()
+		sortByPaymentType := c.QueryParam("payment_type")
+
+		if sortByPaymentType != "" {
+
+			result, err := th.s.GetTransactions(sortByPaymentType)
+
+			if err != nil {
+				logrus.Info("Handler : Get All Process Error : ", err.Error())
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			}
+
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+
+		}
+
+		blank := ""
+		result, err := th.s.GetTransactions(blank)
 
 		if err != nil {
 			logrus.Info("Handler : Get All Process Error : ", err.Error())
@@ -158,6 +174,7 @@ func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 
 func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		sortByPaymentType := c.QueryParam("payment_type")
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -165,7 +182,22 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
-		result, err := th.s.GetTransaction(id)
+		if sortByPaymentType != "" {
+
+			result, err := th.s.GetTransaction(id, sortByPaymentType)
+
+			if err != nil {
+				logrus.Info("Handler : Get All Process Error : ", err.Error())
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			}
+
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+
+		}
+
+		blank := ""
+
+		result, err := th.s.GetTransaction(id, blank)
 
 		if err != nil {
 			logrus.Info("Handler : Get By ID Process Error : ", err.Error())

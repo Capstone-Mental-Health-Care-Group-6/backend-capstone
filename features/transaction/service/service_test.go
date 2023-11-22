@@ -18,7 +18,8 @@ func TestGetTransactions(t *testing.T) {
 
 	service := service.New(mockData, nil, mockMidtrans)
 
-	result, err := service.GetTransactions()
+	blank := ""
+	result, err := service.GetTransactions(blank)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, expectedTransactions, result)
@@ -35,7 +36,8 @@ func TestGetTransaction(t *testing.T) {
 	mockData.On("GetByID", 1).Return(expectedTransaction, nil).Once()
 
 	service := service.New(mockData, nil, mockMidtrans)
-	result, err := service.GetTransaction(1)
+	blank := ""
+	result, err := service.GetTransaction(1, blank)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, expectedTransaction, result)

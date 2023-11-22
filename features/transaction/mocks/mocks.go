@@ -17,12 +17,12 @@ type MockMidtransServiceInterface struct {
 	mock.Mock
 }
 
-func (m *MockTransactionDataInterface) GetAll() ([]transaction.TransactionInfo, error) {
+func (m *MockTransactionDataInterface) GetAll(sort string) ([]transaction.TransactionInfo, error) {
 	args := m.Called()
 	return args.Get(0).([]transaction.TransactionInfo), args.Error(1)
 }
 
-func (m *MockTransactionDataInterface) GetByID(id int) ([]transaction.Transaction, error) {
+func (m *MockTransactionDataInterface) GetByID(id int, sort string) ([]transaction.Transaction, error) {
 	args := m.Called(id)
 	return args.Get(0).([]transaction.Transaction), args.Error(1)
 }
