@@ -19,6 +19,10 @@ import (
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
 	serviceArticleCategory "FinalProject/features/article_categories/service"
 
+	dataWithdraw "FinalProject/features/withdraw/data"
+	handlerWithdraw "FinalProject/features/withdraw/handler"
+	serviceWithdraw "FinalProject/features/withdraw/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
@@ -56,6 +60,10 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
+	withdrawModel := dataWithdraw.New(db)
+	withdrawServices := serviceWithdraw.New(withdrawModel)
+	withdrawController := handlerWithdraw.New(withdrawServices)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -68,6 +76,7 @@ func main() {
 	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
+	routes.RouteWithdraw(e, withdrawController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

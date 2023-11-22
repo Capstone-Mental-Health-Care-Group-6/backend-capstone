@@ -26,6 +26,58 @@ func (wh *WithdrawHandler) GetAllWithdraw() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", res))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get all data", res))
+	}
+}
+
+func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var req = new(InputRequest)
+
+		if err := c.Bind(req); err != nil {
+			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
+		}
+
+		isValid, errors := helper.ValidateJSON(req)
+		if !isValid {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
+		}
+
+		var serviceInput = new(withdraw.Withdraw)
+		serviceInput.DoctorID = req.DoctorID
+		serviceInput.BalanceReq = req.BalanceReq
+		serviceInput.PaymentMethod = req.PaymentMethod
+		serviceInput.PaymentNumber = req.PaymentNumber
+		serviceInput.PaymentName = req.PaymentName
+
+		balance, err := wh.s.GetBalance(serviceInput.DoctorID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		if balance < serviceInput.BalanceReq {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Balance not enough", nil))
+		}
+
+		serviceInput.BalanceBefore = balance
+		serviceInput.BalanceAfter = balance - serviceInput.BalanceReq
+
+		result, err := wh.s.CreateWithdraw(*serviceInput)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var ress = new(WithdrawResponse)
+		ress.DoctorID = result.DoctorID
+		ress.BalanceReq = result.BalanceReq
+		ress.BalanceBefore = result.BalanceBefore
+		ress.BalanceAfter = result.BalanceAfter
+		ress.PaymentMethod = result.PaymentMethod
+		ress.PaymentNumber = result.PaymentNumber
+		ress.PaymentName = result.PaymentName
+
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success create new withdraw", ress))
 	}
 }

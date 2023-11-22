@@ -1,10 +1,11 @@
 package handler
 
 type InputRequest struct {
-	DoctorID      uint   `json:"doctor_id"`
-	BalanceReq    uint   `json:"balance_req"`
-	PaymentMethod string `json:"payment_method"`
-	PaymentNumber string `json:"payment_number"`
+	DoctorID      uint   `json:"doctor_id" validate:"required"`
+	BalanceReq    uint   `json:"balance_req" validate:"required"`
+	PaymentMethod string `json:"payment_method" validate:"required"`
+	PaymentNumber string `json:"payment_number" validate:"required"`
+	PaymentName   string `json:"payment_name" validate:"required"`
 }
 
 type UpdateRequest struct {

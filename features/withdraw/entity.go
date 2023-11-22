@@ -15,6 +15,7 @@ type Withdraw struct {
 	BalanceReq    uint
 	PaymentMethod string
 	PaymentNumber string
+	PaymentName   string
 	DateConfirmed time.Time
 	Status        string
 }
@@ -28,18 +29,25 @@ type WithdrawInfo struct {
 	BalanceReq    uint
 	PaymentMethod string
 	PaymentNumber string
+	PaymentName   string
 	DateConfirmed time.Time
 	Status        string
 }
 
 type WithdrawHandlerInterface interface {
 	GetAllWithdraw() echo.HandlerFunc
+	CreateWithdraw() echo.HandlerFunc
 }
 
 type WithdrawServiceInterface interface {
 	GetAllWithdraw() ([]WithdrawInfo, error)
+	CreateWithdraw(newData Withdraw) (*Withdraw, error)
+	GetBalance(idDoctor uint) (uint, error)
 }
 
 type WithdrawDataInterface interface {
 	GetAll() ([]WithdrawInfo, error)
+	Insert(newData Withdraw) (*Withdraw, error)
+	GetBalance(idDoctor uint) (uint, error)
+	LessBalance(idDoctor uint, balance uint) (bool, error)
 }

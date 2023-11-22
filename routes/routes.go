@@ -6,6 +6,7 @@ import (
 	"FinalProject/features/articles"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
+	withdraw "FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -39,4 +40,9 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 }

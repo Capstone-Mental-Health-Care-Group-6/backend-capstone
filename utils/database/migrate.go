@@ -13,13 +13,13 @@ import (
 
 func Migrate(db *gorm.DB) {
 	migrator := migration.NewMySqlMigrator(db)
-	migrator.DropTable([]migration.Table{
-		DataUser.User{},
-		DataArticleCategory.ArticleCategory{},
-		DataArticle.Article{},
-		DataTransaction.Transaction{},
-		DataWithdraw.Withdraw{},
-	}...)
+	// migrator.DropTable([]migration.Table{
+	// 	// DataUser.User{},
+	// 	// DataArticleCategory.ArticleCategory{},
+	// 	// DataArticle.Article{},
+	// 	// DataTransaction.Transaction{},
+	// 	// DataWithdraw.Withdraw{},
+	// }...)
 	migrator.CreateTable([]migration.Table{
 		DataUser.User{},
 		DataArticleCategory.ArticleCategory{},
