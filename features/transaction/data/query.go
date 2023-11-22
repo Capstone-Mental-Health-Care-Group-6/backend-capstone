@@ -2,6 +2,7 @@ package data
 
 import (
 	"FinalProject/features/transaction"
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -44,13 +45,13 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 
 func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.TransactionInfo, error) {
 	var transactionInfos []transaction.TransactionInfo
-	var qry = ad.db.Table("transactions").Select("user_id, payment_status, payment_type, midtrans_id, price_result").Where("midtrans_id = ?", id).Find(&transactionInfos)
+	var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Select("user_id, midtrans_id, payment_status, payment_type, price_result").Find(&transactionInfos)
 
 	if qry.Error != nil {
 		return nil, qry.Error
 	}
 
-	fmt.Println("Json Response for query:", &qry)
+	fmt.Println("Json Response for query:", transactionInfos)
 
 	return transactionInfos, nil
 }
@@ -96,6 +97,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.PriceDuration = newData.PriceDuration
 	dbData.PriceCounseling = newData.PriceCounseling
 	dbData.PriceResult = newData.PriceResult
+	dbData.PaymentProof = newData.PaymentProof
 
 	dbData.PaymentStatus = newData.PaymentStatus
 	dbData.PaymentType = newData.PaymentType
@@ -115,6 +117,48 @@ func (ad *TransactionData) Delete(id int) (bool, error) {
 
 	if qry.Error != nil {
 		return false, qry.Error
+	}
+
+	return true, nil
+}
+
+func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, id int) (bool, error) {
+	var qry = ad.db.Table("transactions").Where("id = ?", id).Updates(Transaction{
+		UserID:          newData.UserID,
+		PriceMethod:     newData.PriceMethod,
+		PriceDuration:   newData.PriceDuration,
+		PriceCounseling: newData.PriceCounseling,
+		PriceResult:     newData.PriceResult,
+		PaymentStatus:   newData.PaymentStatus,
+		PaymentType:     newData.PaymentType})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransactionManual, id string) (bool, error) {
+	var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Updates(Transaction{
+		UserID:          newData.UserID,
+		PriceMethod:     newData.PriceMethod,
+		PriceDuration:   newData.PriceDuration,
+		PriceCounseling: newData.PriceCounseling,
+		PriceResult:     newData.PriceResult,
+		PaymentStatus:   newData.PaymentStatus,
+		PaymentType:     newData.PaymentType})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
 	return true, nil

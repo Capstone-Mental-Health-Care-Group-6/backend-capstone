@@ -21,6 +21,7 @@ import (
 
 	"FinalProject/helper"
 	"FinalProject/routes"
+	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 
@@ -38,6 +39,7 @@ func main() {
 	database.Migrate(db)
 
 	midtrans := midtrans.InitMidtrans(*config)
+	cld := cloudinary.InitCloud(*config)
 
 	userModel := dataUser.New(db)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
@@ -45,7 +47,7 @@ func main() {
 	userController := handlerUser.NewHandler(userServices)
 
 	transaksiModel := dataTransaksi.New(db)
-	transaksiServices := serviceTransaksi.New(transaksiModel, midtrans)
+	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
 	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
 
 	articleModel := dataArticle.New(db)
@@ -68,6 +70,8 @@ func main() {
 	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
+
+	// config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

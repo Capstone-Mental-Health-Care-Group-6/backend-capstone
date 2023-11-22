@@ -42,6 +42,16 @@ func (m *MockTransactionDataInterface) GetAndUpdate(newData transaction.UpdateTr
 	return args.Bool(0), args.Error(1)
 }
 
+func (m *MockTransactionDataInterface) Update(newData transaction.UpdateTransactionManual, id int) (bool, error) {
+	args := m.Called(newData, id)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockTransactionDataInterface) UpdateWithTrxID(newData transaction.UpdateTransactionManual, id string) (bool, error) {
+	args := m.Called(newData, id)
+	return args.Bool(0), args.Error(1)
+}
+
 func (m *MockTransactionDataInterface) Delete(id int) (bool, error) {
 	args := m.Called(id)
 	return args.Bool(0), args.Error(1)

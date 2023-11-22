@@ -16,7 +16,7 @@ func TestGetTransactions(t *testing.T) {
 	expectedTransactions := []transaction.TransactionInfo{}
 	mockData.On("GetAll").Return(expectedTransactions, nil).Once()
 
-	service := service.New(mockData, mockMidtrans)
+	service := service.New(mockData, nil, mockMidtrans)
 
 	result, err := service.GetTransactions()
 
@@ -34,7 +34,7 @@ func TestGetTransaction(t *testing.T) {
 
 	mockData.On("GetByID", 1).Return(expectedTransaction, nil).Once()
 
-	service := service.New(mockData, mockMidtrans)
+	service := service.New(mockData, nil, mockMidtrans)
 	result, err := service.GetTransaction(1)
 
 	assert.Nil(t, err)
@@ -51,7 +51,7 @@ func TestGetTransaction(t *testing.T) {
 // 	newTransaction := transaction.Transaction{UserID: 1, MidtransID: "abc123", PriceResult: 1000, PaymentStatus: 1, PaymentType: "gopay"}
 // 	expectedResponse := map[string]interface{}{"key": "value"}
 // 	mockData.On("Insert", newTransaction).Return(&newTransaction, nil)
-// 	mockMidtrans.On("GenerateTransaction", 100, "CreditCard").Return(&midtrans.ChargeResponse{}, expectedResponse, nil)
+// 	mockMidtrans.On("GenerateTransaction", 0, "gopay").Return(&midtrans.ChargeResponse{}, expectedResponse, nil)
 
 // 	service := service.New(mockData, mockMidtrans)
 // 	result, response, err := service.CreateTransaction(newTransaction)

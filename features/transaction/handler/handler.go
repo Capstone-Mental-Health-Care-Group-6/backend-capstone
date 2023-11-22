@@ -63,9 +63,9 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		var input = new(InputRequest)
-		if err := c.Bind(&input); err != nil {
+		if err := c.Bind(input); err != nil {
 			logrus.Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind", nil))
 		}
 
 		var serviceInput = new(transaction.Transaction)
@@ -90,13 +90,55 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.CounselingType = input.CounselingType
 		serviceInput.PaymentType = input.PaymentType
 
-		_, response, err := th.s.CreateTransaction(*serviceInput)
+		if input.PaymentType == "manual" {
 
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			formHeaderPaymentProof, err := c.FormFile("payment_proof")
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Payment Proof", nil))
+			}
+
+			formPaymentProof, err := formHeaderPaymentProof.Open()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to get payment proof", nil))
+			}
+
+			uploadUrlPaymentProof, err := th.s.PaymentProofUpload(transaction.PaymentProofDataModel{PaymentProofPhoto: formPaymentProof})
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Upload Payment Proof", nil))
+			}
+
+			serviceInput.PaymentProof = uploadUrlPaymentProof
+
+			logrus.Info("Ini payment proof: ", uploadUrlPaymentProof)
+
+			result, err := th.s.CreateManualTransaction(*serviceInput)
+
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			}
+
+			var response = new(ManualTransactionResponse)
+			response.PriceResult = result.PriceResult
+			response.UserID = result.UserID
+			response.MidtransID = result.MidtransID
+			response.PaymentStatus = result.PaymentStatus
+			response.PaymentProof = result.PaymentProof
+			response.PaymentType = result.PaymentType
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Manual Transaction", response))
+
+		} else {
+
+			serviceInput.PaymentProof = "midtrans_payment"
+			_, response, err := th.s.CreateTransaction(*serviceInput)
+
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Transaction", response))
+
 		}
-
-		return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Transaction", response))
 
 	}
 }
@@ -147,6 +189,40 @@ func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
 
 		if err != nil {
 			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		// id, err := strconv.Atoi(paramID)
+		// if err != nil {
+		// 	c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		// }
+
+		var input = new(UpdateRequest)
+		if err := c.Bind(&input); err != nil {
+			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		var serviceUpdate = new(transaction.UpdateTransactionManual)
+		serviceUpdate.UserID = input.UserID
+		serviceUpdate.PriceMethod = input.PriceMethod
+		serviceUpdate.PriceDuration = input.PriceDuration
+		serviceUpdate.PriceCounseling = input.PriceCounseling
+		serviceUpdate.PriceResult = input.PriceResult
+		serviceUpdate.PaymentStatus = input.PaymentStatus
+
+		result, err := th.s.UpdateTransactionManual(*serviceUpdate, paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
