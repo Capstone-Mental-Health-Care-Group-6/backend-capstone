@@ -9,12 +9,14 @@ import (
 )
 
 type WithdrawHandler struct {
-	s withdraw.WithdrawServiceInterface
+	s   withdraw.WithdrawServiceInterface
+	jwt helper.JWTInterface
 }
 
-func New(service withdraw.WithdrawServiceInterface) withdraw.WithdrawHandlerInterface {
+func New(service withdraw.WithdrawServiceInterface, jwt helper.JWTInterface) withdraw.WithdrawHandlerInterface {
 	return &WithdrawHandler{
-		s: service,
+		s:   service,
+		jwt: jwt,
 	}
 }
 
@@ -44,8 +46,13 @@ func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
+		idJwt, err := wh.jwt.GetID(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Token is not valid", nil))
+		}
+
 		var serviceInput = new(withdraw.Withdraw)
-		serviceInput.DoctorID = req.DoctorID
+		serviceInput.DoctorID = idJwt
 		serviceInput.BalanceReq = req.BalanceReq
 		serviceInput.PaymentMethod = req.PaymentMethod
 		serviceInput.PaymentNumber = req.PaymentNumber

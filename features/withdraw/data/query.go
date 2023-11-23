@@ -20,9 +20,10 @@ func New(db *gorm.DB) withdraw.WithdrawDataInterface {
 
 func (ad *WithdrawData) GetAll() ([]withdraw.WithdrawInfo, error) {
 	var list = []withdraw.WithdrawInfo{}
-	var qry = ad.db.Table("withdraws").Select("withdraws.*, doctors.doctor_name as doctor_name, users.name as confirm_name").
-		Joins("JOIN users on users.id = withdraws.confirm_by_id").
-		Joins("JOIN doctors on doctors.id = withdraws.doctor_id").
+	var qry = ad.db.Table("withdraws").
+		Select("withdraws.id, doctors.doctor_name as doctor_name, users.name as confirm_name, withdraws.balance_before, withdraws.balance_after, withdraws.balance_req, withdraws.payment_method, withdraws.payment_number, withdraws.payment_name, withdraws.date_confirmed, withdraws.status").
+		Joins("LEFT JOIN doctors on doctors.id = withdraws.doctor_id").
+		Joins("LEFT JOIN users on users.id = withdraws.confirm_by_id").
 		Where("withdraws.deleted_at is null").Scan(&list)
 
 	if err := qry.Error; err != nil {
@@ -36,9 +37,12 @@ func (ad *WithdrawData) GetAll() ([]withdraw.WithdrawInfo, error) {
 func (ad *WithdrawData) Insert(newData withdraw.Withdraw) (*withdraw.Withdraw, error) {
 	var data = new(Withdraw)
 	data.DoctorID = newData.DoctorID
+	data.BalanceBefore = newData.BalanceBefore
+	data.BalanceAfter = newData.BalanceAfter
 	data.BalanceReq = newData.BalanceReq
 	data.PaymentMethod = newData.PaymentMethod
 	data.PaymentNumber = newData.PaymentNumber
+	data.PaymentName = newData.PaymentName
 
 	if err := ad.db.Create(data).Error; err != nil {
 		return nil, err

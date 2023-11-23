@@ -40,11 +40,11 @@ func main() {
 
 	db := database.InitDB(*config)
 	database.Migrate(db)
+	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	midtrans := midtrans.InitMidtrans(*config)
 
 	userModel := dataUser.New(db)
-	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
 	userController := handlerUser.NewHandler(userServices)
 
@@ -62,7 +62,7 @@ func main() {
 
 	withdrawModel := dataWithdraw.New(db)
 	withdrawServices := serviceWithdraw.New(withdrawModel)
-	withdrawController := handlerWithdraw.New(withdrawServices)
+	withdrawController := handlerWithdraw.New(withdrawServices, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
