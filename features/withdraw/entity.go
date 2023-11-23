@@ -38,6 +38,7 @@ type WithdrawHandlerInterface interface {
 	GetAllWithdraw() echo.HandlerFunc
 	CreateWithdraw() echo.HandlerFunc
 	GetWithdraw() echo.HandlerFunc
+	UpdateStatus() echo.HandlerFunc
 }
 
 type WithdrawServiceInterface interface {
@@ -45,6 +46,7 @@ type WithdrawServiceInterface interface {
 	CreateWithdraw(newData Withdraw) (*Withdraw, error)
 	GetBalance(idDoctor uint) (uint, error)
 	GetByID(id int) (*WithdrawInfo, error)
+	UpdateStatus(id int, newData Withdraw) (bool, error)
 }
 
 type WithdrawDataInterface interface {
@@ -53,4 +55,5 @@ type WithdrawDataInterface interface {
 	GetBalance(idDoctor uint) (uint, error)
 	LessBalance(idDoctor uint, balance uint) (bool, error)
 	GetByID(id int) (*WithdrawInfo, error)
+	UpdateStatus(id int, newData Withdraw) (bool, error)
 }

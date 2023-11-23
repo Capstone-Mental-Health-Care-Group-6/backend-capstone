@@ -5,6 +5,7 @@ import (
 	"FinalProject/helper"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -110,5 +111,50 @@ func (wh *WithdrawHandler) GetWithdraw() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success get data", res))
+	}
+}
+
+func (wh *WithdrawHandler) UpdateStatus() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Param ID Error", nil))
+		}
+
+		var req = new(UpdateStatusRequest)
+		if err := c.Bind(req); err != nil {
+			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
+		}
+
+		isValid, errors := helper.ValidateJSON(req)
+		if !isValid {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
+		}
+
+		idJwt, err := wh.jwt.GetID(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Token is not valid", nil))
+		}
+
+		var serviceInput = new(withdraw.Withdraw)
+		serviceInput.ConfirmByID = idJwt
+		serviceInput.Status = req.Status
+		serviceInput.DateConfirmed = time.Now()
+
+		ress, err := wh.s.UpdateStatus(id, *serviceInput)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		if ress != true {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Data not found", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success update status to "+req.Status, nil))
 	}
 }

@@ -95,3 +95,23 @@ func (ad *WithdrawData) GetByID(id int) (*withdraw.WithdrawInfo, error) {
 
 	return withdraw, nil
 }
+
+func (ad *WithdrawData) UpdateStatus(id int, newData withdraw.Withdraw) (bool, error) {
+	var qry = ad.db.Table("withdraws").
+		Where("id = ?", id).
+		Updates(Withdraw{
+			Status:        newData.Status,
+			ConfirmByID:   newData.ConfirmByID,
+			DateConfirmed: newData.DateConfirmed,
+		})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}

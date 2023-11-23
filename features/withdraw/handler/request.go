@@ -7,7 +7,6 @@ type InputRequest struct {
 	PaymentName   string `json:"payment_name" validate:"required"`
 }
 
-type UpdateRequest struct {
-	ConfirmByID uint   `json:"confirm_by_id"`
-	Status      string `json:"status"`
+type UpdateStatusRequest struct {
+	Status string `json:"status" validate:"required" `
 }

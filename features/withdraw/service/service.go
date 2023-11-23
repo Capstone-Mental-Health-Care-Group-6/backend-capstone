@@ -2,6 +2,7 @@ package service
 
 import (
 	"FinalProject/features/withdraw"
+	"errors"
 )
 
 type WithdrawService struct {
@@ -49,6 +50,24 @@ func (s *WithdrawService) GetByID(id int) (*withdraw.WithdrawInfo, error) {
 	result, err := s.wd.GetByID(id)
 	if err != nil {
 		return nil, err
+	}
+
+	return result, nil
+}
+
+func (s *WithdrawService) UpdateStatus(id int, newData withdraw.Withdraw) (bool, error) {
+	cekData, err := s.wd.GetByID(id)
+	if err != nil {
+		return false, err
+	}
+
+	if cekData.ID == 0 {
+		return false, errors.New("data not found")
+	}
+
+	result, err := s.wd.UpdateStatus(id, newData)
+	if err != nil {
+		return false, err
 	}
 
 	return result, nil
