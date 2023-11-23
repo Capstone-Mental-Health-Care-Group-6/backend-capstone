@@ -130,6 +130,7 @@ func (pdata *PatientData) Update(id int, newData patients.UpdateProfile) (bool, 
 }
 
 func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword) (bool, error) {
+	newData.Password, _ = helper.HashPassword(newData.Password)
 	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{
 		Password: newData.Password,
 	})

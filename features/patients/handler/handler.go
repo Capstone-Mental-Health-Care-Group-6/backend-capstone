@@ -5,7 +5,6 @@ import (
 	"FinalProject/helper"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -123,12 +122,8 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 
 func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var paramID = c.Param("id")
-		id, err := strconv.Atoi(paramID)
-		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
-		}
+		id := mdl.jwt.GetID(c)
+		userIdInt := int(id.(float64))
 		var input = new(UpdateProfile)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
@@ -158,7 +153,7 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 		serviceUpdate.Phone = input.Phone
 		serviceUpdate.Avatar = uploadUrlPhoto
 
-		result, err := mdl.svc.UpdatePatient(id, *serviceUpdate)
+		result, err := mdl.svc.UpdatePatient(userIdInt, *serviceUpdate)
 
 		if err != nil {
 			c.Logger().Info("Handler : Input Process Error : ", err.Error())
@@ -199,12 +194,8 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 
 func (mdl *PatientHandler) UpdatePassword() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var paramID = c.Param("id")
-		id, err := strconv.Atoi(paramID)
-		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
-		}
+		id := mdl.jwt.GetID(c)
+		userIdInt := int(id.(float64))
 		var input = new(UpdatePassword)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
@@ -214,7 +205,7 @@ func (mdl *PatientHandler) UpdatePassword() echo.HandlerFunc {
 		var serviceUpdate = new(patients.UpdatePassword)
 		serviceUpdate.Password = input.Password
 
-		result, err := mdl.svc.UpdatePassword(id, *serviceUpdate)
+		result, err := mdl.svc.UpdatePassword(userIdInt, *serviceUpdate)
 
 		if err != nil {
 			c.Logger().Info("Handler : Input Process Error : ", err.Error())
