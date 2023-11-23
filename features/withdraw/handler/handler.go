@@ -4,6 +4,7 @@ import (
 	"FinalProject/features/withdraw"
 	"FinalProject/helper"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -86,5 +87,28 @@ func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 		ress.PaymentName = result.PaymentName
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success create new withdraw", ress))
+	}
+}
+
+func (wh *WithdrawHandler) GetWithdraw() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Param ID Error", nil))
+		}
+
+		res, err := wh.s.GetByID(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		if res.ID == 0 {
+			return c.JSON(http.StatusNotFound, helper.FormatResponse("Data not found", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get data", res))
 	}
 }

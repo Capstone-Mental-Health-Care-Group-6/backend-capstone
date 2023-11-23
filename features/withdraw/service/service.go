@@ -44,3 +44,12 @@ func (s *WithdrawService) CreateWithdraw(newData withdraw.Withdraw) (*withdraw.W
 
 	return result, nil
 }
+
+func (s *WithdrawService) GetByID(id int) (*withdraw.WithdrawInfo, error) {
+	result, err := s.wd.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

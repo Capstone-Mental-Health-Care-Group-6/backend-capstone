@@ -78,3 +78,20 @@ func (ad *WithdrawData) LessBalance(idDoctor uint, balance uint) (bool, error) {
 
 	return true, nil
 }
+
+func (ad *WithdrawData) GetByID(id int) (*withdraw.WithdrawInfo, error) {
+	var withdraw = new(withdraw.WithdrawInfo)
+	var qry = ad.db.Table("withdraws").
+		Select("withdraws.id, doctors.doctor_name as doctor_name, users.name as confirm_name, withdraws.balance_before, withdraws.balance_after, withdraws.balance_req, withdraws.payment_method, withdraws.payment_number, withdraws.payment_name, withdraws.date_confirmed, withdraws.status").
+		Joins("LEFT JOIN doctors on doctors.id = withdraws.doctor_id").
+		Joins("LEFT JOIN users on users.id = withdraws.confirm_by_id").
+		Where("withdraws.deleted_at is null").
+		Where("withdraws.id = ?", id).
+		Scan(&withdraw)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return withdraw, nil
+}
