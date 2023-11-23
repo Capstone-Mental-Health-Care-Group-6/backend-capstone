@@ -19,8 +19,13 @@ import (
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
 	serviceArticleCategory "FinalProject/features/article_categories/service"
 
+	dataPatient "FinalProject/features/patients/data"
+	handlerPatient "FinalProject/features/patients/handler"
+	servicePatient "FinalProject/features/patients/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
+	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 
@@ -38,6 +43,7 @@ func main() {
 	database.Migrate(db)
 
 	midtrans := midtrans.InitMidtrans(*config)
+	cloudinary := cloudinary.InitCloud(*config)
 
 	userModel := dataUser.New(db)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
@@ -56,6 +62,10 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
+	patientModel := dataPatient.New(db)
+	patientServices := servicePatient.NewPatient(patientModel, cloudinary, jwtInterface)
+	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -68,6 +78,7 @@ func main() {
 	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
+	routes.RoutePatientAccount(e, patientController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
