@@ -12,7 +12,3 @@ type ArticleCategory struct {
 	Slug     string         `gorm:"column:slug;type:varchar(255)"`
 	Articles []data.Article `gorm:"foreignKey:CategoryID"`
 }
-
-func (ArticleCategory) TableName() string {
-	return "article_categories"
-}

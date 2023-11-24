@@ -6,7 +6,6 @@ import (
 	"FinalProject/features/articles"
 	"FinalProject/features/doctor"
 	"FinalProject/features/users"
-	"FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -33,21 +32,14 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
-// func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
-// 	e.GET("/patients", ph.GetPatients())
-// 	e.GET("/patients/:id", ph.GetPatient())
-// 	e.POST("/patients/register", ph.CreatePatient())
-// }
+func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/patients", ph.GetPatients())
+	e.GET("/patients/:id", ph.GetPatient())
+	e.POST("/patients/register", ph.CreatePatient())
+}
 
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors())
 	e.GET("/doctor/:id", ph.GetDoctor())
 	e.POST("/doctor/register", ph.CreateDoctor())
-}
-
-func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 }
