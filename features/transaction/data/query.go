@@ -142,8 +142,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 
 	existingDataDoctor := data.Doctor{}
 	if err := ad.db.Table("doctors").Where("id = ?", newData.DoctorID).First(&existingDataDoctor).Error; err != nil {
-		fmt.Printf("Error fetching doctor data: %v\n", err)
-		return nil, err
+		return nil, errors.New("Doctor ID not found")
 	}
 
 	var dbData = new(Transaction)
