@@ -20,6 +20,7 @@ type ProgrammingConfig struct {
 	MidtransServerKey   string
 	MidtransClientKey   string
 	MidtransEnvironment string
+	CloudinaryURL       string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -98,6 +99,10 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("MT_ENV"); found {
 		res.MidtransEnvironment = val
+	}
+
+	if val, found := os.LookupEnv("CloudURL"); found {
+		res.CloudinaryURL = val
 	}
 
 	return res

@@ -4,9 +4,9 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
-	transaction "FinalProject/features/transaction"
+	"FinalProject/features/doctor"
 	"FinalProject/features/users"
-	withdraw "FinalProject/features/withdraw"
+	"FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -15,15 +15,6 @@ import (
 func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.POST("/register", uh.Register())
 	e.POST("/login", uh.Login())
-}
-
-func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.POST("/transaksi", th.CreateTransaction())
-	e.POST("/transaksi/notif", th.NotifTransaction())
-	e.GET("/transaksi/:id", th.GetTransaction())
-	e.GET("/transaksi", th.GetTransactions())
-	e.DELETE("/transaksi/:id", th.DeleteTransaction())
-	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -40,6 +31,18 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+// func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
+// 	e.GET("/patients", ph.GetPatients())
+// 	e.GET("/patients/:id", ph.GetPatient())
+// 	e.POST("/patients/register", ph.CreatePatient())
+// }
+
+func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/doctor", ph.GetDoctors())
+	e.GET("/doctor/:id", ph.GetDoctor())
+	e.POST("/doctor/register", ph.CreateDoctor())
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
