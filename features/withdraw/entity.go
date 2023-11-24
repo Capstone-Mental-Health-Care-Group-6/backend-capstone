@@ -7,31 +7,31 @@ import (
 )
 
 type Withdraw struct {
-	ID            uint
-	DoctorID      uint
-	ConfirmByID   uint
-	BalanceBefore uint
-	BalanceAfter  uint
-	BalanceReq    uint
-	PaymentMethod string
-	PaymentNumber string
-	PaymentName   string
-	DateConfirmed time.Time
-	Status        string
+	ID            uint      `json:"id"`
+	DoctorID      uint      `json:"doctor_id"`
+	ConfirmByID   uint      `json:"confirm_by_id"`
+	BalanceBefore uint      `json:"balance_before"`
+	BalanceAfter  uint      `json:"balance_after"`
+	BalanceReq    uint      `json:"balance_req"`
+	PaymentMethod string    `json:"payment_method"`
+	PaymentNumber string    `json:"payment_number"`
+	PaymentName   string    `json:"payment_name"`
+	DateConfirmed time.Time `json:"date_confirmed"`
+	Status        string    `json:"status"`
 }
 
 type WithdrawInfo struct {
-	ID            uint
-	DoctorName    string
-	ConfirmName   string
-	BalanceBefore uint
-	BalanceAfter  uint
-	BalanceReq    uint
-	PaymentMethod string
-	PaymentNumber string
-	PaymentName   string
-	DateConfirmed time.Time
-	Status        string
+	ID            uint      `json:"id"`
+	DoctorName    string    `json:"doctor_name"`
+	ConfirmName   string    `json:"confirm_name"`
+	BalanceBefore uint      `json:"balance_before"`
+	BalanceAfter  uint      `json:"balance_after"`
+	BalanceReq    uint      `json:"balance_req"`
+	PaymentMethod string    `json:"payment_method"`
+	PaymentNumber string    `json:"payment_number"`
+	PaymentName   string    `json:"payment_name"`
+	DateConfirmed time.Time `json:"date_confirmed"`
+	Status        string    `json:"status"`
 }
 
 type WithdrawHandlerInterface interface {
