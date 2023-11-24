@@ -6,6 +6,11 @@ import (
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
 	"FinalProject/utils/cloudinary"
+	"FinalProject/utils/midtrans"
+
+	dataTransaksi "FinalProject/features/transaction/data"
+	handlerTransaksi "FinalProject/features/transaction/handler"
+	serviceTransaksi "FinalProject/features/transaction/service"
 
 	dataUser "FinalProject/features/users/data"
 	handlerUser "FinalProject/features/users/handler"
@@ -41,6 +46,8 @@ func main() {
 
 	var cld = cloudinary.InitCloud(*config)
 
+	midtrans := midtrans.InitMidtrans(*config)
+
 	userModel := dataUser.New(db)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
@@ -49,6 +56,10 @@ func main() {
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
 	articleController := handlerArticle.NewHandler(articleServices)
+
+	transaksiModel := dataTransaksi.New(db)
+	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
 
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
@@ -78,8 +89,11 @@ func main() {
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 	// routes.RoutePatient(e, patientController, *config)
+	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
+
+	config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
