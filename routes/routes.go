@@ -4,6 +4,7 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
+	"FinalProject/features/doctor"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
 
@@ -41,4 +42,10 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/doctor", ph.GetDoctors())
+	e.GET("/doctor/:id", ph.GetDoctor())
+	e.POST("/doctor/register", ph.CreateDoctor())
 }
