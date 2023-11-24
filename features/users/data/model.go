@@ -2,6 +2,7 @@ package data
 
 import (
 	articles "FinalProject/features/articles/data"
+
 	"gorm.io/gorm"
 )
 
@@ -14,5 +15,4 @@ type User struct {
 	Status         string             `gorm:"type:enum('Active','Inactive','Suspend');column:status"`
 	TokenResetPass string             `gorm:"column:token_reset_pass;type:varchar(255)"`
 	Articles       []articles.Article `gorm:"foreignKey:UserID"`
-	Patient        Patient            `gorm:"foreignKey:UserID;references:ID"`
 }

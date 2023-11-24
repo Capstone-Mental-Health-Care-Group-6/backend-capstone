@@ -5,6 +5,7 @@ import (
 	DataArticle "FinalProject/features/articles/data"
 	DataDoctor "FinalProject/features/doctor/data"
 	DataUser "FinalProject/features/users/data"
+	DataWithdraw "FinalProject/features/withdraw/data"
 
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataUser.User{})
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
 	db.AutoMigrate(DataArticle.Article{})
-	db.AutoMigrate(DataUser.Patient{})
+	// db.AutoMigrate(DataUser.Patient{})
 	db.AutoMigrate(DataDoctor.Doctor{})
+	db.AutoMigrate(DataWithdraw.Withdraw{})
 }

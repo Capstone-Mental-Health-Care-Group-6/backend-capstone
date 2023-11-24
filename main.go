@@ -11,10 +11,6 @@ import (
 	handlerUser "FinalProject/features/users/handler"
 	serviceUser "FinalProject/features/users/service"
 
-	dataPatient "FinalProject/features/users/data"
-	handlerPatient "FinalProject/features/users/handler"
-	servicePatient "FinalProject/features/users/service"
-
 	dataDoctor "FinalProject/features/doctor/data"
 	handlerDoctor "FinalProject/features/doctor/handler"
 	serviceDoctor "FinalProject/features/doctor/service"
@@ -22,6 +18,10 @@ import (
 	dataArticleCategory "FinalProject/features/article_categories/data"
 	handlerArticleCategory "FinalProject/features/article_categories/handler"
 	serviceArticleCategory "FinalProject/features/article_categories/service"
+
+	dataWithdraw "FinalProject/features/withdraw/data"
+	handlerWithdraw "FinalProject/features/withdraw/handler"
+	serviceWithdraw "FinalProject/features/withdraw/service"
 
 	"FinalProject/helper"
 	"FinalProject/routes"
@@ -54,13 +54,17 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
-	patientModel := dataPatient.NewPatient(db)
-	patientServices := servicePatient.NewPatient(patientModel, cld)
-	patientController := handlerPatient.NewHandlerPatient(patientServices)
+	// patientModel := dataPatient.NewPatient(db)
+	// patientServices := servicePatient.NewPatient(patientModel, cld)
+	// patientController := handlerPatient.NewHandlerPatient(patientServices)
 
 	doctorModel := dataDoctor.NewDoctor(db)
 	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices)
+
+	withdrawModel := dataWithdraw.New(db)
+	withdrawServices := serviceWithdraw.New(withdrawModel)
+	withdrawController := handlerWithdraw.New(withdrawServices, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -73,8 +77,9 @@ func main() {
 	routes.RouteUser(e, userController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
-	routes.RoutePatient(e, patientController, *config)
+	// routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
+	routes.RouteWithdraw(e, withdrawController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
