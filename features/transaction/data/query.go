@@ -167,20 +167,53 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 }
 
 func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransactionManual, id string) (bool, error) {
-	var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Updates(Transaction{
+	// Fetch the existing transaction data
+	existingData := Transaction{}
+	if err := ad.db.Table("transactions").Where("midtrans_id = ?", id).First(&existingData).Error; err != nil {
+		return false, err
+	}
+
+	// Check if the existing PaymentStatus is 4 or 2
+	if existingData.PaymentStatus == 4 || existingData.PaymentStatus == 2 {
+		fmt.Println("Error: You cannot update a transaction that's already finished.")
+		return false, errors.New("Transaction already finished")
+	}
+
+	// Perform the update
+	qry := ad.db.Table("transactions").Where("midtrans_id = ?", id).Updates(Transaction{
 		UserID:          newData.UserID,
 		PriceMethod:     newData.PriceMethod,
 		PriceDuration:   newData.PriceDuration,
 		PriceCounseling: newData.PriceCounseling,
 		PriceResult:     newData.PriceResult,
 		PaymentStatus:   newData.PaymentStatus,
-		PaymentType:     newData.PaymentType})
+		PaymentType:     newData.PaymentType,
+	})
 
 	if err := qry.Error; err != nil {
 		return false, err
 	}
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	existingData := Doctor{}
+	if err := ad.db.Table("doctor").Where("id = ?", id).First(&existingData).Error; err != nil {
+		return false, err
+	}
+
+	newDoctorBalance := existingData.DoctorBalance + newData.PriceResult
+
+	qryToDoctor := ad.db.Table("doctor").Where("id = ?", id).Updates(Doctor{
+		DoctorBalance: newDoctorBalance,
+	})
+
+	if err := qryToDoctor.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
