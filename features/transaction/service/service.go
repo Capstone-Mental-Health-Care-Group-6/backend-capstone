@@ -74,7 +74,7 @@ func (as *TransactionService) CreateTransaction(newData transaction.Transaction)
 
 	fmt.Println("Ini new data: ", newData)
 	if err != nil {
-		return nil, nil, errors.New("Insert Process Failed")
+		return nil, nil, err
 	}
 	return result, response, nil
 }
@@ -85,7 +85,7 @@ func (as *TransactionService) CreateManualTransaction(newData transaction.Transa
 
 	result, err := as.d.Insert(newData)
 	if err != nil {
-		return nil, errors.New("Insert Manual Process Failed")
+		return nil, err
 	}
 	return result, nil
 }
@@ -107,7 +107,7 @@ func (as *TransactionService) UpdateTransactionManual(newData transaction.Update
 		result, err := as.d.UpdateWithTrxID(newData, id)
 
 		if err != nil {
-			return false, errors.New("Update Process Failed")
+			return false, err
 		}
 		return result, nil
 

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"FinalProject/features/doctor/data"
 	"FinalProject/features/transaction"
 	"errors"
 	"fmt"
@@ -21,14 +22,15 @@ func New(db *gorm.DB) transaction.TransactionDataInterface {
 func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, id string) (bool, error) {
 
 	var transaction Transaction
-	db := ad.db
-	db.Where("midtrans_id = ?", id).First(&transaction)
+	// db := ad.db
+
+	ad.db.Where("midtrans_id = ?", id).First(&transaction)
 	fmt.Println("This is the id: ", transaction.ID)
 	transactionID := transaction.ID
 
 	fmt.Println("This is the new payment status: ", newData.PaymentStatus)
 
-	qry := db.Table("transactions").Where("id = ?", transactionID).Updates(Transaction{
+	qry := ad.db.Table("transactions").Where("id = ?", transactionID).Updates(Transaction{
 		PaymentStatus: newData.PaymentStatus,
 	})
 
@@ -38,6 +40,36 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 
 	if err := qry.Error; err != nil {
 		return false, err
+	}
+
+	if newData.PaymentStatus == 2 {
+		if transaction.DoctorID == 0 {
+			return false, errors.New("Doctor ID not found in transaction")
+		}
+
+		fmt.Println("This is the existing DoctorID: ", transaction.DoctorID)
+
+		existingDataDoctor := data.Doctor{}
+		if err := ad.db.Table("doctors").Where("id = ?", transaction.DoctorID).First(&existingDataDoctor).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
+		newDoctorBalance := existingDataDoctor.DoctorBalance + transaction.PriceResult
+		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
+
+		qryToDoctor := ad.db.Table("doctors").Where("id = ?", transaction.DoctorID).Updates(data.Doctor{
+			DoctorBalance: newDoctorBalance,
+		})
+
+		if err := qryToDoctor.Error; err != nil {
+			fmt.Printf("Error updating doctor balance: %v\n", err)
+			return false, err
+		}
+
+		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
+			return false, errors.New("Update Data Error, No Data Affected")
+		}
 	}
 
 	return true, nil
@@ -102,6 +134,18 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 }
 
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
+	if newData.DoctorID == 0 {
+		return nil, errors.New("Doctor ID not found")
+	}
+
+	fmt.Println("This is the existing DoctorID: ", newData.DoctorID)
+
+	existingDataDoctor := data.Doctor{}
+	if err := ad.db.Table("doctors").Where("id = ?", newData.DoctorID).First(&existingDataDoctor).Error; err != nil {
+		fmt.Printf("Error fetching doctor data: %v\n", err)
+		return nil, err
+	}
+
 	var dbData = new(Transaction)
 
 	dbData.TopicID = newData.TopicID
@@ -146,6 +190,17 @@ func (ad *TransactionData) Delete(id int) (bool, error) {
 }
 
 func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, id int) (bool, error) {
+	existingData := Transaction{}
+	if err := ad.db.Table("transactions").Where("id = ?", id).First(&existingData).Error; err != nil {
+		return false, err
+	}
+
+	// Check if the existing PaymentStatus is 4 or 2
+	if existingData.PaymentStatus == 4 || existingData.PaymentStatus == 2 {
+		fmt.Println("Error: You cannot update a transaction that's already finished.")
+		return false, errors.New("Transaction already finished")
+	}
+
 	var qry = ad.db.Table("transactions").Where("id = ?", id).Updates(Transaction{
 		UserID:          newData.UserID,
 		PriceMethod:     newData.PriceMethod,
@@ -161,6 +216,36 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
 		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	if newData.PaymentStatus == 2 {
+		if existingData.DoctorID == 0 {
+			return false, errors.New("Doctor ID not found in transaction")
+		}
+
+		fmt.Println("This is the existing DoctorID: ", existingData.DoctorID)
+
+		existingDataDoctor := data.Doctor{}
+		if err := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).First(&existingDataDoctor).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
+		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
+		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
+
+		qryToDoctor := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).Updates(data.Doctor{
+			DoctorBalance: newDoctorBalance,
+		})
+
+		if err := qryToDoctor.Error; err != nil {
+			fmt.Printf("Error updating doctor balance: %v\n", err)
+			return false, err
+		}
+
+		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
+			return false, errors.New("Update Data Error, No Data Affected")
+		}
 	}
 
 	return true, nil
@@ -191,6 +276,7 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 	})
 
 	if err := qry.Error; err != nil {
+		fmt.Printf("Error updating transaction: %v\n", err)
 		return false, err
 	}
 
@@ -198,23 +284,34 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
-	existingData := Doctor{}
-	if err := ad.db.Table("doctor").Where("id = ?", id).First(&existingData).Error; err != nil {
-		return false, err
-	}
+	if newData.PaymentStatus == 2 {
+		if existingData.DoctorID == 0 {
+			return false, errors.New("Doctor ID not found in transaction")
+		}
 
-	newDoctorBalance := existingData.DoctorBalance + newData.PriceResult
+		fmt.Println("This is the existing DoctorID: ", existingData.DoctorID)
 
-	qryToDoctor := ad.db.Table("doctor").Where("id = ?", id).Updates(Doctor{
-		DoctorBalance: newDoctorBalance,
-	})
+		existingDataDoctor := data.Doctor{}
+		if err := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).First(&existingDataDoctor).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
 
-	if err := qryToDoctor.Error; err != nil {
-		return false, err
-	}
+		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
+		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
-	if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
-		return false, errors.New("Update Data Error, No Data Affected")
+		qryToDoctor := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).Updates(data.Doctor{
+			DoctorBalance: newDoctorBalance,
+		})
+
+		if err := qryToDoctor.Error; err != nil {
+			fmt.Printf("Error updating doctor balance: %v\n", err)
+			return false, err
+		}
+
+		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
+			return false, errors.New("Update Data Error, No Data Affected")
+		}
 	}
 
 	return true, nil

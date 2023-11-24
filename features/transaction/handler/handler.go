@@ -254,8 +254,8 @@ func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 		result, err := th.s.UpdateTransactionManual(*serviceUpdate, paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			// c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))

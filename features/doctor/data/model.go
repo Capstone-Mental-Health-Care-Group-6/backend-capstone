@@ -22,3 +22,7 @@ type Doctor struct {
 	DoctorBalance       uint   `gorm:"column:doctor_balance"`
 	DoctorStatus        string `gorm:"column:doctor_status;type:enum('active','not_active')"`
 }
+
+func (Doctor) TableName() string {
+	return "doctors"
+}
