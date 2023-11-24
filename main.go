@@ -93,7 +93,7 @@ func main() {
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
 
-	config.ServerPort = 8080
+	// config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
