@@ -84,6 +84,7 @@ func main() {
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 	// routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
+	routes.RouteWithdraw(e, withdrawController, *config)
 
 	config.ServerPort = 8080
 
