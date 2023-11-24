@@ -7,6 +7,7 @@ import (
 	"FinalProject/features/doctor"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
+	"FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -48,4 +49,11 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.GET("/doctor", ph.GetDoctors())
 	e.GET("/doctor/:id", ph.GetDoctor())
 	e.POST("/doctor/register", ph.CreateDoctor())
+}
+
+func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 }
