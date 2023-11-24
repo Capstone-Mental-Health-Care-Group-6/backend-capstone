@@ -38,9 +38,9 @@ func main() {
 	database.Migrate(db)
 
 	midtrans := midtrans.InitMidtrans(*config)
+	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
 	userController := handlerUser.NewHandler(userServices)
 
@@ -50,7 +50,7 @@ func main() {
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
-	articleController := handlerArticle.NewHandler(articleServices)
+	articleController := handlerArticle.NewHandler(articleServices, jwtInterface)
 
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)

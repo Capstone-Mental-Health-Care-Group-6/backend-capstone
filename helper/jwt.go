@@ -1,9 +1,12 @@
 package helper
 
 import (
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
 )
@@ -12,6 +15,10 @@ type JWTInterface interface {
 	GenerateJWT(userID uint, role, status string) map[string]any
 	GenerateToken(id uint, role, status string) string
 	ExtractToken(token *jwt.Token) any
+	RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string]any
+	ValidateToken(token string) (*jwt.Token, error)
+	CheckRole(c echo.Context) interface{}
+	GetID(c echo.Context) interface{}
 }
 
 type JWT struct {
@@ -108,6 +115,7 @@ func (j *JWT) generateRefreshToken(accessToken string) string {
 
 	return refreshToken
 }
+
 func (j *JWT) ExtractToken(token *jwt.Token) any {
 	if token.Valid {
 		var claims = token.Claims
@@ -124,4 +132,48 @@ func (j *JWT) ExtractToken(token *jwt.Token) any {
 		return nil
 	}
 	return nil
+}
+
+func (j *JWT) ValidateToken(token string) (*jwt.Token, error) {
+	var authHeader = token[7:]
+	parsedToken, err := jwt.Parse(authHeader, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method %v", t.Header["alg"])
+		}
+		return []byte(j.signKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return parsedToken, nil
+}
+
+func (j *JWT) CheckRole(c echo.Context) interface{} {
+	authHeader := c.Request().Header.Get("Authorization")
+
+	token, err := j.ValidateToken(authHeader)
+	if err != nil {
+		logrus.Info(err)
+		return c.JSON(http.StatusUnauthorized, FormatResponse("Token is not valid", nil))
+	}
+
+	mapClaim := token.Claims.(jwt.MapClaims)
+	role := mapClaim["role"]
+
+	return role
+}
+
+func (j *JWT) GetID(c echo.Context) any {
+	authHeader := c.Request().Header.Get("Authorization")
+
+	token, err := j.ValidateToken(authHeader)
+	if err != nil {
+		logrus.Info(err)
+		return c.JSON(http.StatusUnauthorized, FormatResponse("Token is not valid", nil))
+	}
+
+	mapClaim := token.Claims.(jwt.MapClaims)
+	id := mapClaim["id"]
+
+	return id
 }
