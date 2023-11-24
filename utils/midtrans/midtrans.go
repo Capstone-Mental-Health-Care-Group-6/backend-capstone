@@ -32,6 +32,9 @@ func InitMidtrans(c configs.ProgrammingConfig) MidtransService {
 		envi = midtrans.Sandbox
 	}
 
+	envi = midtrans.Sandbox
+	c.MidtransServerKey = "SB-Mid-server-VXw9IjVeH_fZSL4IZykw3LR4"
+
 	core.New(c.MidtransServerKey, envi)
 
 	return &midtransService{

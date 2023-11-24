@@ -71,7 +71,7 @@ func main() {
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
 
-	// config.ServerPort = 8080
+	config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
