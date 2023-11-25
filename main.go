@@ -28,6 +28,10 @@ import (
 	handlerWithdraw "FinalProject/features/withdraw/handler"
 	serviceWithdraw "FinalProject/features/withdraw/service"
 
+	dataPatient "FinalProject/features/patients/data"
+	handlerPatient "FinalProject/features/patients/handler"
+	servicePatient "FinalProject/features/patients/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/database"
@@ -65,9 +69,9 @@ func main() {
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
-	// patientModel := dataPatient.NewPatient(db)
-	// patientServices := servicePatient.NewPatient(patientModel, cld)
-	// patientController := handlerPatient.NewHandlerPatient(patientServices)
+	patientModel := dataPatient.New(db)
+	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
+	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
 	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
@@ -88,7 +92,7 @@ func main() {
 	routes.RouteUser(e, userController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
-	// routes.RoutePatient(e, patientController, *config)
+	routes.RoutePatient(e, patientController, *config)
 	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
