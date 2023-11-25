@@ -2,33 +2,48 @@ package service
 
 import (
 	transaction "FinalProject/features/transaction"
+	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/midtrans"
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
+
+	"github.com/midtrans/midtrans-go/example"
 )
 
 type TransactionService struct {
-	d  transaction.TransactionDataInterface
-	mt midtrans.MidtransService
+	d   transaction.TransactionDataInterface
+	cld cloudinary.CloudinaryInterface
+	mt  midtrans.MidtransService
 }
 
-func New(data transaction.TransactionDataInterface, mid midtrans.MidtransService) transaction.TransactionServiceInterface {
+func New(data transaction.TransactionDataInterface, cloudinary cloudinary.CloudinaryInterface, mid midtrans.MidtransService) transaction.TransactionServiceInterface {
 	return &TransactionService{
-		d:  data,
-		mt: mid,
+		d:   data,
+		cld: cloudinary,
+		mt:  mid,
 	}
 }
 
-func (as *TransactionService) GetTransactions() ([]transaction.TransactionInfo, error) {
-	result, err := as.d.GetAll()
+func (as *TransactionService) GetTransactions(sort string) ([]transaction.TransactionInfo, error) {
+	result, err := as.d.GetAll(sort)
 	if err != nil {
 		return nil, errors.New("Get All Transactions Failed")
 	}
 	return result, nil
 }
 
-func (as *TransactionService) GetTransaction(id int) ([]transaction.Transaction, error) {
-	result, err := as.d.GetByID(id)
+// func (as *TransactionService) GetTransactionsSort(sort string) ([]transaction.TransactionInfo, error) {
+// 	result, err := as.d.GetAllSort(sort)
+// 	if err != nil {
+// 		return nil, errors.New("Get All Transactions with Sort Failed")
+// 	}
+// 	return result, nil
+// }
+
+func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.Transaction, error) {
+	result, err := as.d.GetByID(id, sort)
 	if err != nil {
 		return nil, errors.New("Get By ID Process Failed")
 	}
@@ -59,9 +74,20 @@ func (as *TransactionService) CreateTransaction(newData transaction.Transaction)
 
 	fmt.Println("Ini new data: ", newData)
 	if err != nil {
-		return nil, nil, errors.New("Insert Process Failed")
+		return nil, nil, err
 	}
 	return result, response, nil
+}
+
+func (as *TransactionService) CreateManualTransaction(newData transaction.Transaction) (*transaction.Transaction, error) {
+
+	newData.MidtransID = "M-" + example.Random()
+
+	result, err := as.d.Insert(newData)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (as *TransactionService) UpdateTransaction(notificationPayload map[string]interface{}, newData transaction.UpdateTransaction) (bool, error) {
@@ -76,6 +102,30 @@ func (as *TransactionService) UpdateTransaction(notificationPayload map[string]i
 	return result, nil
 }
 
+func (as *TransactionService) UpdateTransactionManual(newData transaction.UpdateTransactionManual, id string) (bool, error) {
+	if !containsOnlyNumbers(id) {
+		result, err := as.d.UpdateWithTrxID(newData, id)
+
+		if err != nil {
+			return false, err
+		}
+		return result, nil
+
+	} else {
+		idParsed, err := strconv.Atoi(id)
+		if err != nil {
+			return false, errors.New("Invalid ID format")
+		}
+		result, err := as.d.Update(newData, idParsed)
+
+		if err != nil {
+			return false, errors.New("Update Process Failed")
+		}
+		return result, nil
+
+	}
+}
+
 func (as *TransactionService) DeleteTransaction(id int) (bool, error) {
 	result, err := as.d.Delete(id)
 
@@ -84,4 +134,20 @@ func (as *TransactionService) DeleteTransaction(id int) (bool, error) {
 	}
 
 	return result, nil
+}
+
+func (as *TransactionService) PaymentProofUpload(newData transaction.PaymentProofDataModel) (string, error) {
+	fmt.Println("Ini isi newData: ", newData.PaymentProofPhoto)
+	uploadUrl, err := as.cld.UploadImageHelper(newData.PaymentProofPhoto)
+	fmt.Println("Ini hasil url: ", uploadUrl)
+
+	if err != nil {
+		return "", errors.New("Upload Payment Proof Failed")
+	}
+	return uploadUrl, nil
+}
+
+func containsOnlyNumbers(s string) bool {
+	numericRegex := regexp.MustCompile("^[0-9]+$")
+	return numericRegex.MatchString(s)
 }

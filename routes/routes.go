@@ -5,6 +5,7 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	"FinalProject/features/doctor"
+	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
 	"FinalProject/features/withdraw"
 
@@ -15,6 +16,17 @@ import (
 func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.POST("/register", uh.Register())
 	e.POST("/login", uh.Login())
+}
+
+func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.POST("/transaksi", th.CreateTransaction())
+	e.POST("/transaksi/notif", th.NotifTransaction())
+	e.GET("/transaksi/:id", th.GetTransaction())
+	e.GET("/transaksi", th.GetTransactions())
+	e.DELETE("/transaksi/:id", th.DeleteTransaction())
+	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
+	e.PUT("/transaksi/:id", th.UpdateTransaction())
+	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -32,12 +44,6 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
-
-// func RoutePatient(e *echo.Echo, ph users.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
-// 	e.GET("/patients", ph.GetPatients())
-// 	e.GET("/patients/:id", ph.GetPatient())
-// 	e.POST("/patients/register", ph.CreatePatient())
-// }
 
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors())

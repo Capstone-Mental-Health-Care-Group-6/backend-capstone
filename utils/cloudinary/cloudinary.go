@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/sirupsen/logrus"
 )
 
 type CloudinaryInterface interface {
@@ -25,10 +26,12 @@ func InitCloud(config configs.ProgrammingConfig) CloudinaryInterface {
 }
 
 func (cld *Cloudinary) UploadImageHelper(input interface{}) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Second)
 	defer cancel()
-
 	cl, err := cloudinary.NewFromURL(cld.cfg.CloudinaryURL)
+	//2TFjfPK1yqcIZ1hEKTZ_cZQsLlc
+	logrus.Info("Ini input: ", input)
+	// cl, err := cloudinary.NewFromURL("")
 	if err != nil {
 		return "", err
 	}
@@ -40,6 +43,8 @@ func (cld *Cloudinary) UploadImageHelper(input interface{}) (string, error) {
 	}
 
 	fmt.Println("Sampe sini 2")
+	logrus.Info("Ini payment proof: ", uploadParam.SecureURL)
+	// logrus.Info("Ini map payment: ", uploadParam)
 
 	return uploadParam.SecureURL, nil
 }
