@@ -38,12 +38,12 @@ func InitConfig() *ProgrammingConfig {
 func loadConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
 
-	// err := godotenv.Load(".env")
+	 err := godotenv.Load(".env")
 
-	// if err != nil {
-	// 	logrus.Error("Config : Cannot load config file, ", err.Error())
-	// 	return nil
-	// }
+	 if err != nil {
+	 	logrus.Error("Config : Cannot load config file, ", err.Error())
+	 	return nil
+	 }
 
 	if val, found := os.LookupEnv("SERVER"); found {
 		port, err := strconv.Atoi(val)

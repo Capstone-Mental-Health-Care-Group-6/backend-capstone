@@ -84,10 +84,7 @@ func main() {
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
-	e.Use(middleware.LoggerWithConfig(
-		middleware.LoggerConfig{
-			Format: "method=${method}, uri=${uri}, status=${status}, time=${time_rfc3339}\n",
-		}))
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{}))
 
 	routes.RouteUser(e, userController, *config)
 	routes.RouteArticle(e, articleController, *config)
