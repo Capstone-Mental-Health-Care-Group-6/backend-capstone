@@ -3,6 +3,7 @@ package handler
 import (
 	"FinalProject/features/users"
 	"FinalProject/helper"
+	"FinalProject/utils/oauth"
 	"net/http"
 	"strings"
 
@@ -10,12 +11,14 @@ import (
 )
 
 type UserHandler struct {
-	s users.UserServiceInterface
+	s     users.UserServiceInterface
+	oauth oauth.OauthGoogleInterface
 }
 
-func NewHandler(service users.UserServiceInterface) users.UserHandlerInterface {
+func NewHandler(service users.UserServiceInterface, oauth oauth.OauthGoogleInterface) users.UserHandlerInterface {
 	return &UserHandler{
-		s: service,
+		s:     service,
+		oauth: oauth,
 	}
 }
 
@@ -70,5 +73,34 @@ func (uh *UserHandler) Login() echo.HandlerFunc {
 		response.Token = result.Access
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
+	}
+}
+
+func (uh *UserHandler) LoginGoogle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		state, _ := uh.oauth.GenerateState()
+		url, _ := uh.oauth.AuthCodeURL(state)
+		return c.Redirect(http.StatusTemporaryRedirect, url)
+	}
+}
+
+func (uh *UserHandler) CallbackGoogle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		code := c.QueryParam("code")
+		token, err := uh.oauth.Exchange(code)
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unable to exchange code for token", nil))
+		}
+
+		user, err := uh.oauth.GetEmail(token)
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unable to get user email", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", user))
 	}
 }

@@ -23,6 +23,7 @@ import (
 	"FinalProject/routes"
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
+	"FinalProject/utils/oauth"
 
 	// "fmt"
 
@@ -37,12 +38,14 @@ func main() {
 	db := database.InitDB(*config)
 	database.Migrate(db)
 
+	oauth := oauth.NewOauthGoogleConfig(*config)
+
 	midtrans := midtrans.InitMidtrans(*config)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
 	userServices := serviceUser.New(userModel, jwtInterface)
-	userController := handlerUser.NewHandler(userServices)
+	userController := handlerUser.NewHandler(userServices, oauth)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, midtrans)

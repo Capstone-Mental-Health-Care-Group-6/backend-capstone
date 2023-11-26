@@ -20,6 +20,8 @@ type UserCredential struct {
 type UserHandlerInterface interface {
 	Register() echo.HandlerFunc
 	Login() echo.HandlerFunc
+	LoginGoogle() echo.HandlerFunc
+	CallbackGoogle() echo.HandlerFunc
 }
 
 type UserServiceInterface interface {
@@ -30,4 +32,5 @@ type UserServiceInterface interface {
 type UserDataInterface interface {
 	Register(newData User) (*User, error)
 	Login(email string, password string) (*User, error)
+	GetByEmail(email string) (*User, error)
 }
