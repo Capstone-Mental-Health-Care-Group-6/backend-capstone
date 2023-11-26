@@ -19,19 +19,19 @@ type Patiententity struct {
 }
 
 type Patientdetail struct {
-	ID          uint
-	Name        string
-	Email       string
-	DateOfBirth string
-	Gender      string
-	Avatar      string
-	Phone       string
-	Role        string
-	Status      string
+	ID          uint   `json:"ID"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	DateOfBirth string `json:"date_of_birth"`
+	Gender      string `json:"gender"`
+	Avatar      string `json:"avatar"`
+	Phone       string `json:"phone_number"`
+	Role        string `json:"role"`
+	Status      string `json:"status"`
 }
 
 type UpdateProfile struct {
-	Name        string
+	Name        string `json:"name"`
 	Email       string
 	DateOfBirth string
 	Gender      string
@@ -55,6 +55,7 @@ type AvatarPhoto struct {
 
 type PatientHandlerInterface interface {
 	GetPatients() echo.HandlerFunc
+	GetPatient() echo.HandlerFunc
 	CreatePatient() echo.HandlerFunc
 	UpdatePatient() echo.HandlerFunc
 	UpdatePassword() echo.HandlerFunc

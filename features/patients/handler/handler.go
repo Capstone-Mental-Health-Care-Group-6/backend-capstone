@@ -5,6 +5,7 @@ import (
 	"FinalProject/helper"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -26,29 +27,8 @@ func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
-		if role == "Patient" {
-			userId := mdl.jwt.CheckID(c)
-			userIdInt := int(userId.(float64))
-
-			res, err := mdl.svc.GetPatient(userIdInt)
-
-			if err != nil {
-				c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("cannot process data", nil))
-			}
-
-			response := new(PatientResponse)
-			response.ID = res.ID
-			response.Name = res.Name
-			response.Email = res.Email
-			response.DateOfBirth = res.DateOfBirth
-			response.Gender = res.Gender
-			response.Avatar = res.Avatar
-			response.Phone = res.Phone
-			response.Role = res.Role
-			response.Status = res.Status
-
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success get User", response))
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 
 		result, err := mdl.svc.GetPatients()
@@ -209,6 +189,27 @@ func (mdl *PatientHandler) UpdatePassword() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (mdl *PatientHandler) GetPatient() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		result, err := mdl.svc.GetPatient(id)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 

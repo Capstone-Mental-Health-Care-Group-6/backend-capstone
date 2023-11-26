@@ -5,10 +5,10 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	"FinalProject/features/doctor"
+	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
 	"FinalProject/features/withdraw"
-	"FinalProject/features/patients"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -61,8 +61,9 @@ func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg confi
 
 func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/patient", ph.GetPatients(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/patient/account/:id", ph.GetPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/patient/register", ph.CreatePatient())
 	e.POST("/patient/login", ph.LoginPatient())
-	e.PUT("/patient/update/:id", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/patient/update/password/:id", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
 }
