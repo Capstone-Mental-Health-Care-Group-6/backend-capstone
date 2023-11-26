@@ -94,13 +94,24 @@ func (uh *UserHandler) CallbackGoogle() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unable to exchange code for token", nil))
 		}
 
-		user, err := uh.oauth.GetEmail(token)
+		email, err := uh.oauth.GetEmail(token)
 
 		if err != nil {
 			c.Logger().Error("Handler: Callback process error: ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unable to get user email", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", user))
+		result, err := uh.s.GenerateJwt(email)
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var response = new(LoginResponse)
+		response.Name = result.Name
+		response.Email = result.Email
+		response.Token = result.Access
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
 	}
 }

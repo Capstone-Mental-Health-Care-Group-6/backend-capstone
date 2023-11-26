@@ -27,6 +27,7 @@ type UserHandlerInterface interface {
 type UserServiceInterface interface {
 	Register(newData User) (*User, error)
 	Login(email string, password string) (*UserCredential, error)
+	GenerateJwt(email string) (*UserCredential, error)
 }
 
 type UserDataInterface interface {
