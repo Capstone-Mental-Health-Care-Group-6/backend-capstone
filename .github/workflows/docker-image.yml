@@ -1,85 +1,69 @@
-# name: Docker Image CI
+name: Docker Image CI
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-<<<<<<< HEAD
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      -
-        name: Build and push
+      - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/empathicare:latest 
-      -
-        name: connect ssh
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/imgsimk:latest 
+      - name: connect ssh
         uses: appleboy/ssh-action@v0.1.9
+        env:
+          DB_USER: ${{ secrets.DBUSER }}
+          DB_PASS: ${{ secrets.DBPASS }}
+          DB_PORT: ${{ secrets.DBPORT }}
+          DB_NAME: ${{ secrets.DBNAME }}
+          SERVER_PORT: ${{ secrets.SERVER }}
+          JWT_SECRET: ${{ secrets.JWTSECRET }}
+          REF_SECRET: ${{ secrets.REFSECRET }}
+          MT_CLIENT_KEY: ${{ secrets.MT_CLIENT_KEY }}
+          MT_SERVER_KEY: ${{ secrets.MT_SERVER_KEY }}
+          # CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          # CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          # CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          # CLOUDINARY_UPLOAD_FOLDER: ${{ secrets.CLOUDINARY_UPLOAD_FOLDER }}
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USERNAME}}
+          key: ${{secrets.KEY}}
+          port: ${{secrets.PORT}}
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_UPLOAD_FOLDER
           script: |
-            docker stop ${{ secrets.CNAME }}
-            docker rm ${{ secrets.CNAME }}
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-            docker run --name ${{ secrets.CNAME }} -p 8000:8000 -d -e DBHOST=${{secrets.DBHOST}} -e DBPORT=3306 -e DBUSER=${{secrets.DBUSER}} -e DBNAME=${{secrets.DBNAME}} -e DBPASS=${{secrets.DBPASS}} -e MT_SERVER_KEY=${{secrets.MT_SERVER_KEY}} -e MT_CLIENT_KEY=${{secrets.MT_CLIENT_KEY}} -e MT_ENV=${{secrets.MT_ENV}} -e SECRET=${{secrets.JWTSECRET}} -e REFSECRET=${{secrets.REFSECRET}} -e SERVER=8000 ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-=======
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       -
-#         name: Checkout
-#         uses: actions/checkout@v3
-#       -
-#         name: Login to Docker Hub
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
-#       -
-#         name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
-#       -
-#         name: Build and push
-#         uses: docker/build-push-action@v4
-#         with:
-#           context: .
-#           file: ./Dockerfile
-#           push: true
-#           tags: ${{ secrets.DOCKERHUB_USERNAME }}/empathicare:latest 
-#       -
-#         name: connect ssh
-#         uses: appleboy/ssh-action@v0.1.9
-#         with:
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           key: ${{ secrets.KEY }}
-#           port: ${{ secrets.PORT }}
-#           script: |
-#             docker stop ${{ secrets.CNAME }}
-#             docker rm ${{ secrets.CNAME }}
-#             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-#             docker run --name ${{ secrets.CNAME }} -p 8000:8000 -d -e DBHOST=${{secrets.DBHOST}} -e DBPORT=3306 -e DBUSER=${{secrets.DBUSER}} -e DBNAME=${{secrets.DBNAME}} -e DBPASS=${{secrets.DBPASS}} -e SECRET=${{secrets.JWTSECRET}} -e REFSECRET=${{secrets.REFSECRET}} -e SERVER=8000 ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
->>>>>>> b13016e4c03d4e417f83b95a33ada4d1c328b308
+            export DBUSER=$DB_USER
+            export DBPASS=$DB_PASS
+            export DBPORT=$DB_PORT
+            export DBNAME=$DB_NAME
+            export SERVER=$SERVER_PORT
+            export SECRET=$JWT_SECRET
+            export REFSECRET=$REF_SECRET
+            export MT_CLIENT_KEY=$MT_CLIENT_KEY
+            export MT_SERVER_KEY=$MT_SERVER_KEY
+            # export CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+            # export CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
+            # export CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
+            # export CLOUDINARY_UPLOAD_FOLDER=$CLOUDINARY_UPLOAD_FOLDER
+            # curl -o docker-compose.yaml https://raw.githubusercontent.com/irvanhau/mini-project-go/main/docker-compose.yaml
+            # docker exec irvanhau-db-1 /usr/bin/mysqldump -u ${{secrets.DB_USER}} --password=${{secrets.DB_PASS}} ${{secrets.DB_NAME}} > backup_db.sql
+            docker compose down -v
+            docker compose up -d
+            # docker exec -i irvanhau-db-1 mysql -u ${{secrets.DB_USER}} --password=${{secrets.DB_PASS}} ${{secrets.DB_NAME}} < backup_db.sql
