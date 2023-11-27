@@ -49,7 +49,10 @@ func main() {
 	var config = configs.InitConfig()
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
-	var db = database.InitDB(*config)
+	db, err := database.InitDB(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run database, ", err.Error())
+	}
 
 	database.Migrate(db)
 	oauth := oauth.NewOauthGoogleConfig(*config)
