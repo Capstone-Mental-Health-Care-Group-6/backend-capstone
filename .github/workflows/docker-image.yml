@@ -62,7 +62,7 @@ jobs:
             # export CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
             # export CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
             # export CLOUDINARY_UPLOAD_FOLDER=$CLOUDINARY_UPLOAD_FOLDER
-            # curl -o docker-compose.yaml https://raw.githubusercontent.com/irvanhau/mini-project-go/main/docker-compose.yaml
+            curl -o docker-compose.yaml https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml?token=GHSAT0AAAAAACH5N7WJW36KD4S4FEWJ7OQAZLEKLOA
             # docker exec irvanhau-db-1 /usr/bin/mysqldump -u ${{secrets.DB_USER}} --password=${{secrets.DB_PASS}} ${{secrets.DB_NAME}} > backup_db.sql
             docker compose down -v
             docker compose up -d
