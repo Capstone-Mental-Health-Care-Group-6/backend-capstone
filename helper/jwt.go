@@ -14,11 +14,11 @@ import (
 type JWTInterface interface {
 	GenerateJWT(userID uint, role, status string) map[string]any
 	GenerateToken(id uint, role, status string) string
-	ExtractToken(token *jwt.Token) any
+	ExtractToken(token *jwt.Token) map[string]interface{}
 	RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string]any
 	ValidateToken(token string) (*jwt.Token, error)
 	CheckRole(c echo.Context) interface{}
-	GetID(c echo.Context) interface{}
+	GetID(c echo.Context) any
 }
 
 type JWT struct {
@@ -116,13 +116,13 @@ func (j *JWT) generateRefreshToken(accessToken string) string {
 	return refreshToken
 }
 
-func (j *JWT) ExtractToken(token *jwt.Token) any {
+func (j *JWT) ExtractToken(token *jwt.Token) map[string]interface{} {
 	if token.Valid {
 		var claims = token.Claims
 		expTime, _ := claims.GetExpirationTime()
 		if expTime.Time.Compare(time.Now()) > 0 {
 			var mapClaim = claims.(jwt.MapClaims)
-			var result = map[string]any{}
+			var result = map[string]interface{}{}
 			result["id"] = mapClaim["id"]
 			result["role"] = mapClaim["role"]
 			result["status"] = mapClaim["status"]
@@ -147,6 +147,7 @@ func (j *JWT) ValidateToken(token string) (*jwt.Token, error) {
 	}
 	return parsedToken, nil
 }
+
 
 func (j *JWT) CheckRole(c echo.Context) interface{} {
 	authHeader := c.Request().Header.Get("Authorization")

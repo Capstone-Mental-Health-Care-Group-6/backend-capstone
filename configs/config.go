@@ -20,10 +20,10 @@ type ProgrammingConfig struct {
 	MidtransServerKey       string
 	MidtransClientKey       string
 	MidtransEnvironment     string
+  CloudinaryURL           string
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
-}
 
 func InitConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
@@ -113,6 +113,9 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("OAUTH_GOOGLE_REDIRECT_URL"); found {
 		res.OauthGoogleRedirectURL = val
+
+	if val, found := os.LookupEnv("CloudURL"); found {
+		res.CloudinaryURL = val
 	}
 
 	return res

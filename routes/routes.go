@@ -6,6 +6,8 @@ import (
 	"FinalProject/features/articles"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
+  "FinalProject/features/doctor"
+  "FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -25,6 +27,8 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi", th.GetTransactions())
 	e.DELETE("/transaksi/:id", th.DeleteTransaction())
 	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
+  e.PUT("/transaksi/:id", th.UpdateTransaction())
+	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -41,4 +45,17 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/doctor", ph.GetDoctors())
+	e.GET("/doctor/:id", ph.GetDoctor())
+	e.POST("/doctor/register", ph.CreateDoctor())
+}
+
+func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 }
