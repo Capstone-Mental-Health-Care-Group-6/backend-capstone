@@ -1,3 +1,5 @@
+// midtrans/midtrans.go
+
 package midtrans
 
 import (
@@ -10,8 +12,10 @@ import (
 	"github.com/midtrans/midtrans-go/example"
 )
 
+type ChargeResponse = coreapi.ChargeResponse
+
 type MidtransService interface {
-	GenerateTransaction(result int, paymentType string) (*coreapi.ChargeResponse, map[string]interface{}, error)
+	GenerateTransaction(result int, paymentType string) (*ChargeResponse, map[string]interface{}, error)
 	TransactionStatus(notificationPayload map[string]interface{}) (int, string, error)
 }
 
@@ -35,10 +39,10 @@ func InitMidtrans(c configs.ProgrammingConfig) MidtransService {
 	}
 }
 
-func (ms *midtransService) GenerateTransaction(result int, paymentType string) (*coreapi.ChargeResponse, map[string]interface{}, error) {
+func (ms *midtransService) GenerateTransaction(result int, paymentType string) (*ChargeResponse, map[string]interface{}, error) {
 	var chargeReq *coreapi.ChargeReq
-	response := map[string]any{}
-	var deepLinkURL string
+	response := map[string]any{} // Using interface{} instead of any
+
 	if paymentType == "qris" {
 		chargeReq = &coreapi.ChargeReq{
 			PaymentType: "qris",
@@ -60,7 +64,6 @@ func (ms *midtransService) GenerateTransaction(result int, paymentType string) (
 				GrossAmt: int64(result),
 			},
 		}
-
 	}
 
 	if paymentType == "bca" || paymentType == "bni" || paymentType == "bri" {
@@ -98,11 +101,11 @@ func (ms *midtransService) GenerateTransaction(result int, paymentType string) (
 			for _, action := range chargeResp.Actions {
 				switch action.Name {
 				case "generate-qr-code":
-					deepLinkURL = action.URL
+					deepLinkURL := action.URL
 					response["callback_url"] = deepLinkURL
 					response["payment_type"] = "qris"
 				case "deeplink-redirect":
-					deepLinkURL = action.URL
+					deepLinkURL := action.URL
 					response["callback_url"] = deepLinkURL
 					response["payment_type"] = "gopay"
 				}
@@ -130,65 +133,38 @@ func (ms *midtransService) TransactionStatus(notificationPayload map[string]inte
 	orderId, exists := notificationPayload["order_id"].(string)
 	if !exists {
 		return 0, "", errors.New("Order ID Not Found")
-		// return echo.NewHTTPError(http.StatusBadRequest, "order_id not found")
 	}
 
 	transactionStatusResp, e := ms.core.CheckTransaction(orderId)
 	if e != nil {
 		return 0, "", errors.New(e.GetMessage())
-		// return echo.NewHTTPError(http.StatusInternalServerError, e.GetMessage())
 	} else {
 		if transactionStatusResp != nil {
 			if transactionStatusResp.TransactionStatus == "capture" {
-
 				if transactionStatusResp.FraudStatus == "challenge" {
 					fmt.Println("Payment status challenged")
-					// var serviceUpdate = new(transaction.UpdateTransaction)
-					// serviceUpdate.PaymentStatus = 1 //CHALLENGE
 					paymentStatus = 1
-
 					return paymentStatus, transactionStatusResp.OrderID, nil
 				} else if transactionStatusResp.FraudStatus == "accept" {
-					// var serviceUpdate = new(transaction.UpdateTransaction)
-					// serviceUpdate.PaymentStatus = 2 //ACCEPT
 					fmt.Println("Payment received")
 					paymentStatus = 2
-
 					return paymentStatus, transactionStatusResp.OrderID, nil
-
-					// TODO set transaction status on your database to 'success'
 				}
 			} else if transactionStatusResp.TransactionStatus == "settlement" {
-				// var serviceUpdate = new(transaction.UpdateTransaction)
-				// serviceUpdate.PaymentStatus = 2 //ACCEPT
 				fmt.Println("Payment status settlement")
 				paymentStatus = 2
-
 				return paymentStatus, transactionStatusResp.OrderID, nil
-				// TODO set transaction status on your databaase to 'success'
 			} else if transactionStatusResp.TransactionStatus == "deny" {
-				// var serviceUpdate = new(transaction.UpdateTransaction)
-				// serviceUpdate.PaymentStatus = 3 //DENIED
 				fmt.Println("Payment status denied")
 				paymentStatus = 3
-
 				return paymentStatus, transactionStatusResp.OrderID, nil
-				// TODO you can ignore 'deny', because most of the time it allows payment retries
-				// and later can become success
 			} else if transactionStatusResp.TransactionStatus == "cancel" || transactionStatusResp.TransactionStatus == "expire" {
-				// var serviceUpdate = new(transaction.UpdateTransaction)
-				// serviceUpdate.PaymentStatus = 4 //FAILURE
 				fmt.Println("Payment status failure")
 				paymentStatus = 4
-
 				return paymentStatus, transactionStatusResp.OrderID, nil
-				// TODO set transaction status on your databaase to 'failure'
 			} else if transactionStatusResp.TransactionStatus == "pending" {
-				// var serviceUpdate = new(transaction.UpdateTransaction)
-				// serviceUpdate.PaymentStatus = 5 //WAITING
 				fmt.Println("Payment status pending")
 				paymentStatus = 5
-
 				return paymentStatus, transactionStatusResp.OrderID, nil
 			}
 		}

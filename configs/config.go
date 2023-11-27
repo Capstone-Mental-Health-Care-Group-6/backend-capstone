@@ -9,18 +9,21 @@ import (
 )
 
 type ProgrammingConfig struct {
-	ServerPort          int
-	DBPort              int
-	DBHost              string
-	DBUser              string
-	DBPass              string
-	DBName              string
-	Secret              string
-	RefSecret           string
-	MidtransServerKey   string
-	MidtransClientKey   string
-	MidtransEnvironment string
-}
+	ServerPort              int
+	DBPort                  int
+	DBHost                  string
+	DBUser                  string
+	DBPass                  string
+	DBName                  string
+	Secret                  string
+	RefSecret               string
+	MidtransServerKey       string
+	MidtransClientKey       string
+	MidtransEnvironment     string
+  CloudinaryURL           string
+	OauthGoogleClientID     string
+	OauthGoogleClientSecret string
+	OauthGoogleRedirectURL  string
 
 func InitConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
@@ -98,6 +101,21 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("MT_ENV"); found {
 		res.MidtransEnvironment = val
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_ID"); found {
+		res.OauthGoogleClientID = val
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_SECRET"); found {
+		res.OauthGoogleClientSecret = val
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_REDIRECT_URL"); found {
+		res.OauthGoogleRedirectURL = val
+
+	if val, found := os.LookupEnv("CloudURL"); found {
+		res.CloudinaryURL = val
 	}
 
 	return res

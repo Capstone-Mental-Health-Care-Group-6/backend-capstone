@@ -64,3 +64,22 @@ func (ud *UserData) Login(email, password string) (*users.User, error) {
 
 	return result, nil
 }
+
+func (ud *UserData) GetByEmail(email string) (*users.User, error) {
+	var dbData = new(User)
+	dbData.Email = email
+
+	if err := ud.db.Where("email = ?", dbData.Email).First(dbData).Error; err != nil {
+		logrus.Info("DB Error : ", err.Error())
+		return nil, err
+	}
+
+	var result = new(users.User)
+	result.ID = dbData.ID
+	result.Email = dbData.Email
+	result.Name = dbData.Name
+	result.Role = dbData.Role
+	result.Status = dbData.Status
+
+	return result, nil
+}
