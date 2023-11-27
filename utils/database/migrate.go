@@ -4,6 +4,7 @@ import (
 	DataArticleCategory "FinalProject/features/article_categories/data"
 	DataArticle "FinalProject/features/articles/data"
 	DataDoctor "FinalProject/features/doctor/data"
+	DataPatient "FinalProject/features/patients/data"
 	DataTransaction "FinalProject/features/transaction/data"
 	DataUser "FinalProject/features/users/data"
 	"FinalProject/utils/database/migration"
@@ -29,5 +30,6 @@ func Migrate(db *gorm.DB) {
 		DataDoctor.DoctorExpertiseRelation{},
 		DataDoctor.DoctorRating{},
 		DataDoctor.DoctorWorkadays{},
+		DataPatient.PatientAccount{},
 	}...)
 }

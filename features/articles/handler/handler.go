@@ -11,17 +11,25 @@ import (
 )
 
 type ArticleHandler struct {
-	s articles.ArticleServiceInterface
+	s   articles.ArticleServiceInterface
+	jwt helper.JWTInterface
 }
 
-func NewHandler(service articles.ArticleServiceInterface) articles.ArticleHandlerInterface {
+func NewHandler(service articles.ArticleServiceInterface, jwt helper.JWTInterface) articles.ArticleHandlerInterface {
 	return &ArticleHandler{
-		s: service,
+		s:   service,
+		jwt: jwt,
 	}
 }
 
 func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
 		result, err := ah.s.GetArticles()
 
 		if err != nil {
@@ -35,6 +43,11 @@ func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 
 func (ah *ArticleHandler) GetArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -55,6 +68,11 @@ func (ah *ArticleHandler) GetArticle() echo.HandlerFunc {
 
 func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
 		var input = new(InputRequest)
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
@@ -92,6 +110,11 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 
 func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -124,6 +147,11 @@ func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 
 func (ah *ArticleHandler) DeleteArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 

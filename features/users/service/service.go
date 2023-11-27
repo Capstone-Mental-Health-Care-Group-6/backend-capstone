@@ -49,3 +49,26 @@ func (us *UserService) Login(email, password string) (*users.UserCredential, err
 
 	return response, nil
 }
+
+func (us *UserService) GenerateJwt(email string) (*users.UserCredential, error) {
+	result, err := us.d.GetByEmail(email)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			return nil, errors.New("data not found")
+		}
+		return nil, errors.New("process failed")
+	}
+
+	tokenData := us.j.GenerateJWT(result.ID, result.Role, result.Status)
+
+	if tokenData == nil {
+		return nil, errors.New("token process failed")
+	}
+
+	response := new(users.UserCredential)
+	response.Name = result.Name
+	response.Email = result.Email
+	response.Access = tokenData
+
+	return response, nil
+}

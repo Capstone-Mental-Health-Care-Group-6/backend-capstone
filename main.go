@@ -5,8 +5,7 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
-	"FinalProject/utils/cloudinary"
-	"FinalProject/utils/midtrans"
+	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
 	handlerTransaksi "FinalProject/features/transaction/handler"
@@ -28,10 +27,18 @@ import (
 	handlerWithdraw "FinalProject/features/withdraw/handler"
 	serviceWithdraw "FinalProject/features/withdraw/service"
 
+	dataPatient "FinalProject/features/patients/data"
+	handlerPatient "FinalProject/features/patients/handler"
+	servicePatient "FinalProject/features/patients/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
+	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
-	"fmt"
+	"FinalProject/utils/midtrans"
+	"FinalProject/utils/oauth"
+
+	// "fmt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -39,35 +46,37 @@ import (
 
 func main() {
 	e := echo.New()
-	config := configs.InitConfig()
-
-	var db = database.InitDB(*config)
-	database.Migrate(db)
-
+	var config = configs.InitConfig()
 	var cld = cloudinary.InitCloud(*config)
+	var midtrans = midtrans.InitMidtrans(*config)
+	db, err := database.InitDB(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run database, ", err.Error())
+	}
 
-	midtrans := midtrans.InitMidtrans(*config)
+	database.Migrate(db)
+	oauth := oauth.NewOauthGoogleConfig(*config)
+	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	jwtInterface := helper.New(config.Secret, config.RefSecret)
 	userServices := serviceUser.New(userModel, jwtInterface)
-	userController := handlerUser.NewHandler(userServices)
-
-	articleModel := dataArticle.New(db)
-	articleServices := serviceArticle.New(articleModel)
-	articleController := handlerArticle.NewHandler(articleServices)
+	userController := handlerUser.NewHandler(userServices, oauth)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
 	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
 
+	articleModel := dataArticle.New(db)
+	articleServices := serviceArticle.New(articleModel)
+	articleController := handlerArticle.NewHandler(articleServices, jwtInterface)
+
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
 
-	// patientModel := dataPatient.NewPatient(db)
-	// patientServices := servicePatient.NewPatient(patientModel, cld)
-	// patientController := handlerPatient.NewHandlerPatient(patientServices)
+	patientModel := dataPatient.New(db)
+	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
+	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
 	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
@@ -86,14 +95,12 @@ func main() {
 		}))
 
 	routes.RouteUser(e, userController, *config)
+	routes.RouteTransaction(e, transaksiController, *config)
 	routes.RouteArticle(e, articleController, *config)
 	routes.RouteArticleCategory(e, articleCategoryController, *config)
-	// routes.RoutePatient(e, patientController, *config)
-	routes.RouteTransaction(e, transaksiController, *config)
+	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
-
-	// config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
