@@ -7,6 +7,7 @@ import (
 	DataTransaction "FinalProject/features/transaction/data"
 	DataUser "FinalProject/features/users/data"
 	"FinalProject/utils/database/migration"
+  DataPatient "FinalProject/features/patients/data"
 
 	"gorm.io/gorm"
 )
@@ -18,6 +19,7 @@ func Migrate(db *gorm.DB) {
 	// 	DataArticleCategory.ArticleCategory{},
 	// 	DataArticle.Article{},
 	// 	DataTransaction.Transaction{},
+  //  DataPatient.PatientAccount{},
 	// }...)
   
 	migrator.CreateTable([]migration.Table{
@@ -26,5 +28,6 @@ func Migrate(db *gorm.DB) {
 		DataArticle.Article{},
 		DataDoctor.Doctor{},
 		DataTransaction.Transaction{},
+    DataPatient.PatientAccount{},
 	}...)
 }
