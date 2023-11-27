@@ -2,6 +2,7 @@ version: '3.7'
 services:
   db:
     image: mysql:8.0
+    container_name: empathi-care-db
     environment:
       MYSQL_ROOT_PASSWORD: ${DBPASS}
       MYSQL_DATABASE: ${DBNAME}
@@ -28,6 +29,7 @@ services:
         
   api:
     image: irvanhau/empathicare
+    container_name: empathi-care-app
     depends_on:
       db:
         condition: service_healthy
