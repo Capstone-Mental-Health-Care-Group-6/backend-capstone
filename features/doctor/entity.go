@@ -2,14 +2,14 @@ package doctor
 
 import (
 	"mime/multipart"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 type Doctor struct {
-	ID     uint `json:"id"`
-	UserID uint `json:"user_id"`
-
+	ID                  uint   `json:"id"`
+	UserID              uint   `json:"user_id"`
 	DoctorName          string `json:"doctor_name"`
 	DoctorExperience    string `json:"doctor_experience"`
 	DoctorDescription   string `json:"doctor_description"`
@@ -17,16 +17,62 @@ type Doctor struct {
 	DoctorOfficeName    string `json:"doctor_office_name"`
 	DoctorOfficeAddress string `json:"doctor_office_address"`
 	DoctorOfficeCity    string `json:"doctor_office_city"`
+	DoctorMeetLink      string `json:"doctor_meet_link"`
+	DoctorSIPP          uint   `json:"doctor_sipp"`
+	DoctorSIPPFile      string `json:"doctor_sipp_file"`
+	DoctorSTR           uint   `json:"doctor_str"`
+	DoctorSTRFile       string `json:"doctor_str_file"`
+	DoctorCV            string `json:"doctor_cv"`
+	DoctorIjazah        string `json:"doctor_ijazah"`
+	DoctorBalance       uint   `json:"doctor_balance"`
+	DoctorStatus        string `json:"doctor_status"`
 
-	DoctorMeetLink string `json:"doctor_meet_link"`
-	DoctorSIPP     uint   `json:"doctor_sipp"`
-	DoctorSIPPFile string `json:"doctor_sipp_file"`
-	DoctorSTR      uint   `json:"doctor_str"`
-	DoctorSTRFile  string `json:"doctor_str_file"`
-	DoctorCV       string `json:"doctor_cv"`
-	DoctorIjazah   string `json:"doctor_ijazah"`
-	DoctorBalance  uint   `json:"doctor_balance"`
-	DoctorStatus   string `json:"doctor_status"`
+	DoctorWorkdayID     uint   `json:"workday_id"`
+	DoctorExpertiseID   uint   `json:"expertise_id"`
+	DoctorWorkStartTime string `json:"start_time"`
+	DoctorWorkEndTime   string `json:"end_time"`
+}
+
+type DoctorInfo struct {
+	UserID              uint   `json:"user_id"`
+	DoctorName          string `json:"doctor_name"`
+	DoctorExperience    string `json:"doctor_experience"`
+	DoctorDescription   string `json:"doctor_description"`
+	DoctorAvatar        string `json:"doctor_avatar"`
+	DoctorOfficeName    string `json:"doctor_office_name"`
+	DoctorOfficeAddress string `json:"doctor_office_address"`
+	DoctorOfficeCity    string `json:"doctor_office_city"`
+	DoctorMeetLink      string `json:"doctor_meet_link"`
+	DoctorSIPPFile      string `json:"doctor_sipp_file"`
+	DoctorSTRFile       string `json:"doctor_str_file"`
+	DoctorCV            string `json:"doctor_cv"`
+	DoctorIjazah        string `json:"doctor_ijazah"`
+	DoctorBalance       uint   `json:"doctor_balance"`
+	DoctorStatus        string `json:"doctor_status"`
+
+	WorkdayID   uint      `json:"workday_id"`
+	ExpertiseID uint      `json:"expertise_id"`
+	StartTime   time.Time `json:"start_time"`
+	EndTime     time.Time `json:"end_time"`
+}
+
+type DoctorExpertiseRelation struct {
+	DoctorID    uint `json:"doctor_id"`
+	ExpertiseID uint `json:"expertise_id"`
+}
+
+type DoctorWorkadays struct {
+	DoctorID  uint      `json:"doctor_id"`
+	WorkdayID uint      `json:"workday_id"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
+
+type DoctorRating struct {
+	DoctorID         uint   `json:"doctor_id"`
+	PatientID        uint   `json:"patient_id"`
+	DoctorStarRating uint   `json:"doctor_star_rating"`
+	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
 }
 
 type JwtMapClaims struct {
@@ -62,8 +108,10 @@ type DoctorHandlerInterface interface {
 }
 
 type DoctorServiceInterface interface {
-	GetDoctors() ([]Doctor, error)
-	GetDoctor(id int) ([]Doctor, error)
+	GetDoctors() ([]DoctorInfo, error)
+	GetDoctor(id int) ([]DoctorInfo, error)
+	CreateDoctorExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
+	CreateDoctorWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
 	CreateDoctor(newData Doctor) (*Doctor, error)
 	DoctorAvatarUpload(newData DoctorAvatarPhoto) (string, error)
 	DoctorSIPPUpload(newData DoctorSIPPFileDataModel) (string, error)
@@ -74,7 +122,9 @@ type DoctorServiceInterface interface {
 }
 
 type DoctorDataInterface interface {
-	GetAll() ([]Doctor, error)
-	GetByID(id int) ([]Doctor, error)
+	GetAll() ([]DoctorInfo, error)
+	GetByID(id int) ([]DoctorInfo, error)
 	Insert(newData Doctor) (*Doctor, error)
+	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
+	InsertWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
 }
