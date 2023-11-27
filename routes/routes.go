@@ -4,10 +4,10 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
-	"FinalProject/features/doctor"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
-	"FinalProject/features/withdraw"
+  "FinalProject/features/doctor"
+  "FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -16,6 +16,8 @@ import (
 func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.POST("/register", uh.Register())
 	e.POST("/login", uh.Login())
+	e.GET("/login/google", uh.LoginGoogle())
+	e.GET("/login/google/callback", uh.CallbackGoogle())
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -25,7 +27,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi", th.GetTransactions())
 	e.DELETE("/transaksi/:id", th.DeleteTransaction())
 	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
-	e.PUT("/transaksi/:id", th.UpdateTransaction())
+  e.PUT("/transaksi/:id", th.UpdateTransaction())
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 

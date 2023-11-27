@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -14,8 +15,10 @@ type JWTInterface interface {
 	GenerateJWT(userID uint, role, status string) map[string]any
 	GenerateToken(id uint, role, status string) string
 	ExtractToken(token *jwt.Token) map[string]interface{}
+	RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string]any
 	ValidateToken(token string) (*jwt.Token, error)
-	GetID(c echo.Context) (uint, error)
+	CheckRole(c echo.Context) interface{}
+	GetID(c echo.Context) any
 }
 
 type JWT struct {
@@ -112,6 +115,7 @@ func (j *JWT) generateRefreshToken(accessToken string) string {
 
 	return refreshToken
 }
+
 func (j *JWT) ExtractToken(token *jwt.Token) map[string]interface{} {
 	if token.Valid {
 		var claims = token.Claims
@@ -144,21 +148,33 @@ func (j *JWT) ValidateToken(token string) (*jwt.Token, error) {
 	return parsedToken, nil
 }
 
-func (j *JWT) GetID(c echo.Context) (uint, error) {
+
+func (j *JWT) CheckRole(c echo.Context) interface{} {
 	authHeader := c.Request().Header.Get("Authorization")
 
 	token, err := j.ValidateToken(authHeader)
 	if err != nil {
 		logrus.Info(err)
-		return 0, err
+		return c.JSON(http.StatusUnauthorized, FormatResponse("Token is not valid", nil))
 	}
 
 	mapClaim := token.Claims.(jwt.MapClaims)
-	idFloat, ok := mapClaim["id"].(float64)
-	if !ok {
-		return 0, fmt.Errorf("ID not found or not a valid number")
+	role := mapClaim["role"]
+
+	return role
+}
+
+func (j *JWT) GetID(c echo.Context) any {
+	authHeader := c.Request().Header.Get("Authorization")
+
+	token, err := j.ValidateToken(authHeader)
+	if err != nil {
+		logrus.Info(err)
+		return c.JSON(http.StatusUnauthorized, FormatResponse("Token is not valid", nil))
 	}
 
-	idUint := uint(idFloat)
-	return idUint, nil
+	mapClaim := token.Claims.(jwt.MapClaims)
+	id := mapClaim["id"]
+
+	return id
 }
