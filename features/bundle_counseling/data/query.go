@@ -31,3 +31,26 @@ func (bc *BundleCounselingData) GetAll() ([]bundlecounseling.BundleCounselingInf
 
 	return listBundleCounseling, nil
 }
+
+func (bc *BundleCounselingData) Create(input bundlecounseling.BundleCounseling) (*bundlecounseling.BundleCounselingInfo, error) {
+	var newBundleCounseling = &bundlecounseling.BundleCounseling{
+		Name:         input.Name,
+		Sessions:     input.Sessions,
+		Type:         input.Type,
+		Price:        input.Price,
+		Description:  input.Description,
+		ActivePriode: input.ActivePriode,
+		Avatar:       input.Avatar,
+	}
+
+	return &bundlecounseling.BundleCounselingInfo{
+		Name:         newBundleCounseling.Name,
+		Sessions:     newBundleCounseling.Sessions,
+		Type:         newBundleCounseling.Type,
+		Price:        newBundleCounseling.Price,
+		Description:  newBundleCounseling.Description,
+		ActivePriode: newBundleCounseling.ActivePriode,
+		Avatar:       newBundleCounseling.Avatar,
+	}, nil
+
+}
