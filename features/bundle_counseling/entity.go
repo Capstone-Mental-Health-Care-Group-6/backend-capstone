@@ -28,9 +28,13 @@ type BundleCounselingInfo struct {
 	Avatar       string `json:"avatar"`
 }
 
+type BundleCounselingFile struct {
+	Avatar multipart.File `json:"avatar"`
+}
+
 type BundleCounselingDataInterface interface {
 	GetAll() ([]BundleCounselingInfo, error)
-	Create(input BundleCounseling) (*BundleCounselingInfo, error)
+	Create(input BundleCounseling) (*BundleCounseling, error)
 }
 
 type BundleCounselingHandlerInterface interface {
@@ -40,6 +44,5 @@ type BundleCounselingHandlerInterface interface {
 
 type BundleCounselingServiceInterface interface {
 	GetAllBundle() ([]BundleCounselingInfo, error)
-	CreateBundle(input BundleCounseling, file *multipart.FileHeader) (*BundleCounselingInfo, error)
-	UploadFile(file *multipart.FileHeader) (string, error)
+	CreateBundle(input BundleCounseling, file BundleCounselingFile) (*BundleCounseling, error)
 }

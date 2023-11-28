@@ -4,7 +4,6 @@ import (
 	bundlecounseling "FinalProject/features/bundle_counseling"
 	"FinalProject/utils/cloudinary"
 	"errors"
-	"mime/multipart"
 )
 
 type BundleCounselingService struct {
@@ -27,9 +26,9 @@ func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCouns
 	return result, nil
 }
 
-func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCounseling, file *multipart.FileHeader) (*bundlecounseling.BundleCounselingInfo, error) {
+func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (*bundlecounseling.BundleCounseling, error) {
 
-	uploadUrl, err := s.cld.UploadImageHelper(file)
+	uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
 	if err != nil {
 		return nil, errors.New("Upload Failed")
 	}
@@ -50,12 +49,4 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 	}
 
 	return result, nil
-}
-
-func (s *BundleCounselingService) UploadFile(file *multipart.FileHeader) (string, error) {
-	uploadUrl, err := s.cld.UploadImageHelper(file)
-	if err != nil {
-		return "", errors.New("Upload Failed")
-	}
-	return uploadUrl, nil
 }

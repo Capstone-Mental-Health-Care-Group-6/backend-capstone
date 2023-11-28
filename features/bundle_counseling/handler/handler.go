@@ -67,6 +67,12 @@ func (h *BundleCounselingHandler) CreateBundle() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
 		}
 
+		openFile, err := file.Open()
+		if err != nil {
+			c.Logger().Fatal("Handler : Open File Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
+		}
+
 		var serviceInput = new(bundlecounseling.BundleCounseling)
 		serviceInput.Name = req.Name
 		serviceInput.Sessions = req.Sessions
@@ -75,7 +81,7 @@ func (h *BundleCounselingHandler) CreateBundle() echo.HandlerFunc {
 		serviceInput.Description = req.Description
 		serviceInput.ActivePriode = req.ActivePriode
 
-		result, err := h.s.CreateBundle(*serviceInput, file)
+		result, err := h.s.CreateBundle(*serviceInput, bundlecounseling.BundleCounselingFile{Avatar: openFile})
 		if err != nil {
 			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))

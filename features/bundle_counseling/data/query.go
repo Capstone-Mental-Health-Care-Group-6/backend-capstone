@@ -32,25 +32,29 @@ func (bc *BundleCounselingData) GetAll() ([]bundlecounseling.BundleCounselingInf
 	return listBundleCounseling, nil
 }
 
-func (bc *BundleCounselingData) Create(input bundlecounseling.BundleCounseling) (*bundlecounseling.BundleCounselingInfo, error) {
-	var newBundleCounseling = &bundlecounseling.BundleCounseling{
-		Name:         input.Name,
-		Sessions:     input.Sessions,
-		Type:         input.Type,
-		Price:        input.Price,
-		Description:  input.Description,
-		ActivePriode: input.ActivePriode,
-		Avatar:       input.Avatar,
+func (bc *BundleCounselingData) Create(input bundlecounseling.BundleCounseling) (*bundlecounseling.BundleCounseling, error) {
+	// var newBundleCounseling = &bundlecounseling.BundleCounseling{
+	// 	Name:         input.Name,
+	// 	Sessions:     input.Sessions,
+	// 	Type:         input.Type,
+	// 	Price:        input.Price,
+	// 	Description:  input.Description,
+	// 	ActivePriode: input.ActivePriode,
+	// 	Avatar:       input.Avatar,
+	// }
+
+	var newData = new(bundlecounseling.BundleCounseling)
+	newData.Name = input.Name
+	newData.Sessions = input.Sessions
+	newData.Type = input.Type
+	newData.Price = input.Price
+	newData.Description = input.Description
+	newData.ActivePriode = input.ActivePriode
+	newData.Avatar = input.Avatar
+
+	if err := bc.db.Table("bundle_counseling").Create(newData).Error; err != nil {
+		return nil, err
 	}
 
-	return &bundlecounseling.BundleCounselingInfo{
-		Name:         newBundleCounseling.Name,
-		Sessions:     newBundleCounseling.Sessions,
-		Type:         newBundleCounseling.Type,
-		Price:        newBundleCounseling.Price,
-		Description:  newBundleCounseling.Description,
-		ActivePriode: newBundleCounseling.ActivePriode,
-		Avatar:       newBundleCounseling.Avatar,
-	}, nil
-
+	return &input, nil
 }
