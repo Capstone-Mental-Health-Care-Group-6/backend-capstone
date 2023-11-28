@@ -74,3 +74,24 @@ func (bc *BundleCounselingData) GetById(id int) (*bundlecounseling.BundleCounsel
 
 	return result, nil
 }
+
+func (bc *BundleCounselingData) Update(id int, input bundlecounseling.BundleCounseling) (bool, error) {
+	var newData = map[string]interface{}{
+		"name":          input.Name,
+		"sessions":      input.Sessions,
+		"type":          input.Type,
+		"price":         input.Price,
+		"description":   input.Description,
+		"active_priode": input.ActivePriode,
+	}
+
+	if input.Avatar != "" {
+		newData["avatar"] = input.Avatar
+	}
+
+	if err := bc.db.Table("bundle_counseling").Where("id = ?", id).Updates(newData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

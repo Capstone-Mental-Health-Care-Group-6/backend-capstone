@@ -36,16 +36,19 @@ type BundleCounselingHandlerInterface interface {
 	GetAllBundle() echo.HandlerFunc
 	CreateBundle() echo.HandlerFunc
 	GetBundle() echo.HandlerFunc
+	UpdateBundle() echo.HandlerFunc
 }
 
 type BundleCounselingServiceInterface interface {
 	GetAllBundle() ([]BundleCounselingInfo, error)
 	CreateBundle(input BundleCounseling, file BundleCounselingFile) (*BundleCounseling, error)
 	GetBundle(id int) (*BundleCounseling, error)
+	UpdateBundle(id int, input BundleCounseling, file BundleCounselingFile) (bool, error)
 }
 
 type BundleCounselingDataInterface interface {
 	GetAll() ([]BundleCounselingInfo, error)
 	Create(input BundleCounseling) (*BundleCounseling, error)
 	GetById(id int) (*BundleCounseling, error)
+	Update(id int, newData BundleCounseling) (bool, error)
 }

@@ -59,3 +59,31 @@ func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCou
 
 	return result, nil
 }
+
+func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (bool, error) {
+
+	newData := bundlecounseling.BundleCounseling{
+		Name:         input.Name,
+		Sessions:     input.Sessions,
+		Type:         input.Type,
+		Price:        input.Price,
+		Description:  input.Description,
+		ActivePriode: input.ActivePriode,
+	}
+
+	if file.Avatar != nil {
+		uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
+		if err != nil {
+			return false, errors.New("Upload Failed")
+		}
+
+		newData.Avatar = uploadUrl
+	}
+
+	result, err := s.d.Update(id, newData)
+	if err != nil {
+		return false, err
+	}
+
+	return result, nil
+}
