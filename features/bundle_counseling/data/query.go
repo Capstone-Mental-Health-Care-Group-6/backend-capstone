@@ -58,3 +58,19 @@ func (bc *BundleCounselingData) Create(input bundlecounseling.BundleCounseling) 
 
 	return &input, nil
 }
+
+func (bc *BundleCounselingData) GetById(id int) (*bundlecounseling.BundleCounseling, error) {
+	var result = new(bundlecounseling.BundleCounseling)
+
+	var qry = bc.db.Table("bundle_counseling").
+		Select("bundle_counseling.*").
+		Where("bundle_counseling.deleted_at is null").
+		Where("bundle_counseling.id = ?", id).
+		Scan(&result)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

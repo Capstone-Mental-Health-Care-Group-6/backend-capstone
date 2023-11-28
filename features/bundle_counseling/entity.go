@@ -32,17 +32,20 @@ type BundleCounselingFile struct {
 	Avatar multipart.File `json:"avatar"`
 }
 
-type BundleCounselingDataInterface interface {
-	GetAll() ([]BundleCounselingInfo, error)
-	Create(input BundleCounseling) (*BundleCounseling, error)
-}
-
 type BundleCounselingHandlerInterface interface {
 	GetAllBundle() echo.HandlerFunc
 	CreateBundle() echo.HandlerFunc
+	GetBundle() echo.HandlerFunc
 }
 
 type BundleCounselingServiceInterface interface {
 	GetAllBundle() ([]BundleCounselingInfo, error)
 	CreateBundle(input BundleCounseling, file BundleCounselingFile) (*BundleCounseling, error)
+	GetBundle(id int) (*BundleCounseling, error)
+}
+
+type BundleCounselingDataInterface interface {
+	GetAll() ([]BundleCounselingInfo, error)
+	Create(input BundleCounseling) (*BundleCounseling, error)
+	GetById(id int) (*BundleCounseling, error)
 }

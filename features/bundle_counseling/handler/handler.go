@@ -4,6 +4,7 @@ import (
 	bundlecounseling "FinalProject/features/bundle_counseling"
 	"FinalProject/helper"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -51,7 +52,7 @@ func (h *BundleCounselingHandler) CreateBundle() echo.HandlerFunc {
 		var req InputRequest
 
 		if err := c.Bind(&req); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
 		}
 
@@ -69,7 +70,7 @@ func (h *BundleCounselingHandler) CreateBundle() echo.HandlerFunc {
 
 		openFile, err := file.Open()
 		if err != nil {
-			c.Logger().Fatal("Handler : Open File Error : ", err.Error())
+			c.Logger().Info("Handler : Open File Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
 		}
 
@@ -83,10 +84,41 @@ func (h *BundleCounselingHandler) CreateBundle() echo.HandlerFunc {
 
 		result, err := h.s.CreateBundle(*serviceInput, bundlecounseling.BundleCounselingFile{Avatar: openFile})
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
 		}
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success to create bundle", result))
+	}
+}
+
+func (h *BundleCounselingHandler) GetBundle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := h.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		result, err := h.s.GetBundle(id)
+
+		if err != nil {
+			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get bundle", nil))
+		}
+
+		if result.ID == 0 {
+			return c.JSON(http.StatusNotFound, helper.FormatResponse("Success", "Data not found"))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get bundle", result))
 	}
 }

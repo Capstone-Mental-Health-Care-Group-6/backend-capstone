@@ -50,3 +50,12 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 
 	return result, nil
 }
+
+func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCounseling, error) {
+	result, err := s.d.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
