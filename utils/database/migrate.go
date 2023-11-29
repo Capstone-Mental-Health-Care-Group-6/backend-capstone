@@ -13,8 +13,8 @@ import (
 
 func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataUser.User{})
-	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
-	db.AutoMigrate(DataArticle.Article{})
+	// db.AutoMigrate(DataArticleCategory.ArticleCategory{})
+	// db.AutoMigrate(DataArticle.Article{})
 	db.AutoMigrate(DataDoctor.Doctor{})
 	db.AutoMigrate(DataPatient.PatientAccount{})
 	db.AutoMigrate(DataTransaction.Transaction{})
