@@ -38,7 +38,7 @@ jobs:
           REF_SECRET: ${{ secrets.REFSECRET }}
           MT_CLIENT_KEY: ${{ secrets.MT_CLIENT_KEY }}
           MT_SERVER_KEY: ${{ secrets.MT_SERVER_KEY }}
-          MT_ENV: ${{ secrets.MT_ENV }}
+          MT_ENVIRONMENT: ${{ secrets.MT_ENV }}
           CLOUDINARY_URL: ${{ secrets.CloudURL }}
           OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
           OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
@@ -59,7 +59,7 @@ jobs:
             echo $REF_SECRET >> tulisan.txt
             echo $MT_CLIENT_KEY >> tulisan.txt
             echo $MT_SERVER_KEY >> tulisan.txt
-            echo $MT_ENV >> tulisan.txt
+            echo $MT_ENVIRONMENT >> tulisan.txt
             echo $CLOUDINARY_URL >> tulisan.txt
             echo $OAUTH_GOOGLE_CLIENT_ID >> tulisan.txt
             echo $OAUTH_GOOGLE_CLIENT_SECRET >> tulisan.txt
@@ -73,7 +73,7 @@ jobs:
             # export REFSECRET=$REF_SECRET
             # export MT_CLIENT_KEY=$MT_CLIENT_KEY
             # export MT_SERVER_KEY=$MT_SERVER_KEY
-            # export MT_ENV=$MT_ENV
+            # export MT_ENV=$MT_ENVIRONMENT
             # export CloudURL=$CLOUDINARY_URL
             # export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
             # export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
