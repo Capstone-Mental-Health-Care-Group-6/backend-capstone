@@ -66,23 +66,6 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
-		// authorizationHeader := c.Request().Header.Get("Authorization")
-
-		// // Check if the authorization header is valid
-		// if !strings.Contains(authorizationHeader, "Bearer") {
-		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Invalid auth token", nil))
-
-		// }
-
-		// jwtMapClaims, err := mdl.svc.JwtExtractToken(authorizationHeader)
-		// if err != nil {
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to extract", nil))
-		// }
-
-		// if jwtMapClaims.Role == 0 || jwtMapClaims.Role == 1 {
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Not allowed to register as doctor", nil))
-		// }
-
 		formHeaderPhoto, err := c.FormFile("doctor_avatar")
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Avatar", nil))
@@ -162,7 +145,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		serviceInput.UserID = input.UserID
 		serviceInput.DoctorName = input.DoctorName
-		serviceInput.DoctorExperience = input.DoctorExperience
+		serviceInput.DoctorExperienced = input.DoctorExperienced
 		serviceInput.DoctorDescription = input.DoctorDescription
 		serviceInput.DoctorAvatar = uploadUrlPhoto
 
@@ -198,28 +181,115 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
-		var serviceInputWorkadays = new(doctor.DoctorWorkadays)
-		serviceInputWorkadays.DoctorID = result.ID
-		serviceInputWorkadays.WorkdayID = input.DoctorWorkdayID
-		serviceInputWorkadays.StartTime = input.DoctorWorkStartTime
-		serviceInputWorkadays.EndTime = input.DoctorWorkEndTime
-
-		resultWorkadays, err := mdl.svc.CreateDoctorWorkadays(*serviceInputWorkadays)
-
-		if err != nil {
-			c.Logger().Info("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		if len(input.DoctorWorkdayID) != len(input.DoctorWorkStartTime) || len(input.DoctorWorkdayID) != len(input.DoctorWorkEndTime) {
+			c.Logger().Info("Handler: workday, start time, and end time must have the same array length!")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Workday, Start and End time mismatch array length.", nil))
 		}
 
-		//handling error untuk duplicate user id dan user id tidak ada di table users belum fix
+		// Validate array lengths for DoctorEducation
+		if len(input.DoctorUniversity) != len(input.DoctorStudyProgram) || len(input.DoctorUniversity) != len(input.DoctorGraduateYear) {
+			c.Logger().Info("Handler: university, study program, and graduate year must have the same array length!")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: University, Study Program, and Graduate Year mismatch array length.", nil))
+		}
+
+		// Validate array lengths for DoctorExperience
+		if len(input.DoctorCompany) != len(input.DoctorTitle) || len(input.DoctorCompany) != len(input.DoctorDescription) ||
+			len(input.DoctorCompany) != len(input.DoctorStartDate) || len(input.DoctorCompany) != len(input.DoctorEndDate) ||
+			len(input.DoctorCompany) != len(input.DoctorIsNow) {
+			c.Logger().Info("Handler: company, title, experience, start date, end date, and is now must have the same array length!")
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Company, Title, Experience, Start Date, End Date, and Is Now mismatch array length.", nil))
+		}
+
+		// Create DoctorWorkadays objects
+		var resultWorkadaysSlice []*doctor.DoctorWorkadays
+		for i, workdayID := range input.DoctorWorkdayID {
+			// Extract values for the current iteration
+			startTime := input.DoctorWorkStartTime[i]
+			endTime := input.DoctorWorkEndTime[i]
+
+			// Create a DoctorWorkadays object
+			serviceInputWorkadays := doctor.DoctorWorkadays{
+				DoctorID:  result.ID,
+				WorkdayID: workdayID,
+				StartTime: startTime,
+				EndTime:   endTime,
+			}
+
+			// Call the service to create DoctorWorkadays
+			resultWorkadays, err := mdl.svc.CreateDoctorWorkadays(serviceInputWorkadays)
+			resultWorkadaysSlice = append(resultWorkadaysSlice, resultWorkadays)
+
+			if err != nil {
+				c.Logger().Info("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+		}
+
+		// Create DoctorEducation objects
+		var resultEducationSlice []*doctor.DoctorEducation
+
+		for i, university := range input.DoctorUniversity {
+			// Extract values for the current iteration
+			studyProgram := input.DoctorStudyProgram[i]
+			graduateYear := input.DoctorGraduateYear[i]
+
+			// Create a DoctorEducation object
+			serviceInputEducation := doctor.DoctorEducation{
+				DoctorID:           result.ID,
+				DoctorUniversity:   university,
+				DoctorStudyProgram: studyProgram,
+				DoctorGraduateYear: graduateYear,
+			}
+
+			// Call the service to create DoctorEducation
+			resultEducation, err := mdl.svc.CreateDoctorEducation(serviceInputEducation)
+			resultEducationSlice = append(resultEducationSlice, resultEducation)
+
+			if err != nil {
+				c.Logger().Info("Handler: Input Process Error (CreateDoctorEducation): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+		}
+
+		// Create DoctorExperience objects
+		var resultExperienceSlice []*doctor.DoctorExperience
+		for i, company := range input.DoctorCompany {
+			// Extract values for the current iteration
+			title := input.DoctorTitle[i]
+			description := input.DoctorExperienceDescription[i]
+			startDate := input.DoctorStartDate[i]
+			endDate := input.DoctorEndDate[i]
+			isNow := input.DoctorIsNow[i]
+
+			// Create a DoctorExperience object
+			serviceInputExperience := doctor.DoctorExperience{
+				DoctorID:                    result.ID,
+				DoctorCompany:               company,
+				DoctorTitle:                 title,
+				DoctorExperienceDescription: description,
+				DoctorStartDate:             startDate,
+				DoctorEndDate:               endDate,
+				DoctorIsNow:                 isNow,
+			}
+
+			// Call the service to create DoctorExperience
+			resultExperience, err := mdl.svc.CreateDoctorExperience(serviceInputExperience)
+			resultExperienceSlice = append(resultExperienceSlice, resultExperience)
+
+			if err != nil {
+				c.Logger().Info("Handler: Input Process Error (CreateDoctorExperience): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+		}
 
 		var response = new(DoctorResponse)
 
-		// response.ID = result.ID
+		// response.ID = result.
 		response.UserID = result.UserID
 		response.DoctorName = result.DoctorName
-		response.DoctorExperience = result.DoctorExperience
-		response.DoctorDescription = result.DoctorDescription
+		response.DoctorExpertise = resultExpertise.ExpertiseID
+		// response.DoctorExperience = result.DoctorExperience
+		// response.DoctorDescription = result.DoctorDescription
 		response.DoctorAvatar = result.DoctorAvatar
 		response.DoctorOfficeName = result.DoctorOfficeName
 		response.DoctorOfficeAddress = result.DoctorOfficeAddress
@@ -232,10 +302,14 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		response.DoctorBalance = result.DoctorBalance
 		response.DoctorStatus = result.DoctorStatus
 
-		response.DoctorExpertiseID = resultExpertise.ExpertiseID
-		response.DoctorWorkdayID = resultWorkadays.WorkdayID
-		response.DoctorWorkStartTime = resultWorkadays.StartTime.String()
-		response.DoctorWorkEndTime = resultWorkadays.EndTime.String()
+		response.DoctorWorkday = resultWorkadaysSlice
+		response.DoctorEducation = resultEducationSlice
+		response.DoctorExperience = resultExperienceSlice
+
+		// response.DoctorExpertiseID = resultExpertise.ExpertiseID
+		// response.DoctorWorkdayID = resultWorkadays.WorkdayID
+		// response.DoctorWorkStartTime = resultWorkadays.StartTime.String()
+		// response.DoctorWorkEndTime = resultWorkadays.EndTime.String()
 
 		//INPUT RESPONSE
 

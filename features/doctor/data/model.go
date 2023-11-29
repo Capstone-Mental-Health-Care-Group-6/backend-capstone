@@ -10,7 +10,7 @@ type Doctor struct {
 	*gorm.Model
 	UserID                  uint                      `gorm:"column:user_id"`
 	DoctorName              string                    `gorm:"column:doctor_name;type:varchar(255)"`
-	DoctorExperience        string                    `gorm:"column:doctor_experience;type:varchar(255)"`
+	DoctorExperienced       string                    `gorm:"column:doctor_experienced;type:enum('under_five_years','five_to_ten_years','above_ten_years'"`
 	DoctorDescription       string                    `gorm:"column:doctor_description;type:varchar(255)"`
 	DoctorAvatar            string                    `gorm:"column:doctor_avatar;type:varchar(255)"`
 	DoctorOfficeName        string                    `gorm:"column:doctor_office_name;type:varchar(255)"`
@@ -28,6 +28,8 @@ type Doctor struct {
 	DoctorExpertiseRelation []DoctorExpertiseRelation `gorm:"foreignKey:DoctorID"`
 	DoctorWorkadays         []DoctorWorkadays         `gorm:"foreignKey:DoctorID"`
 	DoctorRating            []DoctorRating            `gorm:"foreignKey:DoctorID"`
+	DoctorExperience        []DoctorExperience        `gorm:"foreignKey:DoctorID"`
+	DoctorEducation         []DoctorEducation         `gorm:"foreignKey:DoctorID"`
 }
 
 type DoctorExpertiseRelation struct {
@@ -52,6 +54,25 @@ type DoctorRating struct {
 	DoctorReview     string `gorm:"column:doctor_review;type:varchar(255)"`
 }
 
+type DoctorEducation struct {
+	*gorm.Model
+	DoctorID           uint      `gorm:"column:doctor_id"`
+	DoctorUniversity   string    `gorm:"column:doctor_university"`
+	DoctorStudyProgram string    `gorm:"column:doctor_study_program"`
+	DoctorGraduateYear time.Time `gorm:"column:doctor_graduate_year"`
+}
+
+type DoctorExperience struct {
+	*gorm.Model
+	DoctorID                    uint      `gorm:"column:doctor_id"`
+	DoctorCompany               string    `gorm:"column:doctor_company"`
+	DoctorTitle                 string    `gorm:"column:doctor_title"`
+	DoctorExperienceDescription string    `gorm:"column:doctor_experience_description"`
+	DoctorStartDate             time.Time `gorm:"column:doctor_start_date"`
+	DoctorEndDate               time.Time `gorm:"column:doctor_end_date"`
+	DoctorIsNow                 bool      `gorm:"column:doctor_is_now"`
+}
+
 func (Doctor) TableName() string {
 	return "doctors"
 }
@@ -66,4 +87,12 @@ func (DoctorWorkadays) TableName() string {
 
 func (DoctorRating) TableName() string {
 	return "doctors_rating"
+}
+
+func (DoctorEducation) TableName() string {
+	return "doctors_education"
+}
+
+func (DoctorExperience) TableName() string {
+	return "doctors_experience"
 }

@@ -30,6 +30,8 @@ func Migrate(db *gorm.DB) {
 		DataDoctor.DoctorExpertiseRelation{},
 		DataDoctor.DoctorRating{},
 		DataDoctor.DoctorWorkadays{},
+		DataDoctor.DoctorExperience{},
+		DataDoctor.DoctorEducation{},
 		DataPatient.PatientAccount{},
 	}...)
 }

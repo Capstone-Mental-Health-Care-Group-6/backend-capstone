@@ -64,6 +64,22 @@ func (psvc *DoctorService) CreateDoctorWorkadays(newData doctor.DoctorWorkadays)
 	return resultWorkadays, nil
 }
 
+func (psvc *DoctorService) CreateDoctorEducation(newData doctor.DoctorEducation) (*doctor.DoctorEducation, error) {
+	resultEducation, err := psvc.data.InsertEducation(newData)
+	if err != nil {
+		return nil, errors.New("insert Process Failed")
+	}
+	return resultEducation, nil
+}
+
+func (psvc *DoctorService) CreateDoctorExperience(newData doctor.DoctorExperience) (*doctor.DoctorExperience, error) {
+	resultExperience, err := psvc.data.InsertExperience(newData)
+	if err != nil {
+		return nil, errors.New("insert Process Failed")
+	}
+	return resultExperience, nil
+}
+
 func (psvc *DoctorService) DoctorAvatarUpload(newData doctor.DoctorAvatarPhoto) (string, error) {
 	uploadUrl, err := psvc.cld.UploadImageHelper(newData.DoctorAvatar)
 	if err != nil {

@@ -57,7 +57,7 @@ func (pdata *DoctorData) Insert(newData doctor.Doctor) (*doctor.Doctor, error) {
 	var dbData = new(Doctor)
 	dbData.DoctorName = newData.DoctorName
 	dbData.UserID = newData.UserID
-	dbData.DoctorExperience = newData.DoctorExperience
+	dbData.DoctorExperienced = newData.DoctorExperienced
 	dbData.DoctorDescription = newData.DoctorDescription
 	dbData.DoctorAvatar = newData.DoctorAvatar
 	dbData.DoctorOfficeName = newData.DoctorOfficeName
@@ -116,6 +116,47 @@ func (pdata *DoctorData) InsertWorkadays(newData doctor.DoctorWorkadays) (*docto
 	dbData.WorkdayID = newData.WorkdayID
 	dbData.StartTime = newData.StartTime
 	dbData.EndTime = newData.EndTime
+	//handling error for duplicate user id won't fix
+	// if err := pdata.db.Where("user_id = ?", dbData.UserID).Find(dbData).Error; err != nil {
+	// 	return nil, err
+	// }
+
+	if err := pdata.db.Create(dbData).Error; err != nil {
+		return nil, err
+	}
+
+	return &newData, nil
+}
+
+func (pdata *DoctorData) InsertExperience(newData doctor.DoctorExperience) (*doctor.DoctorExperience, error) {
+
+	var dbData = new(DoctorExperience)
+	dbData.DoctorID = newData.DoctorID
+	dbData.DoctorCompany = newData.DoctorCompany
+	dbData.DoctorTitle = newData.DoctorTitle
+	dbData.DoctorExperienceDescription = newData.DoctorExperienceDescription
+	dbData.DoctorStartDate = newData.DoctorStartDate
+	dbData.DoctorEndDate = newData.DoctorEndDate
+	dbData.DoctorIsNow = newData.DoctorIsNow
+	//handling error for duplicate user id won't fix
+	// if err := pdata.db.Where("user_id = ?", dbData.UserID).Find(dbData).Error; err != nil {
+	// 	return nil, err
+	// }
+
+	if err := pdata.db.Create(dbData).Error; err != nil {
+		return nil, err
+	}
+
+	return &newData, nil
+}
+
+func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*doctor.DoctorEducation, error) {
+
+	var dbData = new(DoctorEducation)
+	dbData.DoctorID = newData.DoctorID
+	dbData.DoctorUniversity = newData.DoctorUniversity
+	dbData.DoctorStudyProgram = newData.DoctorStudyProgram
+	dbData.DoctorGraduateYear = newData.DoctorGraduateYear
 	//handling error for duplicate user id won't fix
 	// if err := pdata.db.Where("user_id = ?", dbData.UserID).Find(dbData).Error; err != nil {
 	// 	return nil, err

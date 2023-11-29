@@ -11,7 +11,7 @@ type Doctor struct {
 	ID                  uint   `json:"id"`
 	UserID              uint   `json:"user_id"`
 	DoctorName          string `json:"doctor_name"`
-	DoctorExperience    string `json:"doctor_experience"`
+	DoctorExperienced   string `json:"doctor_experienced"`
 	DoctorDescription   string `json:"doctor_description"`
 	DoctorAvatar        string `json:"doctor_avatar"`
 	DoctorOfficeName    string `json:"doctor_office_name"`
@@ -27,16 +27,17 @@ type Doctor struct {
 	DoctorBalance       uint   `json:"doctor_balance"`
 	DoctorStatus        string `json:"doctor_status"`
 
-	DoctorWorkdayID     uint   `json:"workday_id"`
-	DoctorExpertiseID   uint   `json:"expertise_id"`
-	DoctorWorkStartTime string `json:"start_time"`
-	DoctorWorkEndTime   string `json:"end_time"`
+	DoctorExpertise uint `json:"doctor_expertise"`
+
+	DoctorWorkday    []DoctorWorkadays  `json:"workday"`
+	DoctorEducation  []DoctorEducation  `json:"education"`
+	DoctorExperience []DoctorExperience `json:"experience"`
 }
 
 type DoctorInfo struct {
 	UserID              uint   `json:"user_id"`
 	DoctorName          string `json:"doctor_name"`
-	DoctorExperience    string `json:"doctor_experience"`
+	DoctorExperienced   string `json:"doctor_experienced"`
 	DoctorDescription   string `json:"doctor_description"`
 	DoctorAvatar        string `json:"doctor_avatar"`
 	DoctorOfficeName    string `json:"doctor_office_name"`
@@ -50,10 +51,11 @@ type DoctorInfo struct {
 	DoctorBalance       uint   `json:"doctor_balance"`
 	DoctorStatus        string `json:"doctor_status"`
 
-	WorkdayID   uint      `json:"workday_id"`
-	ExpertiseID uint      `json:"expertise_id"`
-	StartTime   time.Time `json:"start_time"`
-	EndTime     time.Time `json:"end_time"`
+	DoctorExpertise uint `json:"doctor_expertise"`
+
+	DoctorWorkday    []DoctorWorkadays  `json:"workday"`
+	DoctorEducation  []DoctorEducation  `json:"education"`
+	DoctorExperience []DoctorExperience `json:"experience"`
 }
 
 type DoctorExpertiseRelation struct {
@@ -73,6 +75,23 @@ type DoctorRating struct {
 	PatientID        uint   `json:"patient_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
 	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
+}
+
+type DoctorEducation struct {
+	DoctorID           uint      `json:"doctor_id"`
+	DoctorUniversity   string    `json:"doctor_university"`
+	DoctorStudyProgram string    `json:"doctor_study_program"`
+	DoctorGraduateYear time.Time `json:"doctor_graduate_year"`
+}
+
+type DoctorExperience struct {
+	DoctorID                    uint      `json:"doctor_id"`
+	DoctorCompany               string    `json:"doctor_company"`
+	DoctorTitle                 string    `json:"doctor_title"`
+	DoctorExperienceDescription string    `json:"doctor_experience_description"`
+	DoctorStartDate             time.Time `json:"doctor_start_date"`
+	DoctorEndDate               time.Time `json:"doctor_end_date"`
+	DoctorIsNow                 bool      `json:"doctor_is_now"`
 }
 
 type JwtMapClaims struct {
@@ -112,6 +131,8 @@ type DoctorServiceInterface interface {
 	GetDoctor(id int) ([]DoctorInfo, error)
 	CreateDoctorExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	CreateDoctorWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
+	CreateDoctorEducation(newData DoctorEducation) (*DoctorEducation, error)
+	CreateDoctorExperience(newData DoctorExperience) (*DoctorExperience, error)
 	CreateDoctor(newData Doctor) (*Doctor, error)
 	DoctorAvatarUpload(newData DoctorAvatarPhoto) (string, error)
 	DoctorSIPPUpload(newData DoctorSIPPFileDataModel) (string, error)
@@ -127,4 +148,6 @@ type DoctorDataInterface interface {
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
+	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
+	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
 }
