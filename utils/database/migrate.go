@@ -27,7 +27,7 @@ func Migrate(db *gorm.DB) {
 		DataArticleCategory.ArticleCategory{},
 		DataArticle.Article{},
 		DataDoctor.Doctor{},
-		DataTransaction.Transaction{},
 		DataPatient.PatientAccount{},
+		DataTransaction.Transaction{},
 	}...)
 }
