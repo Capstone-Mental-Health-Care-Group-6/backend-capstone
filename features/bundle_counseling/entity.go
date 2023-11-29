@@ -37,6 +37,7 @@ type BundleCounselingHandlerInterface interface {
 	CreateBundle() echo.HandlerFunc
 	GetBundle() echo.HandlerFunc
 	UpdateBundle() echo.HandlerFunc
+	DeleteBundle() echo.HandlerFunc
 }
 
 type BundleCounselingServiceInterface interface {
@@ -44,6 +45,7 @@ type BundleCounselingServiceInterface interface {
 	CreateBundle(input BundleCounseling, file BundleCounselingFile) (*BundleCounseling, error)
 	GetBundle(id int) (*BundleCounseling, error)
 	UpdateBundle(id int, input BundleCounseling, file BundleCounselingFile) (bool, error)
+	DeleteBundle(id int) (bool, error)
 }
 
 type BundleCounselingDataInterface interface {
@@ -51,4 +53,5 @@ type BundleCounselingDataInterface interface {
 	Create(input BundleCounseling) (*BundleCounseling, error)
 	GetById(id int) (*BundleCounseling, error)
 	Update(id int, newData BundleCounseling) (bool, error)
+	Delete(id int) (bool, error)
 }

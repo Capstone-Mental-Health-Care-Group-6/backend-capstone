@@ -95,3 +95,13 @@ func (bc *BundleCounselingData) Update(id int, input bundlecounseling.BundleCoun
 
 	return true, nil
 }
+
+func (bc *BundleCounselingData) Delete(id int) (bool, error) {
+	var deleteData = new(bundlecounseling.BundleCounseling)
+
+	if err := bc.db.Table("bundle_counseling").Where("id = ?", id).Delete(&deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

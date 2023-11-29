@@ -192,3 +192,30 @@ func (h *BundleCounselingHandler) UpdateBundle() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to update bundle", result))
 	}
 }
+
+func (h *BundleCounselingHandler) DeleteBundle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := h.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		result, err := h.s.DeleteBundle(id)
+
+		if err != nil {
+			c.Logger().Info("Handler : Delete Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to delete bundle", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete bundle", result))
+	}
+}

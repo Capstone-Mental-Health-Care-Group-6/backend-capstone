@@ -87,3 +87,12 @@ func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.Bu
 
 	return result, nil
 }
+
+func (s *BundleCounselingService) DeleteBundle(id int) (bool, error) {
+	result, err := s.d.Delete(id)
+	if err != nil {
+		return false, err
+	}
+
+	return result, nil
+}
