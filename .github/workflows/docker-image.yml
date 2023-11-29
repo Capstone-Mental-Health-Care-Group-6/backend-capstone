@@ -50,17 +50,17 @@ jobs:
           port: ${{secrets.PORT}}
           envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL
           script: |
-            echo $DBUSER >> tulisan.txt
-            echo $DBPASS >> tulisan.txt
-            echo $DBPORT >> tulisan.txt
-            echo $DBNAME >> tulisan.txt
-            echo $SERVER >> tulisan.txt
-            echo $SECRET >> tulisan.txt
-            echo $REFSECRET >> tulisan.txt
+            echo $DB_USER >> tulisan.txt
+            echo $DB_PASS >> tulisan.txt
+            echo $DB_PORT >> tulisan.txt
+            echo $DB_NAME >> tulisan.txt
+            echo $SERVER_PORT >> tulisan.txt
+            echo $JWT_SECRET >> tulisan.txt
+            echo $REF_SECRET >> tulisan.txt
             echo $MT_CLIENT_KEY >> tulisan.txt
             echo $MT_SERVER_KEY >> tulisan.txt
             echo $MT_ENV >> tulisan.txt
-            echo $CloudURL >> tulisan.txt
+            echo $CLOUDINARY_URL >> tulisan.txt
             echo $OAUTH_GOOGLE_CLIENT_ID >> tulisan.txt
             echo $OAUTH_GOOGLE_CLIENT_SECRET >> tulisan.txt
             echo $OAUTH_GOOGLE_REDIRECT_URL >> tulisan.txt
