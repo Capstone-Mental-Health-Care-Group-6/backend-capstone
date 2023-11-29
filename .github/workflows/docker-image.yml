@@ -10,22 +10,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{secrets.DOCKERHUB_USERNAME}}
-      #     password: ${{secrets.DOCKERHUB_TOKEN}}
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v2
-      # - name: Build and push
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     context: .
-      #     file: ./Dockerfile
-      #     push: true
-      #     tags: ${{secrets.DOCKERHUB_USERNAME}}/imgsimk:latest 
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/imgsimk:latest 
       - name: connect ssh
         uses: appleboy/ssh-action@v0.1.9
         env:
@@ -48,39 +48,25 @@ jobs:
           username: ${{secrets.USERNAME}}
           key: ${{secrets.KEY}}
           port: ${{secrets.PORT}}
-          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL
           script: |
-            echo $DB_USER >> tulisan.txt
-            echo $DB_PASS >> tulisan.txt
-            echo $DB_PORT >> tulisan.txt
-            echo $DB_NAME >> tulisan.txt
-            echo $SERVER_PORT >> tulisan.txt
-            echo $JWT_SECRET >> tulisan.txt
-            echo $REF_SECRET >> tulisan.txt
-            echo $MT_CLIENT_KEY >> tulisan.txt
-            echo $MT_SERVER_KEY >> tulisan.txt
-            echo $MT_ENVIRONMENT >> tulisan.txt
-            echo $CLOUDINARY_URL >> tulisan.txt
-            echo $OAUTH_GOOGLE_CLIENT_ID >> tulisan.txt
-            echo $OAUTH_GOOGLE_CLIENT_SECRET >> tulisan.txt
-            echo $OAUTH_GOOGLE_REDIRECT_URL >> tulisan.txt
-            # export DBUSER=$DB_USER
-            # export DBPASS=$DB_PASS
-            # export DBPORT=$DB_PORT
-            # export DBNAME=$DB_NAME
-            # export SERVER=$SERVER_PORT
-            # export SECRET=$JWT_SECRET
-            # export REFSECRET=$REF_SECRET
-            # export MT_CLIENT_KEY=$MT_CLIENT_KEY
-            # export MT_SERVER_KEY=$MT_SERVER_KEY
-            # export MT_ENV=$MT_ENVIRONMENT
-            # export CloudURL=$CLOUDINARY_URL
-            # export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
-            # export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
-            # export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
+            export DBUSER=$DB_USER
+            export DBPASS=$DB_PASS
+            export DBPORT=$DB_PORT
+            export DBNAME=$DB_NAME
+            export SERVER=$SERVER_PORT
+            export SECRET=$JWT_SECRET
+            export REFSECRET=$REF_SECRET
+            export MT_CLIENT_KEY=$MT_CLIENT_KEY
+            export MT_SERVER_KEY=$MT_SERVER_KEY
+            export MT_ENV=$MT_ENVIRONMENT
+            export CloudURL=$CLOUDINARY_URL
+            export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
+            export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
+            export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
 
-            # curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
+            curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
             # docker exec empathi-care-db /usr/bin/mysqldump -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} > backup_db.sql
-            # docker compose down -v
-            # docker compose up -d
+            docker compose down -v
+            docker compose up -d
             # docker exec -i empathi-care-db mysql -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} < backup_db.sql
