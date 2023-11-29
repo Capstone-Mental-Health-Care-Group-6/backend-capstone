@@ -14,18 +14,18 @@ services:
       test: ["CMD", "mysql", "-u$DBUSER",  "-p$DBPASS", "-e", "show databases;"]
       interval: 10s
       
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin:5.0.2
-  #   networks:
-  #     - mynet
-  #   ports:
-  #     - "8001:80"
-  #   environment:
-  #     PMA_HOST: db
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #       required: true
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.0.2
+    networks:
+      - mynet
+    ports:
+      - "8001:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
         
   api:
     image: irvanhau/empathicare
