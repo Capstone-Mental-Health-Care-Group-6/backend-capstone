@@ -1,7 +1,6 @@
 package handler
 
 type DoctorResponse struct {
-	ID                  uint   `json:"id"`
 	UserID              uint   `json:"user_id"`
 	DoctorName          string `json:"doctor_name"`
 	DoctorExperience    string `json:"doctor_experience"`
@@ -17,4 +16,9 @@ type DoctorResponse struct {
 	DoctorIjazah        string `json:"doctor_ijazah"`
 	DoctorBalance       uint   `json:"doctor_balance"`
 	DoctorStatus        string `json:"doctor_status"`
+
+	DoctorWorkdayID     uint   `json:"workday_id"`
+	DoctorExpertiseID   uint   `json:"expertise_id"`
+	DoctorWorkStartTime string `json:"start_time"`
+	DoctorWorkEndTime   string `json:"end_time"`
 }
