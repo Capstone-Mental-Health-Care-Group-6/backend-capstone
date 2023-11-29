@@ -38,32 +38,49 @@ jobs:
           REF_SECRET: ${{ secrets.REFSECRET }}
           MT_CLIENT_KEY: ${{ secrets.MT_CLIENT_KEY }}
           MT_SERVER_KEY: ${{ secrets.MT_SERVER_KEY }}
-          # CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          # CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-          # CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-          # CLOUDINARY_UPLOAD_FOLDER: ${{ secrets.CLOUDINARY_UPLOAD_FOLDER }}
+          MT_ENV: ${{ secrets.MT_ENV }}
+          CLOUDINARY_URL: ${{ secrets.CloudURL }}
+          OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+          OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
+          OAUTH_GOOGLE_REDIRECT_URL: ${{ secrets.OAUTH_GOOGLE_REDIRECT_URL }}
         with:
           host: ${{secrets.HOST}}
           username: ${{secrets.USERNAME}}
           key: ${{secrets.KEY}}
           port: ${{secrets.PORT}}
-          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_UPLOAD_FOLDER
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL
           script: |
-            export DBUSER=$DB_USER
-            export DBPASS=$DB_PASS
-            export DBPORT=$DB_PORT
-            export DBNAME=$DB_NAME
-            export SERVER=$SERVER_PORT
-            export SECRET=$JWT_SECRET
-            export REFSECRET=$REF_SECRET
-            export MT_CLIENT_KEY=$MT_CLIENT_KEY
-            export MT_SERVER_KEY=$MT_SERVER_KEY
-            # export CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
-            # export CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
-            # export CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
-            # export CLOUDINARY_UPLOAD_FOLDER=$CLOUDINARY_UPLOAD_FOLDER
-            curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
-            docker exec empathi-care-db /usr/bin/mysqldump -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} > backup_db.sql
-            docker compose down -v
-            docker compose up -d
-            docker exec -i empathi-care-db mysql -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} < backup_db.sql
+            echo DBUSER >> tulisan.txt
+            echo DBPASS >> tulisan.txt
+            echo DBPORT >> tulisan.txt
+            echo DBNAME >> tulisan.txt
+            echo SERVER >> tulisan.txt
+            echo SECRET >> tulisan.txt
+            echo REFSECRET >> tulisan.txt
+            echo MT_CLIENT_KEY >> tulisan.txt
+            echo MT_SERVER_KEY >> tulisan.txt
+            echo MT_ENV >> tulisan.txt
+            echo CloudURL >> tulisan.txt
+            echo OAUTH_GOOGLE_CLIENT_ID >> tulisan.txt
+            echo OAUTH_GOOGLE_CLIENT_SECRET >> tulisan.txt
+            echo OAUTH_GOOGLE_REDIRECT_URL >> tulisan.txt
+            # export DBUSER=$DB_USER
+            # export DBPASS=$DB_PASS
+            # export DBPORT=$DB_PORT
+            # export DBNAME=$DB_NAME
+            # export SERVER=$SERVER_PORT
+            # export SECRET=$JWT_SECRET
+            # export REFSECRET=$REF_SECRET
+            # export MT_CLIENT_KEY=$MT_CLIENT_KEY
+            # export MT_SERVER_KEY=$MT_SERVER_KEY
+            # export MT_ENV=$MT_ENV
+            # export CloudURL=$CLOUDINARY_URL
+            # export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
+            # export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
+            # export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
+
+            # curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
+            # docker exec empathi-care-db /usr/bin/mysqldump -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} > backup_db.sql
+            # docker compose down -v
+            # docker compose up -d
+            # docker exec -i empathi-care-db mysql -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} < backup_db.sql
