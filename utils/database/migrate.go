@@ -7,27 +7,15 @@ import (
 	DataPatient "FinalProject/features/patients/data"
 	DataTransaction "FinalProject/features/transaction/data"
 	DataUser "FinalProject/features/users/data"
-	"FinalProject/utils/database/migration"
 
 	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) {
-	migrator := migration.NewMySqlMigrator(db)
-	// migrator.DropTable([]migration.Table{
-	// 	DataUser.User{},
-	// 	DataArticleCategory.ArticleCategory{},
-	// 	DataArticle.Article{},
-	// 	DataTransaction.Transaction{},
-	//  DataPatient.PatientAccount{},
-	// }...)
-
-	migrator.CreateTable([]migration.Table{
-		DataUser.User{},
-		DataArticleCategory.ArticleCategory{},
-		DataArticle.Article{},
-		DataDoctor.Doctor{},
-		DataPatient.PatientAccount{},
-		DataTransaction.Transaction{},
-	}...)
+	db.AutoMigrate(DataUser.User{})
+	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
+	db.AutoMigrate(DataArticle.Article{})
+	db.AutoMigrate(DataDoctor.Doctor{})
+	db.AutoMigrate(DataPatient.PatientAccount{})
+	db.AutoMigrate(DataTransaction.Transaction{})
 }
