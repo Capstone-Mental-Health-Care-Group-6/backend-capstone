@@ -65,11 +65,12 @@ jobs:
             export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
             export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
 
-            
+            sudo docker stop empathi-care-app
+            sudo docker rm empathi-care-app
+            sudo docker rmi ${{secrets.DOCKERHUB_USERNAME}}/empathicare:latest
             sudo rm docker-compose.yaml
             curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
             # docker exec empathi-care-db /usr/bin/mysqldump -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} > backup_db.sql
             docker compose down -v
-            sudo docker rmi ${{secrets.DOCKERHUB_USERNAME}}/empathicare:latest
             docker compose up -d
             # docker exec -i empathi-care-db mysql -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} < backup_db.sql
