@@ -2,6 +2,7 @@ package migration
 
 import (
 	"gorm.io/gorm"
+	"log"
 )
 
 type MySqlMigrator struct {
@@ -17,7 +18,10 @@ func NewMySqlMigrator(db *gorm.DB) Migrator {
 func (m *MySqlMigrator) CreateTable(table ...Table) {
 	db := m.DB
 	for _, t := range table {
-		db.AutoMigrate(t)
+		err := db.AutoMigrate(t)
+		if err != nil{
+			log.Println(err)
+		}
 	}
 }
 
