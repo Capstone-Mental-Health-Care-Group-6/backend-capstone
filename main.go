@@ -109,7 +109,7 @@ func main() {
 	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
-	routes.RouteBundle(e, bundleController, *config)
+  routes.RouteBundle(e, bundleController, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

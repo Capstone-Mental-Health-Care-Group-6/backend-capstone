@@ -23,7 +23,6 @@ func Migrate(db *gorm.DB) {
 	// DataPatient.PatientAccount{},
 	// DataBundle.BundleCounseling{},
 	// }...)
-
 	migrator.CreateTable([]migration.Table{
 		DataUser.User{},
 		DataArticleCategory.ArticleCategory{},
@@ -32,5 +31,9 @@ func Migrate(db *gorm.DB) {
 		DataTransaction.Transaction{},
 		DataPatient.PatientAccount{},
 		DataBundle.BundleCounseling{},
+		DataDoctor.DoctorExpertiseRelation{},
+		DataDoctor.DoctorRating{},
+		DataDoctor.DoctorWorkadays{},
+		DataPatient.PatientAccount{},
 	}...)
 }
