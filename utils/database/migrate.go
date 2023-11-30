@@ -3,6 +3,7 @@ package database
 import (
 	DataArticleCategory "FinalProject/features/article_categories/data"
 	DataArticle "FinalProject/features/articles/data"
+	DataBundle "FinalProject/features/bundle_counseling/data"
 	DataDoctor "FinalProject/features/doctor/data"
 	DataPatient "FinalProject/features/patients/data"
 	DataTransaction "FinalProject/features/transaction/data"
@@ -15,11 +16,12 @@ import (
 func Migrate(db *gorm.DB) {
 	migrator := migration.NewMySqlMigrator(db)
 	// migrator.DropTable([]migration.Table{
-	// 	DataUser.User{},
-	// 	DataArticleCategory.ArticleCategory{},
-	// 	DataArticle.Article{},
-	// 	DataDoctor.Doctor{},
-	// 	DataTransaction.Transaction{},
+	// DataUser.User{},
+	// DataArticleCategory.ArticleCategory{},
+	// DataArticle.Article{},
+	// DataTransaction.Transaction{},
+	// DataPatient.PatientAccount{},
+	// DataBundle.BundleCounseling{},
 	// }...)
 	migrator.CreateTable([]migration.Table{
 		DataUser.User{},
@@ -27,6 +29,8 @@ func Migrate(db *gorm.DB) {
 		DataArticle.Article{},
 		DataDoctor.Doctor{},
 		DataTransaction.Transaction{},
+		DataPatient.PatientAccount{},
+		DataBundle.BundleCounseling{},
 		DataDoctor.DoctorExpertiseRelation{},
 		DataDoctor.DoctorRating{},
 		DataDoctor.DoctorWorkadays{},

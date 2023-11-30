@@ -1,0 +1,58 @@
+version: '3.7'
+services:
+  db:
+    image: mysql:8.0
+    container_name: empathi-care-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DBPASS}
+      MYSQL_DATABASE: ${DBNAME}
+    networks:
+      - mynet
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ["CMD", "mysql", "-u$DBUSER",  "-p$DBPASS", "-e", "show databases;"]
+      interval: 10s
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.0.2
+    networks:
+      - mynet
+    ports:
+      - "8001:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+        
+  api:
+    image: irvanhau/empathicare
+    container_name: empathi-care-app
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+    environment:
+      - DBUSER=${DBUSER}
+      - DBPASS=${DBPASS}
+      - DBHOST=db
+      - DBPORT=${DBPORT}
+      - DBNAME=${DBNAME}
+      - SERVER=${SERVER}
+      # - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      # - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      # - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      # - CLOUDINARY_UPLOAD_FOLDER=${CLOUDINARY_UPLOAD_FOLDER}
+      - MT_SERVER_KEY=${MT_SERVER_KEY}
+      - MT_CLIENT_KEY=${MT_CLIENT_KEY}
+    ports:
+      - '8000:8000'
+    networks:
+      - mynet
+  
+  
+networks:
+  mynet:
+    driver: bridge
