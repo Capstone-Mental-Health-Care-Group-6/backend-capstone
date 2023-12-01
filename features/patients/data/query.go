@@ -85,7 +85,7 @@ func (pdata *PatientData) LoginPatient(email, password string) (*patients.Patien
 	var dbData = new(PatientAccount)
 	dbData.Email = email
 
-	if err := pdata.db.Where("email = ?", dbData.Email).First(dbData).Error; err != nil {
+	if err := pdata.db.Where("email = ? AND status = 'Active'", dbData.Email).First(dbData).Error; err != nil {
 		logrus.Info("DB Error : ", err.Error())
 		return nil, err
 	}
@@ -163,9 +163,8 @@ func (pdata *PatientData) UpdateStatus(id int, newData patients.UpdateStatus) (b
 }
 
 func (pdata *PatientData) Delete(id int) (bool, error) {
-	var deleteData = new(PatientAccount)
 
-	if err := pdata.db.Table("patient_accounts").Where("id = ?", id).Delete(&deleteData).Error; err != nil {
+	if err := pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{Status: "Inactive"}).Error; err != nil {
 		return false, err
 	}
 
