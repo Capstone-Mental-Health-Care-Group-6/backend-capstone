@@ -33,3 +33,7 @@ type LoginPatient struct {
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
+
+type UpdateStatus struct {
+	Status string `json:"status" form:"status" validate:"required"`
+}

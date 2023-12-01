@@ -145,3 +145,29 @@ func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword
 
 	return true, nil
 }
+
+func (pdata *PatientData) UpdateStatus(id int, newData patients.UpdateStatus) (bool, error) {
+	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{
+		Status: newData.Status,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (pdata *PatientData) Delete(id int) (bool, error) {
+	var deleteData = new(PatientAccount)
+
+	if err := pdata.db.Table("patient_accounts").Where("id = ?", id).Delete(&deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
