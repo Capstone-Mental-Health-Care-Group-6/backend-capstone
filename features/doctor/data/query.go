@@ -19,10 +19,48 @@ func NewDoctor(db *gorm.DB) doctor.DoctorDataInterface {
 
 func (pdata *DoctorData) GetAll() ([]doctor.DoctorInfo, error) {
 	var listDoctor = []doctor.DoctorInfo{}
+
+	var resultWorkadaysSlice []*doctor.DoctorWorkadays
+
+	qryWorkadays := pdata.db.Table("doctors").
+		Select("doctors.*, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
+		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
+		Where("doctors.deleted_at IS NULL").
+		Scan(&resultWorkadaysSlice)
+
+	if err := qryWorkadays.Error; err != nil {
+		return nil, err
+	}
+
+	var resultEducationSlice []*doctor.DoctorEducation
+
+	qryEducation := pdata.db.Table("doctors").
+		Select("doctors.*, //TAMBAH EDUCATION DOCTOR").
+		Joins("LEFT JOIN doctors_education ON doctors.id = doctors_education.doctor_id").
+		Where("doctors.deleted_at IS NULL").
+		Scan(&resultEducationSlice)
+
+	if err := qryEducation.Error; err != nil {
+		return nil, err
+	}
+
+	var resultExperienceSlice []*doctor.DoctorExperience
+
+	qryExperience := pdata.db.Table("doctors").
+		Select("doctors.*, //TAMBAH EXPERIENCE DOCTOR").
+		Joins("LEFT JOIN doctors_experience ON doctors.id = doctors_experience.doctor_id").
+		Where("doctors.deleted_at IS NULL").
+		Scan(&resultExperienceSlice)
+
+	if err := qryExperience.Error; err != nil {
+		return nil, err
+	}
+
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
 		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
+		Joins("LEFT JOIN doctors_experience ON doctors.id = doctors_experience.doctor_id").
 		Where("doctors.deleted_at IS NULL").
 		Scan(&listDoctor)
 

@@ -52,6 +52,10 @@ type DoctorInfo struct {
 	DoctorStatus        string `json:"doctor_status"`
 
 	DoctorExpertise uint `json:"doctor_expertise"`
+	// DoctorWorkadays string `json:"workday_id"`
+
+	// StartTime time.Time `json:"start_time"`
+	// EndTime   time.Time `json:"end_time"`
 
 	DoctorWorkday    []DoctorWorkadays  `json:"workday"`
 	DoctorEducation  []DoctorEducation  `json:"education"`
