@@ -24,6 +24,12 @@ func New(service withdraw.WithdrawServiceInterface, jwt helper.JWTInterface) wit
 
 func (wh *WithdrawHandler) GetAllWithdraw() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := wh.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
 		res, err := wh.s.GetAllWithdraw()
 
 		if err != nil {
@@ -39,7 +45,7 @@ func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 		var req = new(InputRequest)
 
 		if err := c.Bind(req); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
 		}
 
@@ -97,7 +103,7 @@ func (wh *WithdrawHandler) GetWithdraw() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Param ID Error", nil))
 		}
 
@@ -116,17 +122,23 @@ func (wh *WithdrawHandler) GetWithdraw() echo.HandlerFunc {
 
 func (wh *WithdrawHandler) UpdateStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := wh.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Param ID Error", nil))
 		}
 
 		var req = new(UpdateStatusRequest)
 		if err := c.Bind(req); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
 		}
 
