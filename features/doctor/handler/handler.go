@@ -182,15 +182,40 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		result, err := mdl.svc.CreateDoctor(*serviceInput)
 
-		//handling error untuk duplicate user id dan user id tidak ada di table users belum fix
 		if err != nil {
-			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			c.Logger().Info("Handler: Input Process Error (CreateDoctor): ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
+		var serviceInputExpertise = new(doctor.DoctorExpertiseRelation)
+		serviceInputExpertise.DoctorID = result.ID                  //...
+		serviceInputExpertise.ExpertiseID = input.DoctorExpertiseID //...
+
+		resultExpertise, err := mdl.svc.CreateDoctorExpertise(*serviceInputExpertise)
+
+		if err != nil {
+			c.Logger().Info("Handler: Input Process Error (CreateDoctorExpertise): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		var serviceInputWorkadays = new(doctor.DoctorWorkadays)
+		serviceInputWorkadays.DoctorID = result.ID
+		serviceInputWorkadays.WorkdayID = input.DoctorWorkdayID
+		serviceInputWorkadays.StartTime = input.DoctorWorkStartTime
+		serviceInputWorkadays.EndTime = input.DoctorWorkEndTime
+
+		resultWorkadays, err := mdl.svc.CreateDoctorWorkadays(*serviceInputWorkadays)
+
+		if err != nil {
+			c.Logger().Info("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		//handling error untuk duplicate user id dan user id tidak ada di table users belum fix
+
 		var response = new(DoctorResponse)
 
-		response.ID = result.ID
+		// response.ID = result.ID
 		response.UserID = result.UserID
 		response.DoctorName = result.DoctorName
 		response.DoctorExperience = result.DoctorExperience
@@ -206,6 +231,11 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		response.DoctorIjazah = result.DoctorIjazah
 		response.DoctorBalance = result.DoctorBalance
 		response.DoctorStatus = result.DoctorStatus
+
+		response.DoctorExpertiseID = resultExpertise.ExpertiseID
+		response.DoctorWorkdayID = resultWorkadays.WorkdayID
+		response.DoctorWorkStartTime = resultWorkadays.StartTime.String()
+		response.DoctorWorkEndTime = resultWorkadays.EndTime.String()
 
 		//INPUT RESPONSE
 

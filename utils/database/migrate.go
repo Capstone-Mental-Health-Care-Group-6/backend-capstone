@@ -3,6 +3,7 @@ package database
 import (
 	DataArticleCategory "FinalProject/features/article_categories/data"
 	DataArticle "FinalProject/features/articles/data"
+	DataBundle "FinalProject/features/bundle_counseling/data"
 	DataDoctor "FinalProject/features/doctor/data"
 	DataPatient "FinalProject/features/patients/data"
 	DataTransaction "FinalProject/features/transaction/data"
@@ -16,6 +17,10 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
 	db.AutoMigrate(DataArticle.Article{})
 	db.AutoMigrate(DataDoctor.Doctor{})
-	db.AutoMigrate(DataPatient.PatientAccount{})
 	db.AutoMigrate(DataTransaction.Transaction{})
+	db.AutoMigrate(DataPatient.PatientAccount{})
+	db.AutoMigrate(DataBundle.BundleCounseling{})
+	db.AutoMigrate(DataDoctor.DoctorExpertiseRelation{})
+	db.AutoMigrate(DataDoctor.DoctorRating{})
+	db.AutoMigrate(DataDoctor.DoctorWorkadays{})
 }
