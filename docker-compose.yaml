@@ -49,7 +49,7 @@ services:
       - OAUTH_GOOGLE_CLIENT_ID=${OAUTH_GOOGLE_CLIENT_ID}
       - OAUTH_GOOGLE_CLIENT_SECRET=${OAUTH_GOOGLE_CLIENT_SECRET}
       - OAUTH_GOOGLE_REDIRECT_URL=${OAUTH_GOOGLE_REDIRECT_URL}
-      - CloudURL=${CloudURL}
+      - Cloud_URL=${CloudURL}
     ports:
       - '8000:8000'
     networks:

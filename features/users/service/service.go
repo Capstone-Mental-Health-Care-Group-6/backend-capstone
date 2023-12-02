@@ -20,9 +20,15 @@ func New(data users.UserDataInterface, jwt helper.JWTInterface) users.UserServic
 }
 
 func (us *UserService) Register(newData users.User) (*users.User, error) {
+	_, err := us.d.GetByEmail(newData.Email)
+	if err == nil {
+		return nil, errors.New("Email already registered by another user")
+	}
+
 	result, err := us.d.Register(newData)
+
 	if err != nil {
-		return nil, errors.New("Register Process Failed")
+		return nil, errors.New("Failed to register")
 	}
 	return result, nil
 }

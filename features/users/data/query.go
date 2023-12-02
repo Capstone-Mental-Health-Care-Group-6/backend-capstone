@@ -25,7 +25,7 @@ func (ud *UserData) Register(newData users.User) (*users.User, error) {
 	var dbData = new(User)
 	dbData.Name = newData.Name
 	dbData.Email = newData.Email
-	dbData.Role = "Admin"
+	dbData.Role = newData.Role
 	dbData.Status = "Active"
 	hashPassword, err := helper.HashPassword(newData.Password)
 	if err != nil {

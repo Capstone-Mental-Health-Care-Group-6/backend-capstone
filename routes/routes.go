@@ -4,6 +4,7 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
+	bundlecounseling "FinalProject/features/bundle_counseling"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
@@ -70,4 +71,12 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.POST("/patient/login", ph.LoginPatient())
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/bundle", ph.GetAllBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/bundle/:id", ph.GetBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/bundle/:id", ph.DeleteBundle(), echojwt.JWT([]byte(cfg.Secret)))
 }

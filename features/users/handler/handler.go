@@ -28,25 +28,31 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input = new(RegisterInput)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Error("Handler: Bind input error: ", err.Error())
+			c.Logger().Info("Handler: Bind input error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		isValid, errors := helper.ValidateForm(input)
+		if !isValid {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
 		var serviceInput = new(users.User)
 		serviceInput.Name = input.Name
 		serviceInput.Email = input.Email
 		serviceInput.Password = input.Password
+		serviceInput.Role = input.Role
 
 		result, err := uh.s.Register(*serviceInput)
 
 		if err != nil {
-			c.Logger().Error("Handler: Input Process Error: ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
 		var response = new(RegisterResponse)
 		response.Email = result.Email
 		response.Name = result.Name
+		response.Role = result.Role
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
 	}
 }
