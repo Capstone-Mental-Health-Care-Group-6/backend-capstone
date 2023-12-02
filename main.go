@@ -60,7 +60,7 @@ func main() {
 
 	userModel := dataUser.New(db)
 	userServices := serviceUser.New(userModel, jwtInterface)
-	userController := handlerUser.NewHandler(userServices, oauth)
+	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
@@ -72,7 +72,7 @@ func main() {
 
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
-	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
+	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
 	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)

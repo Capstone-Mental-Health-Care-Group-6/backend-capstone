@@ -13,12 +13,14 @@ import (
 type UserHandler struct {
 	s     users.UserServiceInterface
 	oauth oauth.OauthGoogleInterface
+	jwt   helper.JWTInterface
 }
 
-func NewHandler(service users.UserServiceInterface, oauth oauth.OauthGoogleInterface) users.UserHandlerInterface {
+func NewHandler(service users.UserServiceInterface, oauth oauth.OauthGoogleInterface, jwt helper.JWTInterface) users.UserHandlerInterface {
 	return &UserHandler{
 		s:     service,
 		oauth: oauth,
+		jwt:   jwt,
 	}
 }
 
@@ -113,5 +115,50 @@ func (uh *UserHandler) CallbackGoogle() echo.HandlerFunc {
 		response.Token = result.Access
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
+	}
+}
+
+func (uh *UserHandler) GetUsers() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		status := c.QueryParam("status")
+		name := c.QueryParam("name")
+
+		role := uh.jwt.CheckRole(c)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
+		res, err := uh.s.GetUsers(status, name)
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get user", res))
+	}
+}
+
+func (uh *UserHandler) UserDashboard() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := uh.jwt.CheckRole(c)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+
+		res, err := uh.s.UserDashboard()
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var response = new(DashboardResponse)
+		response.TotalUser = res.TotalUser
+		response.TotalUserBaru = res.TotalUserBaru
+		response.TotalUserActive = res.TotalUserActive
+		response.TotalUserInactive = res.TotalUserInactive
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get user", response))
 	}
 }
