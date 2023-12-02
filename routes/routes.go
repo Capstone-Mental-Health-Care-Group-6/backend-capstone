@@ -4,11 +4,12 @@ import (
 	"FinalProject/configs"
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
+	bundlecounseling "FinalProject/features/bundle_counseling"
+	"FinalProject/features/doctor"
+	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
 	"FinalProject/features/users"
-  "FinalProject/features/doctor"
-  "FinalProject/features/withdraw"
-  "FinalProject/features/patients"
+	"FinalProject/features/withdraw"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -28,7 +29,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi", th.GetTransactions())
 	e.DELETE("/transaksi/:id", th.DeleteTransaction())
 	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
-  e.PUT("/transaksi/:id", th.UpdateTransaction())
+	e.PUT("/transaksi/:id", th.UpdateTransaction())
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 
@@ -66,6 +67,16 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.GET("/patient/account/:id", ph.GetPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/patient/register", ph.CreatePatient())
 	e.POST("/patient/login", ph.LoginPatient())
-	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/bundle", ph.GetAllBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/bundle/:id", ph.GetBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/bundle/:id", ph.DeleteBundle(), echojwt.JWT([]byte(cfg.Secret)))
 }

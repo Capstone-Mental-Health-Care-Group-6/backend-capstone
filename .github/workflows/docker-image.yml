@@ -1,85 +1,77 @@
-# name: Docker Image CI
+name: Docker Image CI
 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-<<<<<<< HEAD
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build and push
-        uses: docker/build-push-action@v4
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/empathicare:latest 
-      -
-        name: connect ssh
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/empathicare:latest 
+      - name: connect ssh
         uses: appleboy/ssh-action@v0.1.9
+        env:
+          DB_USER: ${{ secrets.DBUSER }}
+          DB_PASS: ${{ secrets.DBPASS }}
+          DB_PORT: ${{ secrets.DBPORT }}
+          DB_NAME: ${{ secrets.DBNAME }}
+          SERVER_PORT: ${{ secrets.SERVER }}
+          JWT_SECRET: ${{ secrets.JWTSECRET }}
+          REF_SECRET: ${{ secrets.REFSECRET }}
+          MT_CLIENT_KEY: ${{ secrets.MT_CLIENT_KEY }}
+          MT_SERVER_KEY: ${{ secrets.MT_SERVER_KEY }}
+          MT_ENVIRONMENT: ${{ secrets.MT_ENV }}
+          CLOUDINARY_URL: ${{ secrets.CloudURL }}
+          OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+          OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
+          OAUTH_GOOGLE_REDIRECT_URL: ${{ secrets.OAUTH_GOOGLE_REDIRECT_URL }}
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
+          host: ${{secrets.HOST}}
+          username: ${{secrets.USERNAME}}
+          key: ${{secrets.KEY}}
+          port: ${{secrets.PORT}}
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL
           script: |
-            docker stop ${{ secrets.CNAME }}
-            docker rm ${{ secrets.CNAME }}
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-            docker run --name ${{ secrets.CNAME }} -p 8000:8000 -d -e DBHOST=${{secrets.DBHOST}} -e DBPORT=3306 -e DBUSER=${{secrets.DBUSER}} -e DBNAME=${{secrets.DBNAME}} -e DBPASS=${{secrets.DBPASS}} -e MT_SERVER_KEY=${{secrets.MT_SERVER_KEY}} -e MT_CLIENT_KEY=${{secrets.MT_CLIENT_KEY}} -e MT_ENV=${{secrets.MT_ENV}} -e SECRET=${{secrets.JWTSECRET}} -e REFSECRET=${{secrets.REFSECRET}} -e SERVER=8000 ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-=======
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       -
-#         name: Checkout
-#         uses: actions/checkout@v3
-#       -
-#         name: Login to Docker Hub
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
-#       -
-#         name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
-#       -
-#         name: Build and push
-#         uses: docker/build-push-action@v4
-#         with:
-#           context: .
-#           file: ./Dockerfile
-#           push: true
-#           tags: ${{ secrets.DOCKERHUB_USERNAME }}/empathicare:latest 
-#       -
-#         name: connect ssh
-#         uses: appleboy/ssh-action@v0.1.9
-#         with:
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           key: ${{ secrets.KEY }}
-#           port: ${{ secrets.PORT }}
-#           script: |
-#             docker stop ${{ secrets.CNAME }}
-#             docker rm ${{ secrets.CNAME }}
-#             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
-#             docker run --name ${{ secrets.CNAME }} -p 8000:8000 -d -e DBHOST=${{secrets.DBHOST}} -e DBPORT=3306 -e DBUSER=${{secrets.DBUSER}} -e DBNAME=${{secrets.DBNAME}} -e DBPASS=${{secrets.DBPASS}} -e SECRET=${{secrets.JWTSECRET}} -e REFSECRET=${{secrets.REFSECRET}} -e SERVER=8000 ${{ secrets.DOCKERHUB_USERNAME }}/empathicare
->>>>>>> b13016e4c03d4e417f83b95a33ada4d1c328b308
+            export DBUSER=$DB_USER
+            export DBPASS=$DB_PASS
+            export DBPORT=$DB_PORT
+            export DBNAME=$DB_NAME
+            export SERVER=$SERVER_PORT
+            export SECRET=$JWT_SECRET
+            export REFSECRET=$REF_SECRET
+            export MT_CLIENT_KEY=$MT_CLIENT_KEY
+            export MT_SERVER_KEY=$MT_SERVER_KEY
+            export MT_ENV=$MT_ENVIRONMENT
+            export CloudURL=$CLOUDINARY_URL
+            export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
+            export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
+            export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
+
+            sudo docker stop empathi-care-app
+            sudo docker rm empathi-care-app
+            sudo docker rmi ${{secrets.DOCKERHUB_USERNAME}}/empathicare:latest
+            sudo docker pull ${{secrets.DOCKERHUB_USERNAME}}/empathicare:latest
+            sudo rm docker-compose.yaml
+            curl -H "Accept: application/vnd.github+json"  -H "X-GitHub-Api-Version: 2022-11-28" -H "Authorization: token ${{secrets.TOKEN_GITHUB}}" -LJO https://raw.githubusercontent.com/Capstone-Mental-Health-Care-Group-6/backend-capstone/main/docker-compose.yaml
+            docker exec empathi-care-db /usr/bin/mysqldump -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} > backup_db.sql
+            docker compose down -v
+            docker compose up -d
+            docker exec -i empathi-care-db mysql -u ${{secrets.DBUSER}} --password=${{secrets.DBPASS}} ${{secrets.DBNAME}} < backup_db.sql

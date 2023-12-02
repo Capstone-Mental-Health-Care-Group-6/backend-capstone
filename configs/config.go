@@ -152,7 +152,7 @@ func loadConfig() *ProgrammingConfig {
 		permit = false
 	}
 
-	if val, found := os.LookupEnv("CloudURL"); found {
+	if val, found := os.LookupEnv("Cloud_URL"); found {
 		res.CloudinaryURL = val
 	} else {
 		permit = false
