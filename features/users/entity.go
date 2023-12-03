@@ -34,6 +34,7 @@ type UserHandlerInterface interface {
 	CallbackGoogle() echo.HandlerFunc
 	ForgetPasswordWeb() echo.HandlerFunc
 	ResetPassword() echo.HandlerFunc
+	ForgetPasswordVerify() echo.HandlerFunc
 }
 
 type UserServiceInterface interface {

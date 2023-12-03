@@ -151,7 +151,7 @@ func (uh *UserHandler) ResetPassword() echo.HandlerFunc {
 
 		dataToken, err := uh.s.TokenResetVerify(token)
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to verify token", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil))
 		}
 
 		var input = new(ResetPasswordInput)
@@ -177,5 +177,21 @@ func (uh *UserHandler) ResetPassword() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to reset password", result))
+	}
+}
+
+func (uh *UserHandler) ForgetPasswordVerify() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var token = c.QueryParam("token_reset_password")
+		if token == "" {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Token not found", nil))
+		}
+
+		_, err := uh.s.TokenResetVerify(token)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Token is valid", nil))
 	}
 }

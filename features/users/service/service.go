@@ -92,7 +92,7 @@ func (us *UserService) TokenResetVerify(code string) (*users.UserResetPass, erro
 	result, err := us.d.GetByCode(code)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			return nil, errors.New("Failed to verify token")
+			return nil, errors.New("Token not found")
 		}
 		return nil, errors.New("Failed to verify token")
 	}

@@ -20,7 +20,7 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 	e.GET("/login/google", uh.LoginGoogle())
 	e.GET("/login/google/callback", uh.CallbackGoogle())
 	e.POST("/forget-password", uh.ForgetPasswordWeb())
-	// e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
+	e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
 	e.POST("/reset-password", uh.ResetPassword())
 }
 

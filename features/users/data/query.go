@@ -91,8 +91,8 @@ func (ud *UserData) InsertCode(email string, code string) error {
 	newData.Code = code
 	newData.ExpiresAt = time.Now().Add(10 * time.Minute)
 
-	checkData, _ := ud.GetByCode(code)
-	if checkData.Code != "" {
+	_, err := ud.GetByCode(code)
+	if err != nil {
 		ud.DeleteCode(code)
 	}
 
@@ -125,7 +125,7 @@ func (ud *UserData) GetByCode(code string) (*users.UserResetPass, error) {
 	var result = new(users.UserResetPass)
 	result.Email = dbData.Email
 	result.Code = dbData.Code
-	result.Code = dbData.Code
+	result.ExpiresAt = dbData.ExpiresAt
 
 	return result, nil
 }
