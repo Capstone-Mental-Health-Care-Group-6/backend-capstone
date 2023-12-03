@@ -31,6 +31,10 @@ import (
 	handlerPatient "FinalProject/features/patients/handler"
 	servicePatient "FinalProject/features/patients/service"
 
+	dataBundle "FinalProject/features/bundle_counseling/data"
+	handlerBundle "FinalProject/features/bundle_counseling/handler"
+	serviceBundle "FinalProject/features/bundle_counseling/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
@@ -86,6 +90,10 @@ func main() {
 	withdrawServices := serviceWithdraw.New(withdrawModel)
 	withdrawController := handlerWithdraw.New(withdrawServices, jwtInterface)
 
+	bundleModel := dataBundle.New(db)
+	bundleServices := serviceBundle.New(bundleModel, cld)
+	bundleController := handlerBundle.New(bundleServices, jwtInterface)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -101,6 +109,7 @@ func main() {
 	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
+  routes.RouteBundle(e, bundleController, *config)
 
 	e.Logger.Debug(db)
 

@@ -43,6 +43,10 @@ type UpdatePassword struct {
 	Password string
 }
 
+type UpdateStatus struct {
+	Status string
+}
+
 type PatientCredential struct {
 	Name   string
 	Email  string
@@ -59,7 +63,9 @@ type PatientHandlerInterface interface {
 	CreatePatient() echo.HandlerFunc
 	UpdatePatient() echo.HandlerFunc
 	UpdatePassword() echo.HandlerFunc
+	UpdateStatus() echo.HandlerFunc
 	LoginPatient() echo.HandlerFunc
+	Delete() echo.HandlerFunc
 }
 
 type PatientServiceInterface interface {
@@ -70,6 +76,8 @@ type PatientServiceInterface interface {
 	LoginPatient(email string, password string) (*PatientCredential, error)
 	UpdatePatient(id int, newData UpdateProfile) (bool, error)
 	UpdatePassword(id int, newData UpdatePassword) (bool, error)
+	UpdateStatus(id int, newData UpdateStatus) (bool, error)
+	Delete(id int) (bool, error)
 }
 
 type PatientDataInterface interface {
@@ -79,4 +87,6 @@ type PatientDataInterface interface {
 	LoginPatient(email string, password string) (*Patiententity, error)
 	Update(id int, newData UpdateProfile) (bool, error)
 	UpdatePassword(id int, newData UpdatePassword) (bool, error)
+	UpdateStatus(id int, newData UpdateStatus) (bool, error)
+	Delete(id int) (bool, error)
 }
