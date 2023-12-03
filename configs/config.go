@@ -25,6 +25,7 @@ type ProgrammingConfig struct {
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
+	OpenAI                  string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -152,8 +153,14 @@ func loadConfig() *ProgrammingConfig {
 		permit = false
 	}
 
-	if val, found := os.LookupEnv("Cloud_URL"); found {
+	if val, found := os.LookupEnv("CloudURL"); found {
 		res.CloudinaryURL = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("KEY_OPEN_AI"); found {
+		res.OpenAI = val
 	} else {
 		permit = false
 	}

@@ -5,6 +5,9 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -41,6 +44,7 @@ import (
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/openai"
 
 	// "fmt"
 
@@ -53,6 +57,7 @@ func main() {
 	var config = configs.InitConfig()
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
+	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
@@ -94,6 +99,10 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	chatbotModel := dataChatbot.New()
+	chatbotService := serviceChatbot.New(chatbotModel, openai)
+	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -109,8 +118,8 @@ func main() {
 	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
-  routes.RouteBundle(e, bundleController, *config)
-
+	routes.RouteBundle(e, bundleController, *config)
+	routes.RouteChatBot(e, chatbotController, *config)
 	e.Logger.Debug(db)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
