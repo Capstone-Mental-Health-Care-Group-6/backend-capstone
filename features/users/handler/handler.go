@@ -13,12 +13,14 @@ import (
 type UserHandler struct {
 	s     users.UserServiceInterface
 	oauth oauth.OauthGoogleInterface
+	jwt   helper.JWTInterface
 }
 
-func NewHandler(service users.UserServiceInterface, oauth oauth.OauthGoogleInterface) users.UserHandlerInterface {
+func NewHandler(service users.UserServiceInterface, oauth oauth.OauthGoogleInterface, jwt helper.JWTInterface) users.UserHandlerInterface {
 	return &UserHandler{
 		s:     service,
 		oauth: oauth,
+		jwt:   jwt,
 	}
 }
 

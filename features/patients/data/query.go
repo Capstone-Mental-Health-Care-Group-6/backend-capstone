@@ -4,6 +4,8 @@ import (
 	//"net/url"
 	"FinalProject/features/patients"
 	"FinalProject/helper"
+	"time"
+
 	//mysql "FinalProject/utils/database/migration/mysql"
 
 	"github.com/sirupsen/logrus"
@@ -21,7 +23,7 @@ func New(db *gorm.DB) patients.PatientDataInterface {
 	}
 }
 
-func (pdata *PatientData) GetAll() ([]patients.Patientdetail, error) {
+func (pdata *PatientData) GetAll(status, name string) ([]patients.Patientdetail, error) {
 	//db := pdata.db.Table("patient_accounts")
 	//db = helper.QueryFiltering(db, query)
 	//db = helper.QuerySorting(db, query)
@@ -33,11 +35,17 @@ func (pdata *PatientData) GetAll() ([]patients.Patientdetail, error) {
 	//}
 
 	var listPatient = []patients.Patientdetail{}
-	var qry = pdata.db.Table("patient_accounts").Select("patient_accounts.*").
-		Where("patient_accounts.deleted_at is null").
-		Scan(&listPatient)
+	var qry = pdata.db.Table("patient_accounts")
 
-	if err := qry.Error; err != nil {
+	if status != "" {
+		qry.Where("status = ?", status)
+	}
+
+	if name != "" {
+		qry.Where("name LIKE ?", "%"+name+"%")
+	}
+
+	if err := qry.Scan(&listPatient).Error; err != nil {
 		return nil, err
 	}
 
@@ -145,6 +153,40 @@ func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword
 
 	return true, nil
 }
+
+func (pdata *PatientData) PatientDashboard() (patients.PatientDashboard, error) {
+	var dashboardUser patients.PatientDashboard
+
+	tUser, tUserBaru, tUserActive, tUserInactive := pdata.getTotalUser()
+
+	dashboardUser.TotalUser = tUser
+	dashboardUser.TotalUserBaru = tUserBaru
+	dashboardUser.TotalUserActive = tUserActive
+	dashboardUser.TotalUserInactive = tUserInactive
+
+	return dashboardUser, nil
+}
+
+func (pdata *PatientData) getTotalUser() (int, int, int, int) {
+	var totalUser int64
+	var totalUserBaru int64
+	var totalUserActive int64
+	var totalUserInactive int64
+
+	var now = time.Now()
+	var before = now.AddDate(0, 0, -30)
+
+	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Count(&totalUser)
+	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
+	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Active").Count(&totalUserActive)
+	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Inactive").Count(&totalUserInactive)
+
+	totalUserInt := int(totalUser)
+	totalUserBaruInt := int(totalUserBaru)
+	totalUserActiveInt := int(totalUserActive)
+	totalUserInactiveInt := int(totalUserInactive)
+
+	return totalUserInt, totalUserBaruInt, totalUserActiveInt, totalUserInactiveInt
 
 func (pdata *PatientData) UpdateStatus(id int, newData patients.UpdateStatus) (bool, error) {
 	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{

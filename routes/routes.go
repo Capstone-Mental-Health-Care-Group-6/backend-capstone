@@ -70,10 +70,11 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.GET("/patient/account/:id", ph.GetPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/patient/register", ph.CreatePatient())
 	e.POST("/patient/login", ph.LoginPatient())
-	e.PUT("/patient/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/patient/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+  e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {

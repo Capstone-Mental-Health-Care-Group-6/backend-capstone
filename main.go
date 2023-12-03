@@ -76,7 +76,7 @@ func main() {
 
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
-	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
+	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
 	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)

@@ -7,18 +7,24 @@ import (
 )
 
 type User struct {
-	ID       uint
-	Name     string
-	Email    string
-	Password string
-	Role     string
-	Status   string
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+	Status   string `json:"status"`
 }
 
 type UserCredential struct {
-	Name   string
-	Email  string
-	Access map[string]any
+	Name   string         `json:"name"`
+	Email  string         `json:"email"`
+	Access map[string]any `json:"token"`
+}
+
+type UserInfo struct {
+	Name   string `json:"name"`
+	Email  string `json:"email"`
+	Status string `json:"status"`
 }
 
 type UserResetPass struct {
