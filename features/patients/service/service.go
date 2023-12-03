@@ -101,6 +101,7 @@ func (psvc *PatientService) PatientDashboard() (patients.PatientDashboard, error
 	}
 
 	return res, nil
+}
 
 func (psvc *PatientService) UpdateStatus(id int, newData patients.UpdateStatus) (bool, error) {
 	result, err := psvc.data.UpdateStatus(id, newData)

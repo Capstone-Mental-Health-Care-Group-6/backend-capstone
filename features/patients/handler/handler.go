@@ -246,6 +246,8 @@ func (mdl *PatientHandler) PatientDashboard() echo.HandlerFunc {
 		response.TotalUserInactive = res.TotalUserInactive
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success get patient", response))
+	}
+}
 
 func (mdl *PatientHandler) UpdateStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {

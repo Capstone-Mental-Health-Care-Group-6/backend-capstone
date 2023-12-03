@@ -187,6 +187,7 @@ func (pdata *PatientData) getTotalUser() (int, int, int, int) {
 	totalUserInactiveInt := int(totalUserInactive)
 
 	return totalUserInt, totalUserBaruInt, totalUserActiveInt, totalUserInactiveInt
+}
 
 func (pdata *PatientData) UpdateStatus(id int, newData patients.UpdateStatus) (bool, error) {
 	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{

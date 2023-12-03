@@ -64,7 +64,7 @@ func main() {
 
 	userModel := dataUser.New(db)
 	userServices := serviceUser.New(userModel, jwtInterface, *config)
-	userController := handlerUser.NewHandler(userServices, oauth)
+	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
@@ -109,7 +109,7 @@ func main() {
 	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
-  routes.RouteBundle(e, bundleController, *config)
+	routes.RouteBundle(e, bundleController, *config)
 
 	e.Logger.Debug(db)
 
