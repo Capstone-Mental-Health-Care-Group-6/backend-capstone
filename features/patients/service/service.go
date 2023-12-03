@@ -22,8 +22,8 @@ func NewPatient(data patients.PatientDataInterface, cloudinary cloudinary.Cloudi
 	}
 }
 
-func (psvc *PatientService) GetPatients() ([]patients.Patientdetail, error) {
-	result, err := psvc.data.GetAll()
+func (psvc *PatientService) GetPatients(status, name string) ([]patients.Patientdetail, error) {
+	result, err := psvc.data.GetAll(status, name)
 	if err != nil {
 		return nil, errors.New("get All Process Failed")
 	}
@@ -91,4 +91,14 @@ func (psvc *PatientService) UpdatePassword(id int, newData patients.UpdatePasswo
 		return false, errors.New("update Process Failed")
 	}
 	return result, nil
+}
+
+func (psvc *PatientService) PatientDashboard() (patients.PatientDashboard, error) {
+	res, err := psvc.data.PatientDashboard()
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
 }

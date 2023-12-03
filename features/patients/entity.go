@@ -1,8 +1,9 @@
 package patients
 
 import (
-	"github.com/labstack/echo/v4"
 	"mime/multipart"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Patiententity struct {
@@ -53,6 +54,13 @@ type AvatarPhoto struct {
 	Avatar multipart.File
 }
 
+type PatientDashboard struct {
+	TotalUser         int `json:"total_user"`
+	TotalUserBaru     int `json:"total_user_baru"`
+	TotalUserActive   int `json:"total_user_active"`
+	TotalUserInactive int `json:"total_user_inactive"`
+}
+
 type PatientHandlerInterface interface {
 	GetPatients() echo.HandlerFunc
 	GetPatient() echo.HandlerFunc
@@ -60,23 +68,26 @@ type PatientHandlerInterface interface {
 	UpdatePatient() echo.HandlerFunc
 	UpdatePassword() echo.HandlerFunc
 	LoginPatient() echo.HandlerFunc
+	PatientDashboard() echo.HandlerFunc
 }
 
 type PatientServiceInterface interface {
-	GetPatients() ([]Patientdetail, error)
+	GetPatients(status, name string) ([]Patientdetail, error)
 	GetPatient(id int) (Patientdetail, error)
 	CreatePatient(newData Patiententity) (*Patiententity, error)
 	PhotoUpload(newData AvatarPhoto) (string, error)
 	LoginPatient(email string, password string) (*PatientCredential, error)
 	UpdatePatient(id int, newData UpdateProfile) (bool, error)
 	UpdatePassword(id int, newData UpdatePassword) (bool, error)
+	PatientDashboard() (PatientDashboard, error)
 }
 
 type PatientDataInterface interface {
-	GetAll() ([]Patientdetail, error)
+	GetAll(status, name string) ([]Patientdetail, error)
 	GetByID(id int) (Patientdetail, error)
 	Insert(newData Patiententity) (*Patiententity, error)
 	LoginPatient(email string, password string) (*Patiententity, error)
 	Update(id int, newData UpdateProfile) (bool, error)
 	UpdatePassword(id int, newData UpdatePassword) (bool, error)
+	PatientDashboard() (PatientDashboard, error)
 }

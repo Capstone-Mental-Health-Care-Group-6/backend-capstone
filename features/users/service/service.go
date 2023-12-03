@@ -78,23 +78,3 @@ func (us *UserService) GenerateJwt(email string) (*users.UserCredential, error) 
 
 	return response, nil
 }
-
-func (us *UserService) GetUsers(status, name string) ([]users.User, error) {
-	res, err := us.d.GetUsers(status, name)
-
-	if err != nil {
-		return nil, errors.New("Process Failed")
-	}
-
-	return res, nil
-}
-
-func (us *UserService) UserDashboard() (users.UserDashboard, error) {
-	res, err := us.d.UserDashboard()
-
-	if err != nil {
-		return res, errors.New("Process Failed")
-	}
-
-	return res, nil
-}

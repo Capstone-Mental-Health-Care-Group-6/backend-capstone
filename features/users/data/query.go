@@ -4,7 +4,6 @@ import (
 	"FinalProject/features/users"
 	"FinalProject/helper"
 	"errors"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -83,60 +82,4 @@ func (ud *UserData) GetByEmail(email string) (*users.User, error) {
 	result.Status = dbData.Status
 
 	return result, nil
-}
-
-func (ud *UserData) GetUsers(status, name string) ([]users.User, error) {
-	var listUser = []users.User{}
-
-	var qry = ud.db.Table("users").Where("role = ?", "Patient")
-
-	if status != "" {
-		qry.Where("status = ?", status)
-	}
-
-	if name != "" {
-		qry.Where("name LIKE ?", "%"+name+"%")
-	}
-
-	if err := qry.Scan(&listUser).Error; err != nil {
-		logrus.Info("DB Error : ", err.Error())
-		return nil, err
-	}
-
-	return listUser, nil
-}
-
-func (ud *UserData) UserDashboard() (users.UserDashboard, error) {
-	var dashboardUser users.UserDashboard
-
-	tUser, tUserBaru, tUserActive, tUserInactive := ud.getTotalUser()
-
-	dashboardUser.TotalUser = tUser
-	dashboardUser.TotalUserBaru = tUserBaru
-	dashboardUser.TotalUserActive = tUserActive
-	dashboardUser.TotalUserInactive = tUserInactive
-
-	return dashboardUser, nil
-}
-
-func (ud *UserData) getTotalUser() (int, int, int, int) {
-	var totalUser int64
-	var totalUserBaru int64
-	var totalUserActive int64
-	var totalUserInactive int64
-
-	var now = time.Now()
-	var before = now.AddDate(0, 0, -30)
-
-	var _ = ud.db.Table("users").Where("role = ?", "Patient").Count(&totalUser)
-	var _ = ud.db.Table("users").Where("role = ?", "Patient").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
-	var _ = ud.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Active").Count(&totalUserActive)
-	var _ = ud.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Inactive").Count(&totalUserInactive)
-
-	totalUserInt := int(totalUser)
-	totalUserBaruInt := int(totalUserBaru)
-	totalUserActiveInt := int(totalUserActive)
-	totalUserInactiveInt := int(totalUserInactive)
-
-	return totalUserInt, totalUserBaruInt, totalUserActiveInt, totalUserInactiveInt
 }

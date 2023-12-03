@@ -25,13 +25,16 @@ func NewHandlerPatient(service patients.PatientServiceInterface, jwt helper.JWTI
 
 func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		status := c.QueryParam("status")
+		name := c.QueryParam("name")
+
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
 		if role != "Admin" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 
-		result, err := mdl.svc.GetPatients()
+		result, err := mdl.svc.GetPatients(status, name)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Cannot process data", nil))
@@ -214,5 +217,29 @@ func (mdl *PatientHandler) GetPatient() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (mdl *PatientHandler) PatientDashboard() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		res, err := mdl.svc.PatientDashboard()
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var response = new(DashboardResponse)
+		response.TotalUser = res.TotalUser
+		response.TotalUserBaru = res.TotalUserBaru
+		response.TotalUserActive = res.TotalUserActive
+		response.TotalUserInactive = res.TotalUserInactive
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get patient", response))
 	}
 }

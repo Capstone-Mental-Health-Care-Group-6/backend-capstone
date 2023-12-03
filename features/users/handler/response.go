@@ -17,10 +17,3 @@ type UserInfo struct {
 	Email  string `json:"email" form:"email"`
 	Status string `json:"status" form:"status"`
 }
-
-type DashboardResponse struct {
-	TotalUser         int `json:"total_user"`
-	TotalUserBaru     int `json:"total_user_baru"`
-	TotalUserActive   int `json:"total_user_active"`
-	TotalUserInactive int `json:"total_user_inactive"`
-}
