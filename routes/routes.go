@@ -20,6 +20,9 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 	e.POST("/login", uh.Login())
 	e.GET("/login/google", uh.LoginGoogle())
 	e.GET("/login/google/callback", uh.CallbackGoogle())
+	e.POST("/forget-password", uh.ForgetPasswordWeb())
+	e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
+	e.POST("/reset-password", uh.ResetPassword())
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {

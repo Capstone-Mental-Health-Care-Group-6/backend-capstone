@@ -121,3 +121,83 @@ func (uh *UserHandler) CallbackGoogle() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
 	}
 }
+
+func (uh *UserHandler) ForgetPasswordWeb() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(ForgetPasswordInput)
+
+		if err := c.Bind(input); err != nil {
+			c.Logger().Info("Handler: Bind input error: ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to bind input", nil))
+		}
+
+		isValid, err := helper.ValidateJSON(input)
+		if !isValid {
+			c.Logger().Info("Handler: Bind input error: ", err)
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Validation error", err))
+		}
+
+		result := uh.s.ForgetPasswordWeb(input.Email)
+
+		if result != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to send email", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to send email", nil))
+
+	}
+}
+
+func (uh *UserHandler) ResetPassword() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var token = c.QueryParam("token_reset_password")
+		if token == "" {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Token not found", nil))
+		}
+
+		dataToken, err := uh.s.TokenResetVerify(token)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var input = new(ResetPasswordInput)
+		if err := c.Bind(input); err != nil {
+			c.Logger().Info("Handler: Bind input error: ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to bind input", nil))
+		}
+
+		isValid, errorMsg := helper.ValidateJSON(input)
+		if !isValid {
+			c.Logger().Info("Handler: Bind input error: ", err)
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Validation error", errorMsg))
+		}
+
+		if input.Password != input.PasswordConfirm {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Password not match", nil))
+		}
+
+		result := uh.s.ResetPassword(dataToken.Code, dataToken.Email, input.Password)
+
+		if result != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to reset password", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to reset password", result))
+	}
+}
+
+func (uh *UserHandler) ForgetPasswordVerify() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var token = c.QueryParam("token_reset_password")
+		if token == "" {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Token not found", nil))
+		}
+
+		_, err := uh.s.TokenResetVerify(token)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse(err.Error(), nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Token is valid", nil))
+	}
+}
