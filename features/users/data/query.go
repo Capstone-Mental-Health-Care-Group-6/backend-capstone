@@ -4,6 +4,7 @@ import (
 	"FinalProject/features/users"
 	"FinalProject/helper"
 	"errors"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -82,4 +83,67 @@ func (ud *UserData) GetByEmail(email string) (*users.User, error) {
 	result.Status = dbData.Status
 
 	return result, nil
+}
+
+func (ud *UserData) InsertCode(email string, code string) error {
+	var newData = new(UserResetPass)
+	newData.Email = email
+	newData.Code = code
+	newData.ExpiresAt = time.Now().Add(10 * time.Minute)
+
+	checkData, _ := ud.GetByCode(code)
+	if checkData.Code != "" {
+		ud.DeleteCode(code)
+	}
+
+	if err := ud.db.Table("user_reset_pass").Create(newData).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ud *UserData) DeleteCode(code string) error {
+	var deleteData = new(UserResetPass)
+
+	if err := ud.db.Table("user_reset_pass").Where("code = ?", code).Delete(deleteData).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ud *UserData) GetByCode(code string) (*users.UserResetPass, error) {
+	var dbData = new(UserResetPass)
+	dbData.Code = code
+
+	if err := ud.db.Table("user_reset_pass").Where("code = ?", dbData.Code).Where("deleted_at IS NULL").First(dbData).Error; err != nil {
+		logrus.Info("DB Error : ", err.Error())
+		return nil, err
+	}
+
+	var result = new(users.UserResetPass)
+	result.Email = dbData.Email
+	result.Code = dbData.Code
+	result.Code = dbData.Code
+
+	return result, nil
+}
+
+func (ud *UserData) ResetPassword(code, email string, password string) error {
+	hashPassword, err := helper.HashPassword(password)
+	if err != nil {
+		logrus.Info("Hash Password Error, ", err.Error())
+	}
+
+	if err := ud.db.Table("users").Where("email = ?", email).Update("password", hashPassword).Error; err != nil {
+		return err
+	}
+
+	checkData, _ := ud.GetByCode(code)
+	if checkData.Code != "" {
+		ud.DeleteCode(code)
+	}
+
+	return nil
 }
