@@ -18,6 +18,7 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataArticle.Article{})
 	db.AutoMigrate(DataDoctor.Doctor{})
 	db.AutoMigrate(DataTransaction.Transaction{})
+	db.AutoMigrate(DataUser.UserResetPass{})
 	db.AutoMigrate(DataPatient.PatientAccount{})
 	db.AutoMigrate(DataBundle.BundleCounseling{})
 	db.AutoMigrate(DataDoctor.DoctorExpertiseRelation{})

@@ -41,7 +41,7 @@ func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 		}
 
 		if len(result) == 0 {
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Success", "Data is Empty"))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -60,6 +60,11 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 		formHeaderPhoto, err := c.FormFile("avatar")
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
+		}
+
+		isValidFile, errorsFile := helper.ValidateFile(formHeaderPhoto, 5*1024*1024, "image/jpeg", "image/png")
+		if !isValidFile {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
 		}
 
 		formPhoto, err := formHeaderPhoto.Open()
@@ -241,5 +246,54 @@ func (mdl *PatientHandler) PatientDashboard() echo.HandlerFunc {
 		response.TotalUserInactive = res.TotalUserInactive
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success get patient", response))
+
+func (mdl *PatientHandler) UpdateStatus() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		var req UpdateStatus
+
+		if err := c.Bind(&req); err != nil {
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
+		}
+
+		var serviceUpdate = new(patients.UpdateStatus)
+		serviceUpdate.Status = req.Status
+
+		result, err := mdl.svc.UpdateStatus(id, *serviceUpdate)
+
+		if err != nil {
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (mdl *PatientHandler) Delete() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := mdl.jwt.CheckID(c)
+		userIdInt := int(id.(float64))
+
+		result, err := mdl.svc.Delete(userIdInt)
+
+		if err != nil {
+			c.Logger().Info("Handler : Delete Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to delete bundle", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete account", result))
 	}
 }

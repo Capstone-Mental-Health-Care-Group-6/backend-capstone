@@ -101,4 +101,21 @@ func (psvc *PatientService) PatientDashboard() (patients.PatientDashboard, error
 	}
 
 	return res, nil
+
+func (psvc *PatientService) UpdateStatus(id int, newData patients.UpdateStatus) (bool, error) {
+	result, err := psvc.data.UpdateStatus(id, newData)
+	if err != nil {
+		return false, errors.New("update Process Failed")
+	}
+	return result, nil
+}
+
+func (psvc *PatientService) Delete(id int) (bool, error) {
+	result, err := psvc.data.Delete(id)
+
+	if err != nil {
+		return false, errors.New("Delete Process Failed")
+	}
+
+	return result, nil
 }

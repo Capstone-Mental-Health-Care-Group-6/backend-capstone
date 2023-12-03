@@ -63,8 +63,8 @@ func main() {
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface)
-	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
+	userServices := serviceUser.New(userModel, jwtInterface, *config)
+	userController := handlerUser.NewHandler(userServices, oauth)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)

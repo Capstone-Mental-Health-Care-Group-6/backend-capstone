@@ -25,6 +25,9 @@ type ProgrammingConfig struct {
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
+	EmailSender             string
+	EmailPasswordSender     string
+	BaseURLFE               string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -154,6 +157,24 @@ func loadConfig() *ProgrammingConfig {
 
 	if val, found := os.LookupEnv("Cloud_URL"); found {
 		res.CloudinaryURL = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
+		res.EmailSender = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
+		res.EmailPasswordSender = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("BASE_URL_FE"); found {
+		res.BaseURLFE = val
 	} else {
 		permit = false
 	}
