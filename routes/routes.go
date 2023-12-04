@@ -81,6 +81,6 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 }
 
 func RouteChatBot(e *echo.Echo, ch chatbot.ChatbotHandlerInterface, cfg configs.ProgrammingConfig) {
-	// e.GET("/chatbot", ch.GetChats(), echojwt.JWT([]byte(cfg.Secret)))
-	// e.POST("/chatbot", ch.CreateChat(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/chatbot", ch.GetAllChatBot(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/chatbot", ch.CreateChatBot(), echojwt.JWT([]byte(cfg.Secret)))
 }

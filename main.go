@@ -55,12 +55,18 @@ import (
 func main() {
 	e := echo.New()
 	var config = configs.InitConfig()
+
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
 	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
+	}
+
+	mongo, err := database.InitMongoDb(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run mongo database, ", err.Error())
 	}
 
 	database.Migrate(db)
@@ -99,7 +105,7 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
-	chatbotModel := dataChatbot.New()
+	chatbotModel := dataChatbot.New(mongo)
 	chatbotService := serviceChatbot.New(chatbotModel, openai)
 	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
 
