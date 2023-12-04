@@ -51,7 +51,7 @@ services:
       - OAUTH_GOOGLE_REDIRECT_URL=${OAUTH_GOOGLE_REDIRECT_URL}
       - Cloud_URL=${CloudURL}
     ports:
-      - '8000:8000'
+      - '443:443'
     networks:
       - mynet
   
