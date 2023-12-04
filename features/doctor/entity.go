@@ -183,7 +183,7 @@ type DoctorHandlerInterface interface {
 
 type DoctorServiceInterface interface {
 	GetDoctors() ([]DoctorAll, error)
-	GetDoctor(id int) ([]DoctorInfo, error)
+	GetDoctor(id int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorInfoExperience, error)
 	GetDoctorEducation(id int) ([]DoctorInfoEducation, error)
 	GetDoctorWorkadays(id int) ([]DoctorInfoWorkday, error)
@@ -202,7 +202,7 @@ type DoctorServiceInterface interface {
 
 type DoctorDataInterface interface {
 	GetAll() ([]DoctorAll, error)
-	GetByID(id int) ([]DoctorInfo, error)
+	GetByID(id int) (*DoctorAll, error)
 	GetByIDEducation(id int) ([]DoctorInfoEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorInfoWorkday, error)
 	GetByIDExperience(id int) ([]DoctorInfoExperience, error)

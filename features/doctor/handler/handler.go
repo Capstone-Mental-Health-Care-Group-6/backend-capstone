@@ -55,23 +55,23 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		}
 
 		result, err := mdl.svc.GetDoctor(id)
-		resultExperience, err := mdl.svc.GetDoctorExperience(id)
-		resultWorkadays, err := mdl.svc.GetDoctorWorkadays(id)
-		resultEducation, err := mdl.svc.GetDoctorEducation(id)
+		// resultExperience, err := mdl.svc.GetDoctorExperience(id)
+		// resultWorkadays, err := mdl.svc.GetDoctorWorkadays(id)
+		// resultEducation, err := mdl.svc.GetDoctorEducation(id)
 
 		if err != nil {
 			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
-		mapAllData := map[string]interface{}{
-			"doctor":     result,
-			"workadays":  resultWorkadays,
-			"experience": resultExperience,
-			"education":  resultEducation,
-		}
+		// mapAllData := map[string]interface{}{
+		// 	"doctor":     result,
+		// 	"workadays":  resultWorkadays,
+		// 	"experience": resultExperience,
+		// 	"education":  resultEducation,
+		// }
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", mapAllData))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
 

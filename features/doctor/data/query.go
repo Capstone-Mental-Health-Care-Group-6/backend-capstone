@@ -2,6 +2,7 @@ package data
 
 import (
 	"FinalProject/features/doctor"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -44,6 +45,8 @@ func (pdata *DoctorData) GetAll() ([]doctor.DoctorAll, error) {
 			return nil, err
 		}
 
+		fmt.Println("Data", doctor.ID)
+
 		// Assign the retrieved data to the corresponding fields in the Doctor struct
 		doctors[i].DoctorExperience = experience
 		doctors[i].DoctorEducation = education
@@ -51,6 +54,42 @@ func (pdata *DoctorData) GetAll() ([]doctor.DoctorAll, error) {
 	}
 
 	return doctors, nil
+}
+
+func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
+	var doctor doctor.DoctorAll
+
+	qry := pdata.db.Table("doctors").
+		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Where("doctors.id = ?", id).
+		Where("doctors.deleted_at IS NULL").
+		Scan(&doctor)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	// Retrieve experience, education, and workday for the doctor
+	experience, err := pdata.GetByIDExperience(id)
+	if err != nil {
+		return nil, err
+	}
+	education, err := pdata.GetByIDEducation(id)
+	if err != nil {
+		return nil, err
+	}
+	workday, err := pdata.GetByIDWorkadays(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Assign the retrieved data to the corresponding fields in the Doctor struct
+	doctor.DoctorExperience = experience
+	doctor.DoctorEducation = education
+	doctor.DoctorWorkday = workday
+
+	return &doctor, nil
 }
 
 // func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
@@ -74,7 +113,7 @@ func (pdata *DoctorData) GetByIDExperience(id int) ([]doctor.DoctorInfoExperienc
 	var doctorInfoExperience []doctor.DoctorInfoExperience
 
 	qry := pdata.db.Table("doctors_experience").
-		Select("doctors_experience.*").Where("doctors_experience.id = ?", id).Where("doctors_experience.deleted_at IS NULL").
+		Select("doctors_experience.*").Where("doctors_experience.doctor_id = ?", id).Where("doctors_experience.deleted_at IS NULL").
 		Scan(&doctorInfoExperience)
 
 	if err := qry.Error; err != nil {
@@ -87,7 +126,7 @@ func (pdata *DoctorData) GetByIDEducation(id int) ([]doctor.DoctorInfoEducation,
 	var doctorInfoEducation []doctor.DoctorInfoEducation
 
 	qry := pdata.db.Table("doctors_education").
-		Select("doctors_education.*").Where("doctors_education.id = ?", id).Where("doctors_education.deleted_at IS NULL").
+		Select("doctors_education.*").Where("doctors_education.doctor_id = ?", id).Where("doctors_education.deleted_at IS NULL").
 		Scan(&doctorInfoEducation)
 
 	if err := qry.Error; err != nil {
@@ -101,7 +140,7 @@ func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorInfoWorkday, e
 	var doctorInfoWorkday []doctor.DoctorInfoWorkday
 
 	qry := pdata.db.Table("doctors_workadays").
-		Select("doctors_workadays.*").Where("doctors_workadays.id = ?", id).Where("doctors_workadays.deleted_at IS NULL").
+		Select("doctors_workadays.*").Where("doctors_workadays.doctor_id = ?", id).Where("doctors_workadays.deleted_at IS NULL").
 		Scan(&doctorInfoWorkday)
 
 	if err := qry.Error; err != nil {
@@ -111,23 +150,23 @@ func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorInfoWorkday, e
 	return doctorInfoWorkday, nil
 }
 
-func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
-	var doctorInfo []doctor.DoctorInfo
+// func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
+// 	var doctorInfo []doctor.DoctorInfo
 
-	qry := pdata.db.Table("doctors").
-		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
-		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
-		// Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
-		Where("doctors.id = ?", id).
-		Where("doctors.deleted_at IS NULL").
-		Scan(&doctorInfo)
+// 	qry := pdata.db.Table("doctors").
+// 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
+// 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+// 		// Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
+// 		Where("doctors.id = ?", id).
+// 		Where("doctors.deleted_at IS NULL").
+// 		Scan(&doctorInfo)
 
-	if err := qry.Error; err != nil {
-		return nil, err
-	}
+// 	if err := qry.Error; err != nil {
+// 		return nil, err
+// 	}
 
-	return doctorInfo, nil
-}
+// 	return doctorInfo, nil
+// }
 
 func (pdata *DoctorData) Insert(newData doctor.Doctor) (*doctor.Doctor, error) {
 

@@ -32,7 +32,7 @@ func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorAll, error) {
 	return result, nil
 }
 
-func (psvc *DoctorService) GetDoctor(id int) ([]doctor.DoctorInfo, error) {
+func (psvc *DoctorService) GetDoctor(id int) (*doctor.DoctorAll, error) {
 	result, err := psvc.data.GetByID(id)
 	if err != nil {
 		return nil, errors.New("get By ID Process Failed")
