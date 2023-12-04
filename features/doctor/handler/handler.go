@@ -3,6 +3,7 @@ package handler
 import (
 	"FinalProject/features/doctor"
 	"FinalProject/helper"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,11 +24,11 @@ func NewHandlerDoctor(service doctor.DoctorServiceInterface, jwt helper.JWTInter
 
 func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// role := mdl.jwt.CheckRole(c)
-		// fmt.Println(role)
-		// if role != "Admin" {
-		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
-		// }
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
 
 		result, err := mdl.svc.GetDoctors()
 
@@ -77,11 +78,11 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 
 func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// role := mdl.jwt.CheckRole(c)
-		// fmt.Println(role)
-		// if role != "Doctor" {
-		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
-		// }
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
 
 		var input = new(DoctorRequest)
 

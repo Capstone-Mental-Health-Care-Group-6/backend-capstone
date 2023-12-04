@@ -50,9 +50,9 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 }
 
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/doctor", ph.GetDoctors())
-	e.GET("/doctor/:id", ph.GetDoctor())
-	e.POST("/doctor/register", ph.CreateDoctor())
+	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
