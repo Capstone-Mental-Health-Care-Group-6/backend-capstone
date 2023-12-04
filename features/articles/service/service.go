@@ -15,8 +15,8 @@ func New(data articles.ArticleDataInterface) articles.ArticleServiceInterface {
 	}
 }
 
-func (as *ArticleService) GetArticles() ([]articles.ArticleInfo, error) {
-	result, err := as.d.GetAll()
+func (as *ArticleService) GetArticles(name, kategori string, timePublication int) ([]articles.ArticleInfo, error) {
+	result, err := as.d.GetAll(name, kategori, timePublication)
 	if err != nil {
 		return nil, errors.New("Get All Process Failed")
 	}
@@ -49,12 +49,32 @@ func (as *ArticleService) UpdateArticle(newData articles.UpdateArticle, id int) 
 	return result, nil
 }
 
-func (as *ArticleService) DeleteArticle(id int) (bool, error) {
-	result, err := as.d.Delete(id)
+func (as *ArticleService) DenyArticle(id int) (bool, error) {
+	result, err := as.d.Deny(id)
 
 	if err != nil {
 		return false, errors.New("Delete Process Failed")
 	}
 
 	return result, nil
+}
+
+func (as *ArticleService) ApproveArticle(id int) (bool, error) {
+	result, err := as.d.Approve(id)
+
+	if err != nil {
+		return false, errors.New("Delete Process Failed")
+	}
+
+	return result, nil
+}
+
+func (as *ArticleService) ArticleDashboard() (articles.ArticleDashboard, error) {
+	res, err := as.d.ArticleDashboard()
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
 }

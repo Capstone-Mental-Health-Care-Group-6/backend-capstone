@@ -39,6 +39,7 @@ import (
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
+	"FinalProject/utils/database/seeds"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
 
@@ -46,6 +47,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -59,6 +61,13 @@ func main() {
 	}
 
 	database.Migrate(db)
+
+	for _, seed := range seeds.All() {
+		if err := seed.Run(db); err != nil {
+			logrus.Info("Running seed '%s', failed with error: %s", seed.Name, err)
+		}
+	}
+
 	oauth := oauth.NewOauthGoogleConfig(*config)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 

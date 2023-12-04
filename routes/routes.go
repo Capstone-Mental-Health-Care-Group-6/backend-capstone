@@ -37,11 +37,12 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/articles", ah.GetArticles(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/articles/:id", ah.GetArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles", ah.GetArticles())
+	e.GET("/articles/:id", ah.GetArticle())
 	e.POST("/articles", ah.CreateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id", ah.UpdateArticle(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/articles/:id", ah.DeleteArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/articles/:id", ah.DenyArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles/dashboard", ah.ArticleDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -72,7 +73,7 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.POST("/patient/login", ph.LoginPatient())
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
-  e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }

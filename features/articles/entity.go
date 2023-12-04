@@ -31,26 +31,38 @@ type UpdateArticle struct {
 	Slug      string `json:"slug"`
 }
 
+type ArticleDashboard struct {
+	TotalArticle        int `json:"total_article"`
+	TotalArticleBaru    int `json:"total_article_baru"`
+	TotalArticlePending int `json:"total_article_pending"`
+}
+
 type ArticleHandlerInterface interface {
 	GetArticles() echo.HandlerFunc
 	GetArticle() echo.HandlerFunc
 	CreateArticle() echo.HandlerFunc
 	UpdateArticle() echo.HandlerFunc
-	DeleteArticle() echo.HandlerFunc
+	ArticleDashboard() echo.HandlerFunc
+	DenyArticle() echo.HandlerFunc
+	ApproveArticle() echo.HandlerFunc
 }
 
 type ArticleServiceInterface interface {
-	GetArticles() ([]ArticleInfo, error)
+	GetArticles(name, kategori string, timePublication int) ([]ArticleInfo, error)
 	GetArticle(id int) ([]ArticleInfo, error)
 	CreateArticle(newData Article) (*Article, error)
 	UpdateArticle(newData UpdateArticle, id int) (bool, error)
-	DeleteArticle(id int) (bool, error)
+	ArticleDashboard() (ArticleDashboard, error)
+	DenyArticle(id int) (bool, error)
+	ApproveArticle(id int) (bool, error)
 }
 
 type ArticleDataInterface interface {
-	GetAll() ([]ArticleInfo, error)
+	GetAll(name, kategori string, timePublication int) ([]ArticleInfo, error)
 	GetByID(id int) ([]ArticleInfo, error)
 	Insert(newData Article) (*Article, error)
 	Update(newData UpdateArticle, id int) (bool, error)
-	Delete(id int) (bool, error)
+	ArticleDashboard() (ArticleDashboard, error)
+	Deny(id int) (bool, error)
+	Approve(id int) (bool, error)
 }

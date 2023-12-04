@@ -3,7 +3,6 @@ package handler
 import (
 	"FinalProject/features/articles"
 	"FinalProject/helper"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,13 +23,23 @@ func NewHandler(service articles.ArticleServiceInterface, jwt helper.JWTInterfac
 
 func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := ah.jwt.CheckRole(c)
+		name := c.QueryParam("name")
+		kategori := c.QueryParam("kategori")
+		publication := c.QueryParam("publication")
+		var timePublication int
 
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		switch publication {
+		case "7Days":
+			timePublication = 1
+			break
+		case "30Days":
+			timePublication = 2
+			break
+		default:
+			timePublication = -1
 		}
 
-		result, err := ah.s.GetArticles()
+		result, err := ah.s.GetArticles(name, kategori, timePublication)
 
 		if err != nil {
 			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
@@ -43,11 +52,6 @@ func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 
 func (ah *ArticleHandler) GetArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := ah.jwt.CheckRole(c)
-
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
-		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -69,8 +73,9 @@ func (ah *ArticleHandler) GetArticle() echo.HandlerFunc {
 func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := ah.jwt.CheckRole(c)
+		id, _ := ah.jwt.GetID(c)
 
-		if role != "Admin" {
+		if role != "Doctor" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
 		}
 		var input = new(InputRequest)
@@ -80,12 +85,12 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 		}
 
 		var serviceInput = new(articles.Article)
-		serviceInput.UserID = input.AdminID
+		serviceInput.UserID = id
 		serviceInput.CategoryID = input.CategoryID
 		serviceInput.Title = input.Title
 		serviceInput.Content = input.Content
 		serviceInput.Thumbnail = input.Thumbnail
-		serviceInput.Status = "Active"
+		serviceInput.Status = "Pending"
 		serviceInput.Slug = input.Slug
 
 		result, err := ah.s.CreateArticle(*serviceInput)
@@ -96,7 +101,7 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 		}
 
 		var response = new(InputResponse)
-		response.AdminID = result.UserID
+		response.UserID = result.UserID
 		response.CategoryID = result.CategoryID
 		response.Title = result.Title
 		response.Content = result.Content
@@ -112,7 +117,7 @@ func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := ah.jwt.CheckRole(c)
 
-		if role != "Admin" {
+		if role != "Doctor" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
 		}
 		var paramID = c.Param("id")
@@ -145,7 +150,7 @@ func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 	}
 }
 
-func (ah *ArticleHandler) DeleteArticle() echo.HandlerFunc {
+func (ah *ArticleHandler) DenyArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := ah.jwt.CheckRole(c)
 
@@ -160,15 +165,62 @@ func (ah *ArticleHandler) DeleteArticle() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
-		result, err := ah.s.DeleteArticle(id)
+		_, err = ah.s.DenyArticle(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Delete Process Error : ", err.Error())
+			c.Logger().Fatal("Handler : Deny Article Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
-		fmt.Println(result)
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Denny Article", nil))
+	}
+}
 
-		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success", result))
+func (ah *ArticleHandler) ApproveArticle() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		_, err = ah.s.ApproveArticle(id)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Approve Article Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success Approve Article", nil))
+	}
+}
+
+func (ah *ArticleHandler) ArticleDashboard() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := ah.jwt.CheckRole(c)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		res, err := ah.s.ArticleDashboard()
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var response = new(DashboardResponse)
+		response.TotalArticle = res.TotalArticle
+		response.TotalArticleBaru = res.TotalArticleBaru
+		response.TotalArticlePending = res.TotalArticlePending
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get article dashboard", response))
 	}
 }
