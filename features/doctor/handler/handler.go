@@ -11,16 +11,24 @@ import (
 
 type DoctorHandler struct {
 	svc doctor.DoctorServiceInterface
+	jwt helper.JWTInterface
 }
 
-func NewHandlerDoctor(service doctor.DoctorServiceInterface) doctor.DoctorHandlerInterface {
+func NewHandlerDoctor(service doctor.DoctorServiceInterface, jwt helper.JWTInterface) doctor.DoctorHandlerInterface {
 	return &DoctorHandler{
 		svc: service,
+		jwt: jwt,
 	}
 }
 
 func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// role := mdl.jwt.CheckRole(c)
+		// fmt.Println(role)
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		// }
+
 		result, err := mdl.svc.GetDoctors()
 
 		if err != nil {
@@ -38,6 +46,7 @@ func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 
 func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -46,19 +55,34 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		}
 
 		result, err := mdl.svc.GetDoctor(id)
+		resultExperience, err := mdl.svc.GetDoctorExperience(id)
+		resultWorkadays, err := mdl.svc.GetDoctorWorkadays(id)
+		resultEducation, err := mdl.svc.GetDoctorEducation(id)
 
 		if err != nil {
 			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
-	}
+		mapAllData := map[string]interface{}{
+			"doctor":     result,
+			"workadays":  resultWorkadays,
+			"experience": resultExperience,
+			"education":  resultEducation,
+		}
 
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", mapAllData))
+	}
 }
 
 func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// role := mdl.jwt.CheckRole(c)
+		// fmt.Println(role)
+		// if role != "Doctor" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		// }
+
 		var input = new(DoctorRequest)
 
 		if err := c.Bind(input); err != nil {
@@ -160,7 +184,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		serviceInput.DoctorIjazah = uploadUrlIjazah
 
 		serviceInput.DoctorBalance = 0
-		serviceInput.DoctorStatus = "active"
+		serviceInput.DoctorStatus = "request"
 		//INPUT REQUEST
 
 		result, err := mdl.svc.CreateDoctor(*serviceInput)
@@ -193,7 +217,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		}
 
 		// Validate array lengths for DoctorExperience
-		if len(input.DoctorCompany) != len(input.DoctorTitle) || len(input.DoctorCompany) != len(input.DoctorDescription) ||
+		if len(input.DoctorCompany) != len(input.DoctorTitle) || len(input.DoctorCompany) != len(input.DoctorExperienceDescription) ||
 			len(input.DoctorCompany) != len(input.DoctorStartDate) || len(input.DoctorCompany) != len(input.DoctorEndDate) ||
 			len(input.DoctorCompany) != len(input.DoctorIsNow) {
 			c.Logger().Info("Handler: company, title, experience, start date, end date, and is now must have the same array length!")

@@ -2,7 +2,6 @@ package data
 
 import (
 	"FinalProject/features/doctor"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -17,77 +16,117 @@ func NewDoctor(db *gorm.DB) doctor.DoctorDataInterface {
 	}
 }
 
-func (pdata *DoctorData) GetAll() ([]doctor.DoctorInfo, error) {
-	var listDoctor = []doctor.DoctorInfo{}
-
-	var resultWorkadaysSlice []*doctor.DoctorWorkadays
-
-	qryWorkadays := pdata.db.Table("doctors").
-		Select("doctors.*, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
-		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
-		Where("doctors.deleted_at IS NULL").
-		Scan(&resultWorkadaysSlice)
-
-	if err := qryWorkadays.Error; err != nil {
-		return nil, err
-	}
-
-	var resultEducationSlice []*doctor.DoctorEducation
-
-	qryEducation := pdata.db.Table("doctors").
-		Select("doctors.*, //TAMBAH EDUCATION DOCTOR").
-		Joins("LEFT JOIN doctors_education ON doctors.id = doctors_education.doctor_id").
-		Where("doctors.deleted_at IS NULL").
-		Scan(&resultEducationSlice)
-
-	if err := qryEducation.Error; err != nil {
-		return nil, err
-	}
-
-	var resultExperienceSlice []*doctor.DoctorExperience
-
-	qryExperience := pdata.db.Table("doctors").
-		Select("doctors.*, //TAMBAH EXPERIENCE DOCTOR").
-		Joins("LEFT JOIN doctors_experience ON doctors.id = doctors_experience.doctor_id").
-		Where("doctors.deleted_at IS NULL").
-		Scan(&resultExperienceSlice)
-
-	if err := qryExperience.Error; err != nil {
-		return nil, err
-	}
+func (pdata *DoctorData) GetAll() ([]doctor.DoctorAll, error) {
+	var doctors []doctor.DoctorAll
 
 	qry := pdata.db.Table("doctors").
-		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
+		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
-		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
-		Joins("LEFT JOIN doctors_experience ON doctors.id = doctors_experience.doctor_id").
 		Where("doctors.deleted_at IS NULL").
-		Scan(&listDoctor)
-
-	fmt.Println("List doctor:", listDoctor)
+		Scan(&doctors)
 
 	if err := qry.Error; err != nil {
 		return nil, err
 	}
 
-	return listDoctor, nil
+	for i, doctor := range doctors {
+		// Retrieve experience, education, and workday for each doctor
+		experience, err := pdata.GetByIDExperience(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+		education, err := pdata.GetByIDEducation(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+		workday, err := pdata.GetByIDWorkadays(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+
+		// Assign the retrieved data to the corresponding fields in the Doctor struct
+		doctors[i].DoctorExperience = experience
+		doctors[i].DoctorEducation = education
+		doctors[i].DoctorWorkday = workday
+	}
+
+	return doctors, nil
+}
+
+// func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
+// 	var listDoctor []doctor.DoctorInfo
+
+// 	qry := pdata.db.Table("doctors").
+// 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
+// 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+// 		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
+// 		Where("doctors.id = ?", id).
+// 		Where("doctors.deleted_at IS NULL").
+// 		Scan(&listDoctor)
+
+// 	if err := qry.Error; err != nil {
+// 		return nil, err
+// 	}
+// 	return listDoctor, nil
+// }
+
+func (pdata *DoctorData) GetByIDExperience(id int) ([]doctor.DoctorInfoExperience, error) {
+	var doctorInfoExperience []doctor.DoctorInfoExperience
+
+	qry := pdata.db.Table("doctors_experience").
+		Select("doctors_experience.*").Where("doctors_experience.id = ?", id).Where("doctors_experience.deleted_at IS NULL").
+		Scan(&doctorInfoExperience)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return doctorInfoExperience, nil
+}
+func (pdata *DoctorData) GetByIDEducation(id int) ([]doctor.DoctorInfoEducation, error) {
+	var doctorInfoEducation []doctor.DoctorInfoEducation
+
+	qry := pdata.db.Table("doctors_education").
+		Select("doctors_education.*").Where("doctors_education.id = ?", id).Where("doctors_education.deleted_at IS NULL").
+		Scan(&doctorInfoEducation)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return doctorInfoEducation, nil
+}
+
+func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorInfoWorkday, error) {
+	var doctorInfoWorkday []doctor.DoctorInfoWorkday
+
+	qry := pdata.db.Table("doctors_workadays").
+		Select("doctors_workadays.*").Where("doctors_workadays.id = ?", id).Where("doctors_workadays.deleted_at IS NULL").
+		Scan(&doctorInfoWorkday)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return doctorInfoWorkday, nil
 }
 
 func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
-	var listDoctor []doctor.DoctorInfo
+	var doctorInfo []doctor.DoctorInfo
 
 	qry := pdata.db.Table("doctors").
-		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
+		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
-		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
+		// Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
 		Where("doctors.id = ?", id).
 		Where("doctors.deleted_at IS NULL").
-		Scan(&listDoctor)
+		Scan(&doctorInfo)
 
 	if err := qry.Error; err != nil {
 		return nil, err
 	}
-	return listDoctor, nil
+
+	return doctorInfo, nil
 }
 
 func (pdata *DoctorData) Insert(newData doctor.Doctor) (*doctor.Doctor, error) {

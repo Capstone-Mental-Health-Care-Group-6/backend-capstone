@@ -34,6 +34,33 @@ type Doctor struct {
 	DoctorExperience []DoctorExperience `json:"experience"`
 }
 
+type DoctorAll struct {
+	ID                  uint   `json:"id"`
+	UserID              uint   `json:"user_id"`
+	DoctorName          string `json:"doctor_name"`
+	DoctorExperienced   string `json:"doctor_experienced"`
+	DoctorDescription   string `json:"doctor_description"`
+	DoctorAvatar        string `json:"doctor_avatar"`
+	DoctorOfficeName    string `json:"doctor_office_name"`
+	DoctorOfficeAddress string `json:"doctor_office_address"`
+	DoctorOfficeCity    string `json:"doctor_office_city"`
+	DoctorMeetLink      string `json:"doctor_meet_link"`
+	DoctorSIPP          uint   `json:"doctor_sipp"`
+	DoctorSIPPFile      string `json:"doctor_sipp_file"`
+	DoctorSTR           uint   `json:"doctor_str"`
+	DoctorSTRFile       string `json:"doctor_str_file"`
+	DoctorCV            string `json:"doctor_cv"`
+	DoctorIjazah        string `json:"doctor_ijazah"`
+	DoctorBalance       uint   `json:"doctor_balance"`
+	DoctorStatus        string `json:"doctor_status"`
+
+	DoctorExpertise uint `json:"doctor_expertise"`
+
+	DoctorExperience []DoctorInfoExperience `json:"experience" gorm:"foreignkey:DoctorID"`
+	DoctorEducation  []DoctorInfoEducation  `json:"education" gorm:"foreignkey:DoctorID"`
+	DoctorWorkday    []DoctorInfoWorkday    `json:"workday" gorm:"foreignkey:DoctorID"`
+}
+
 type DoctorInfo struct {
 	UserID              uint   `json:"user_id"`
 	DoctorName          string `json:"doctor_name"`
@@ -52,15 +79,39 @@ type DoctorInfo struct {
 	DoctorStatus        string `json:"doctor_status"`
 
 	DoctorExpertise uint `json:"doctor_expertise"`
-	// DoctorWorkadays string `json:"workday_id"`
-
-	// StartTime time.Time `json:"start_time"`
-	// EndTime   time.Time `json:"end_time"`
-
-	DoctorWorkday    []DoctorWorkadays  `json:"workday"`
-	DoctorEducation  []DoctorEducation  `json:"education"`
-	DoctorExperience []DoctorExperience `json:"experience"`
 }
+
+type DoctorInfoWorkday struct {
+	// DoctorWorkday []DoctorWorkadays `json:"doctor_workday"`
+	DoctorID  uint      `json:"doctor_id"`
+	WorkdayID uint      `json:"workday_id"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+}
+
+type DoctorInfoEducation struct {
+	// DoctorEducation    []DoctorEducation `json:"doctor_education"`
+	DoctorID           uint      `json:"doctor_id"`
+	DoctorUniversity   string    `json:"doctor_university"`
+	DoctorStudyProgram string    `json:"doctor_study_program"`
+	DoctorGraduateYear time.Time `json:"doctor_graduate_year"`
+}
+
+type DoctorInfoExperience struct {
+	// DoctorExperience []DoctorExperience `json:"doctor_experience"`
+	DoctorID                    uint      `json:"doctor_id"`
+	DoctorCompany               string    `json:"doctor_company"`
+	DoctorTitle                 string    `json:"doctor_title"`
+	DoctorExperienceDescription string    `json:"doctor_experience_description"`
+	DoctorStartDate             time.Time `json:"doctor_start_date"`
+	DoctorEndDate               time.Time `json:"doctor_end_date"`
+	DoctorIsNow                 bool      `json:"doctor_is_now"`
+}
+
+// DoctorWorkadays string `json:"workday_id"`
+
+// StartTime time.Time `json:"start_time"`
+// EndTime   time.Time `json:"end_time"`
 
 type DoctorExpertiseRelation struct {
 	DoctorID    uint `json:"doctor_id"`
@@ -131,8 +182,11 @@ type DoctorHandlerInterface interface {
 }
 
 type DoctorServiceInterface interface {
-	GetDoctors() ([]DoctorInfo, error)
+	GetDoctors() ([]DoctorAll, error)
 	GetDoctor(id int) ([]DoctorInfo, error)
+	GetDoctorExperience(id int) ([]DoctorInfoExperience, error)
+	GetDoctorEducation(id int) ([]DoctorInfoEducation, error)
+	GetDoctorWorkadays(id int) ([]DoctorInfoWorkday, error)
 	CreateDoctorExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	CreateDoctorWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
 	CreateDoctorEducation(newData DoctorEducation) (*DoctorEducation, error)
@@ -147,8 +201,11 @@ type DoctorServiceInterface interface {
 }
 
 type DoctorDataInterface interface {
-	GetAll() ([]DoctorInfo, error)
+	GetAll() ([]DoctorAll, error)
 	GetByID(id int) ([]DoctorInfo, error)
+	GetByIDEducation(id int) ([]DoctorInfoEducation, error)
+	GetByIDWorkadays(id int) ([]DoctorInfoWorkday, error)
+	GetByIDExperience(id int) ([]DoctorInfoExperience, error)
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)

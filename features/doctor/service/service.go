@@ -24,7 +24,7 @@ func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.Cloudinary
 	}
 }
 
-func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorInfo, error) {
+func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorAll, error) {
 	result, err := psvc.data.GetAll()
 	if err != nil {
 		return nil, errors.New("get All Process Failed")
@@ -34,6 +34,30 @@ func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorInfo, error) {
 
 func (psvc *DoctorService) GetDoctor(id int) ([]doctor.DoctorInfo, error) {
 	result, err := psvc.data.GetByID(id)
+	if err != nil {
+		return nil, errors.New("get By ID Process Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorInfoWorkday, error) {
+	result, err := psvc.data.GetByIDWorkadays(id)
+	if err != nil {
+		return nil, errors.New("get By ID Process Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorInfoEducation, error) {
+	result, err := psvc.data.GetByIDEducation(id)
+	if err != nil {
+		return nil, errors.New("get By ID Process Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) GetDoctorExperience(id int) ([]doctor.DoctorInfoExperience, error) {
+	result, err := psvc.data.GetByIDExperience(id)
 	if err != nil {
 		return nil, errors.New("get By ID Process Failed")
 	}

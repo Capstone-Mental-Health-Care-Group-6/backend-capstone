@@ -84,7 +84,7 @@ func main() {
 
 	doctorModel := dataDoctor.NewDoctor(db)
 	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
-	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices)
+	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)
 	withdrawServices := serviceWithdraw.New(withdrawModel)
@@ -109,7 +109,7 @@ func main() {
 	routes.RoutePatient(e, patientController, *config)
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
-  routes.RouteBundle(e, bundleController, *config)
+	routes.RouteBundle(e, bundleController, *config)
 
 	e.Logger.Debug(db)
 
