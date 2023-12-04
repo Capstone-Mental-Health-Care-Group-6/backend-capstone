@@ -4,19 +4,30 @@ import (
 	"os"
 	"strconv"
 
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/sirupsen/logrus"
 )
 
 type ProgrammingConfig struct {
-	ServerPort int
-	DBPort     int
-	DBHost     string
-	DBUser     string
-	DBPass     string
-	DBName     string
-	Secret     string
-	RefSecret  string
+	ServerPort              int
+	DBPort                  uint16
+	DBHost                  string
+	DBUser                  string
+	DBPass                  string
+	DBName                  string
+	Secret                  string
+	RefSecret               string
+	MidtransServerKey       string
+	MidtransClientKey       string
+	MidtransEnvironment     string
+	CloudinaryURL           string
+	OauthGoogleClientID     string
+	OauthGoogleClientSecret string
+	OauthGoogleRedirectURL  string
+	EmailSender             string
+	EmailPasswordSender     string
+	BaseURLFE               string
 }
 
 func InitConfig() *ProgrammingConfig {
@@ -31,56 +42,145 @@ func InitConfig() *ProgrammingConfig {
 	return res
 }
 
+func readData() *ProgrammingConfig {
+	var data = new(ProgrammingConfig)
+	data = loadConfig()
+
+	if data == nil {
+		err := godotenv.Load(".env")
+		data = loadConfig()
+		if err != nil || data == nil {
+			return nil
+		}
+	}
+	return data
+}
+
 func loadConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
-	// err := godotenv.Load(".env")
-
-	// if err != nil {
-	// 	logrus.Error("Config : Cannot load config file,", err.Error())
-	// }
+	var permit = true
 
 	if val, found := os.LookupEnv("SERVER"); found {
 		port, err := strconv.Atoi(val)
 		if err != nil {
 			logrus.Error("Config : Invalid port value,", err.Error())
-			return nil
+			permit = false
 		}
-
 		res.ServerPort = port
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("DBPORT"); found {
 		port, err := strconv.Atoi(val)
 		if err != nil {
 			logrus.Error("Config : Invalid port value,", err.Error())
-			return nil
+			permit = false
 		}
 
-		res.DBPort = port
+		res.DBPort = uint16(port)
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("DBHOST"); found {
 		res.DBHost = val
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("DBUSER"); found {
 		res.DBUser = val
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("DBPASS"); found {
 		res.DBPass = val
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("DBNAME"); found {
 		res.DBName = val
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.Secret = val
+	} else {
+		permit = false
 	}
 
 	if val, found := os.LookupEnv("REFSECRET"); found {
 		res.RefSecret = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("MT_SERVER_KEY"); found {
+		res.MidtransServerKey = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("MT_CLIENT_KEY"); found {
+		res.MidtransClientKey = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("MT_ENV"); found {
+		res.MidtransEnvironment = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_ID"); found {
+		res.OauthGoogleClientID = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_SECRET"); found {
+		res.OauthGoogleClientSecret = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("OAUTH_GOOGLE_REDIRECT_URL"); found {
+		res.OauthGoogleRedirectURL = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("Cloud_URL"); found {
+		res.CloudinaryURL = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
+		res.EmailSender = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
+		res.EmailPasswordSender = val
+	} else {
+		permit = false
+	}
+
+	if val, found := os.LookupEnv("BASE_URL_FE"); found {
+		res.BaseURLFE = val
+	} else {
+		permit = false
+	}
+
+	if !permit {
+		return nil
 	}
 
 	return res
