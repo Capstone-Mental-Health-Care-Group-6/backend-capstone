@@ -10,49 +10,44 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Participant struct {
+type Client struct {
+	server  *Server
 	handler *websocket.Conn
+	rooms   map[int]*Room
 	message chan *packet.Message
-	room    *Room
-	id      int
+	sign    int
 }
 
-func NewParticipant(id int, room *Room, context echo.Context) *Participant {
-	return &Participant{
+func NewClient(context echo.Context, server *Server, id int) *Client {
+	return &Client{
+		server:  server,
 		handler: NewProtocol().Switch(context),
+		rooms:   make(map[int]*Room),
 		message: make(chan *packet.Message),
-		room:    room,
-		id:      id,
+		sign:    id,
 	}
 }
 
-func (participant *Participant) connect() {
-	participant.room.register <- participant
+func (c *Client) disconnect() {
+	c.handler.Close()
+	c.server.DeleteClient(c.sign)
 }
 
-func (participant *Participant) disconnect() {
-	participant.handler.Close()
-	participant.handler.SetCloseHandler(func(int, string) error {
-		participant.room.unregister <- participant
-		return nil
-	})
-}
-
-func (participant *Participant) send() {
+func (c *Client) Send() {
 	var (
 		duration time.Duration = time.Second * 60
 		packet   *packet.Message
 		err      error
 	)
-	participant.handler.SetReadLimit(4096)
-	participant.handler.SetReadDeadline(time.Now().Add(duration))
-	participant.handler.SetPongHandler(func(string) error {
-		participant.handler.SetReadDeadline(time.Now().Add(duration))
+	defer c.disconnect()
+	c.handler.SetReadLimit(4096)
+	c.handler.SetReadDeadline(time.Now().Add(duration))
+	c.handler.SetPongHandler(func(string) error {
+		c.handler.SetReadDeadline(time.Now().Add(duration))
 		return nil
 	})
-	defer participant.disconnect()
 	for {
-		err = participant.handler.ReadJSON(&packet)
+		err = c.handler.ReadJSON(&packet)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, []int{
 				websocket.CloseNormalClosure,
@@ -63,31 +58,32 @@ func (participant *Participant) send() {
 			}
 			break
 		}
-		participant.room.message <- packet
+		packet.Time = time.Now()
+		c.rooms[packet.Room].message <- packet
 	}
 }
 
-func (participant *Participant) recv() {
+func (c *Client) Recv() {
 	var (
 		duration time.Duration = time.Second * 55
 		ticker   *time.Ticker  = time.NewTicker(duration)
 		err      error
 	)
-	defer participant.disconnect()
+	defer c.disconnect()
 	defer ticker.Stop()
 	for {
 		duration := time.Second * 15
 		select {
-		case message := <-participant.message:
-			participant.handler.SetWriteDeadline(time.Now().Add(duration))
-			err = participant.handler.WriteJSON(message)
+		case message := <-c.message:
+			c.handler.SetWriteDeadline(time.Now().Add(duration))
+			err = c.handler.WriteJSON(message)
 			if err != nil {
 				logrus.Error("[participant.recv]: ", err.Error())
 				return
 			}
 		case <-ticker.C:
-			participant.handler.SetWriteDeadline(time.Now().Add(duration))
-			err = participant.handler.WriteMessage(websocket.PingMessage, nil)
+			c.handler.SetWriteDeadline(time.Now().Add(duration))
+			err = c.handler.WriteMessage(websocket.PingMessage, nil)
 			if err != nil {
 				return
 			}

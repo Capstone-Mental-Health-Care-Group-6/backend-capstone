@@ -3,9 +3,10 @@ package packet
 import "time"
 
 type Message struct {
-	From      int
-	To        int
-	Text      string
-	Image     []byte
-	Timestamp time.Time
+	Room int       `json:"room"`
+	From int       `json:"from"`
+	To   int       `json:"to"`
+	Text string    `json:"text"`
+	Blob string    `json:"blob"`
+	Time time.Time `json:"time"`
 }

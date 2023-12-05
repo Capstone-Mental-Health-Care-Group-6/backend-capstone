@@ -1,68 +1,53 @@
 package websocket
 
-import (
-	"fmt"
-
-	"FinalProject/utils/websocket/packet"
-)
+import "FinalProject/utils/websocket/packet"
 
 type Room struct {
-	participants map[*Participant]bool
-	message      chan *packet.Message
-	register     chan *Participant
-	unregister   chan *Participant
-	id           int
+	clients map[*Client]bool
+	join    chan *Client
+	message chan *packet.Message
+	sign    int
 }
 
-func NewRoom(id int) *Room {
-	return &Room{
-		participants: make(map[*Participant]bool),
-		message:      make(chan *packet.Message),
-		register:     make(chan *Participant),
-		unregister:   make(chan *Participant),
-		id:           id,
-	}
-}
-
-func (room *Room) join(participant *Participant) {
-	if _, found := room.participants[participant]; !found {
-		fmt.Println(participant.id, "join")
-		room.participants[participant] = true
-	}
-}
-
-func (room *Room) leave(participant *Participant) {
-	if _, found := room.participants[participant]; found {
-		close(participant.message)
-		delete(room.participants, participant)
-	}
-}
-
-func (room *Room) foward(message *packet.Message) {
-	for participant := range room.participants {
-		if message.To == participant.id {
-			participant.message <- message
-		}
-	}
-}
-
-func (room *Room) Listen() {
-	go func() {
-		for {
-			select {
-			case participant := <-room.register:
-				room.join(participant)
-			case participant := <-room.unregister:
-				room.leave(participant)
-			case message := <-room.message:
-				room.foward(message)
+func NewRoom(sign int, clients ...*Client) *Room {
+	room := &Room{
+		clients: func() map[*Client]bool {
+			buffer := make(map[*Client]bool)
+			for _, client := range clients {
+				buffer[client] = true
 			}
-		}
-	}()
+			return buffer
+		}(),
+		join:    make(chan *Client),
+		message: make(chan *packet.Message),
+		sign:    sign,
+	}
+	for _, client := range clients {
+		client.rooms[sign] = room
+	}
+	return room
 }
 
-func (room *Room) Serve(participant *Participant) {
-	participant.connect()
-	go participant.recv()
-	go participant.send()
+func (r *Room) Join(client *Client) {
+	r.clients[client] = true
+	client.rooms[r.sign] = r
+}
+
+func (r *Room) Foward(message *packet.Message) {
+	for client := range r.clients {
+		if message.To == client.sign {
+			client.message <- message
+		}
+	}
+}
+
+func (r *Room) Listen() {
+	for {
+		select {
+		case client := <-r.join:
+			r.Join(client)
+		case message := <-r.message:
+			r.Foward(message)
+		}
+	}
 }
