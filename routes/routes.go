@@ -5,6 +5,7 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	bundlecounseling "FinalProject/features/bundle_counseling"
+	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
@@ -84,4 +85,12 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/bundle/:id", ph.DeleteBundle(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/counseling", ph.GetAllCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/:id", ph.GetCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/counseling/:id", ph.DeleteCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 }

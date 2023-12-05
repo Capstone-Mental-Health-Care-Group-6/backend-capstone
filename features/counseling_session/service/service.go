@@ -1,24 +1,23 @@
 package service
 
 import (
-	bundlecounseling "FinalProject/features/bundle_counseling"
+	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/utils/cloudinary"
-	"errors"
 )
 
-type BundleCounselingService struct {
-	d   bundlecounseling.BundleCounselingDataInterface
+type CounselingSessionService struct {
+	d   counselingsession.CounselingSessionDataInterface
 	cld cloudinary.CloudinaryInterface
 }
 
-func New(data bundlecounseling.BundleCounselingDataInterface, cld cloudinary.CloudinaryInterface) bundlecounseling.BundleCounselingServiceInterface {
-	return &BundleCounselingService{
+func New(data counselingsession.CounselingSessionDataInterface, cld cloudinary.CloudinaryInterface) counselingsession.CounselingSessionServiceInterface {
+	return &CounselingSessionService{
 		d:   data,
 		cld: cld,
 	}
 }
 
-func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCounselingInfo, error) {
+func (s *CounselingSessionService) GetAllCounseling() ([]counselingsession.CounselingSession, error) {
 	result, err := s.d.GetAll()
 	if err != nil {
 		return nil, err
@@ -26,32 +25,32 @@ func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCouns
 	return result, nil
 }
 
-func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (*bundlecounseling.BundleCounseling, error) {
+func (s *CounselingSessionService) CreateCounseling(input counselingsession.CounselingSession) (*counselingsession.CounselingSession, error) {
 
-	uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
-	if err != nil {
-		return nil, errors.New("Upload Failed")
-	}
+	// uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
+	// if err != nil {
+	// 	return nil, errors.New("Upload Failed")
+	// }
 
-	newData := bundlecounseling.BundleCounseling{
-		Name:         input.Name,
-		Sessions:     input.Sessions,
-		Type:         input.Type,
-		Price:        input.Price,
-		Description:  input.Description,
-		ActivePriode: input.ActivePriode,
-		Avatar:       uploadUrl,
-	}
+	// newData := counselingsession.counselingsession{
+	// 	Name:         input.Name,
+	// 	Sessions:     input.Sessions,
+	// 	Type:         input.Type,
+	// 	Price:        input.Price,
+	// 	Description:  input.Description,
+	// 	ActivePriode: input.ActivePriode,
+	// 	Avatar:       uploadUrl,
+	// }
 
-	result, err := s.d.Create(newData)
-	if err != nil {
-		return nil, err
-	}
+	// result, err := s.d.Create(newData)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return result, nil
+	return nil, nil
 }
 
-func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCounseling, error) {
+func (s *CounselingSessionService) GetCounseling(id int) (*counselingsession.CounselingSession, error) {
 	result, err := s.d.GetById(id)
 	if err != nil {
 		return nil, err
@@ -60,35 +59,35 @@ func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCou
 	return result, nil
 }
 
-func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (bool, error) {
+func (s *CounselingSessionService) UpdateCounseling(id int, input counselingsession.CounselingSession) (bool, error) {
 
-	newData := bundlecounseling.BundleCounseling{
-		Name:         input.Name,
-		Sessions:     input.Sessions,
-		Type:         input.Type,
-		Price:        input.Price,
-		Description:  input.Description,
-		ActivePriode: input.ActivePriode,
-	}
+	// newData := counselingsession.counselingsession{
+	// 	Name:         input.Name,
+	// 	Sessions:     input.Sessions,
+	// 	Type:         input.Type,
+	// 	Price:        input.Price,
+	// 	Description:  input.Description,
+	// 	ActivePriode: input.ActivePriode,
+	// }
 
-	if file.Avatar != nil {
-		uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
-		if err != nil {
-			return false, errors.New("Upload Failed")
-		}
+	// if file.Avatar != nil {
+	// 	uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
+	// 	if err != nil {
+	// 		return false, errors.New("Upload Failed")
+	// 	}
 
-		newData.Avatar = uploadUrl
-	}
+	// 	newData.Avatar = uploadUrl
+	// }
 
-	result, err := s.d.Update(id, newData)
-	if err != nil {
-		return false, err
-	}
+	// result, err := s.d.Update(id, newData)
+	// if err != nil {
+	// 	return false, err
+	// }
 
-	return result, nil
+	return true, nil
 }
 
-func (s *BundleCounselingService) DeleteBundle(id int) (bool, error) {
+func (s *CounselingSessionService) DeleteCounseling(id int) (bool, error) {
 	result, err := s.d.Delete(id)
 	if err != nil {
 		return false, err

@@ -35,6 +35,10 @@ import (
 	handlerBundle "FinalProject/features/bundle_counseling/handler"
 	serviceBundle "FinalProject/features/bundle_counseling/service"
 
+	dataCounseling "FinalProject/features/counseling_session/data"
+	handlerCounseling "FinalProject/features/counseling_session/handler"
+	serviceCounseling "FinalProject/features/counseling_session/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
@@ -94,6 +98,10 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	counselingModel := dataCounseling.New(db)
+	counselingServices := serviceCounseling.New(counselingModel, cld)
+	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -110,6 +118,7 @@ func main() {
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
+	routes.RouteCounseling(e, counselingController, *config)
 
 	e.Logger.Debug(db)
 
