@@ -5,6 +5,8 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	bundlecounseling "FinalProject/features/bundle_counseling"
+	. "FinalProject/features/chat_messages"
+	. "FinalProject/features/chats"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
@@ -72,7 +74,7 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.POST("/patient/login", ph.LoginPatient())
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
-  e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
@@ -83,4 +85,22 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/bundle/:id", ph.DeleteBundle(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/api/socket/:id", h.Establish())
+	group := e.Group("/api/chats")
+	group.GET("/users/:id", h.Index())
+	group.POST("", h.Store())
+	group.PUT("/:id", h.Edit())
+	group.DELETE("/:id", h.Destroy())
+}
+
+func RouteMessage(e *echo.Echo, h MessageHandlerInterface, cfg configs.ProgrammingConfig) {
+	group := e.Group("/api/chats/:id/messages")
+	group.GET("", h.Index())
+	group.GET("/:message", h.Observe())
+	group.POST("", h.Store())
+	group.PUT("/:message", h.Edit())
+	group.DELETE("/:message", h.Destroy())
 }
