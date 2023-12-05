@@ -17,3 +17,9 @@ func FormatResponseValidation(message string, msgErr any) map[string]any {
 	}
 	return response
 }
+
+type ApiResponse[T any] struct {
+	Status  int    `json:"status,omitempty"`
+	Message string `json:"message,omitempty"`
+	Data    T      `json:"data,omitempty"`
+}
