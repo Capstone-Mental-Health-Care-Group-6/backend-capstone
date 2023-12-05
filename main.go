@@ -5,6 +5,7 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	"FinalProject/helper/enkrip"
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -55,6 +56,7 @@ func main() {
 	var config = configs.InitConfig()
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
+	var enkrip = enkrip.New()
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
@@ -72,7 +74,7 @@ func main() {
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface, *config)
+	userServices := serviceUser.New(userModel, jwtInterface, *config, enkrip)
 	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
@@ -88,7 +90,7 @@ func main() {
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
-	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
+	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface, enkrip)
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)

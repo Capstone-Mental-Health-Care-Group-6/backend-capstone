@@ -4,6 +4,7 @@ import (
 	"FinalProject/configs"
 	"FinalProject/features/users"
 	"FinalProject/helper"
+	"FinalProject/helper/enkrip"
 	"errors"
 	"math/rand"
 	"strings"
@@ -14,13 +15,15 @@ type UserService struct {
 	d users.UserDataInterface
 	j helper.JWTInterface
 	c configs.ProgrammingConfig
+	e enkrip.HashInterface
 }
 
-func New(data users.UserDataInterface, jwt helper.JWTInterface, config configs.ProgrammingConfig) users.UserServiceInterface {
+func New(data users.UserDataInterface, jwt helper.JWTInterface, config configs.ProgrammingConfig, enkrip enkrip.HashInterface) users.UserServiceInterface {
 	return &UserService{
 		d: data,
 		j: jwt,
 		c: config,
+		e: enkrip,
 	}
 }
 
@@ -29,6 +32,13 @@ func (us *UserService) Register(newData users.User) (*users.User, error) {
 	if err == nil {
 		return nil, errors.New("Email already registered by another user")
 	}
+
+	hashPassword, err := us.e.HashPassword(newData.Password)
+	if err != nil {
+		return nil, errors.New("Hash Password Error")
+	}
+
+	newData.Password = hashPassword
 
 	result, err := us.d.Register(newData)
 
@@ -283,6 +293,11 @@ func (us *UserService) ForgetPasswordWeb(email string) error {
 }
 
 func (us *UserService) ResetPassword(code, email, password string) error {
+	hashPassword, err := us.e.HashPassword(password)
+	if err != nil {
+		return errors.New("Hash Password Error")
+	}
+	password = hashPassword
 
 	if err := us.d.ResetPassword(code, email, password); err != nil {
 		return err

@@ -3,7 +3,6 @@ package data
 import (
 	//"net/url"
 	"FinalProject/features/patients"
-	"FinalProject/helper"
 	"time"
 
 	//mysql "FinalProject/utils/database/migration/mysql"
@@ -76,11 +75,7 @@ func (pdata *PatientData) Insert(newData patients.Patiententity) (*patients.Pati
 	dbData.Phone = newData.Phone
 	dbData.Role = "Patient"
 	dbData.Status = "Active"
-	hashPassword, err := helper.HashPassword(newData.Password)
-	if err != nil {
-		logrus.Info("Hash Password Error, ", err.Error())
-	}
-	dbData.Password = hashPassword
+	dbData.Password = newData.Password
 
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
@@ -138,7 +133,6 @@ func (pdata *PatientData) Update(id int, newData patients.UpdateProfile) (bool, 
 }
 
 func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword) (bool, error) {
-	newData.Password, _ = helper.HashPassword(newData.Password)
 	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{
 		Password: newData.Password,
 	})

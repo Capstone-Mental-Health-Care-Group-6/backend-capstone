@@ -53,7 +53,7 @@ func (as *ArticleService) DenyArticle(id int) (bool, error) {
 	result, err := as.d.Deny(id)
 
 	if err != nil {
-		return false, errors.New("Delete Process Failed")
+		return false, errors.New("Denny Process Failed")
 	}
 
 	return result, nil
@@ -63,7 +63,7 @@ func (as *ArticleService) ApproveArticle(id int) (bool, error) {
 	result, err := as.d.Approve(id)
 
 	if err != nil {
-		return false, errors.New("Delete Process Failed")
+		return false, errors.New("Approve Process Failed")
 	}
 
 	return result, nil
