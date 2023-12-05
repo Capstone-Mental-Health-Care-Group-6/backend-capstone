@@ -4,6 +4,7 @@ go 1.21.1
 
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.6.0
+	github.com/fatih/structs v1.1.0
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/gorilla/websocket v1.5.1
