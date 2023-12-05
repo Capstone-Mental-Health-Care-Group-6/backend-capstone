@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -32,8 +34,9 @@ type ProgrammingConfig struct {
 
 func InitConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
-	res = loadConfig()
+	res, errorRes := loadConfig()
 
+	fmt.Println(errorRes)
 	if res == nil {
 		logrus.Fatal("Config : Cannot start program, failed to load configuration")
 		return nil
@@ -44,11 +47,14 @@ func InitConfig() *ProgrammingConfig {
 
 func readData() *ProgrammingConfig {
 	var data = new(ProgrammingConfig)
-	data = loadConfig()
+	data, _ = loadConfig()
 
 	if data == nil {
 		err := godotenv.Load(".env")
-		data = loadConfig()
+		data, errorData := loadConfig()
+
+		fmt.Println(errorData)
+
 		if err != nil || data == nil {
 			return nil
 		}
@@ -56,7 +62,8 @@ func readData() *ProgrammingConfig {
 	return data
 }
 
-func loadConfig() *ProgrammingConfig {
+func loadConfig() (*ProgrammingConfig, error) {
+	var error error
 	var res = new(ProgrammingConfig)
 	var permit = true
 
@@ -69,6 +76,7 @@ func loadConfig() *ProgrammingConfig {
 		res.ServerPort = port
 	} else {
 		permit = false
+		error = errors.New("Port undefined")
 	}
 
 	if val, found := os.LookupEnv("DBPORT"); found {
@@ -81,107 +89,124 @@ func loadConfig() *ProgrammingConfig {
 		res.DBPort = uint16(port)
 	} else {
 		permit = false
+		error = errors.New("DB Port undefined")
 	}
 
 	if val, found := os.LookupEnv("DBHOST"); found {
 		res.DBHost = val
 	} else {
 		permit = false
+		error = errors.New("DB Host undefined")
 	}
 
 	if val, found := os.LookupEnv("DBUSER"); found {
 		res.DBUser = val
 	} else {
 		permit = false
+		error = errors.New("DB User undefined")
 	}
 
 	if val, found := os.LookupEnv("DBPASS"); found {
 		res.DBPass = val
 	} else {
 		permit = false
+		error = errors.New("DB Pass undefined")
 	}
 
 	if val, found := os.LookupEnv("DBNAME"); found {
 		res.DBName = val
 	} else {
 		permit = false
+		error = errors.New("DB Name undefined")
 	}
 
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.Secret = val
 	} else {
 		permit = false
+		error = errors.New("Secret undefined")
 	}
 
 	if val, found := os.LookupEnv("REFSECRET"); found {
 		res.RefSecret = val
 	} else {
 		permit = false
+		error = errors.New("Ref Secret undefined")
 	}
 
 	if val, found := os.LookupEnv("MT_SERVER_KEY"); found {
 		res.MidtransServerKey = val
 	} else {
 		permit = false
+		error = errors.New("Midtrans Server Key undefined")
 	}
 
 	if val, found := os.LookupEnv("MT_CLIENT_KEY"); found {
 		res.MidtransClientKey = val
 	} else {
 		permit = false
+		error = errors.New("Midtrans Client Key undefined")
 	}
 
 	if val, found := os.LookupEnv("MT_ENV"); found {
 		res.MidtransEnvironment = val
 	} else {
 		permit = false
+		error = errors.New("Midtrans Env undefined")
 	}
 
 	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_ID"); found {
 		res.OauthGoogleClientID = val
 	} else {
 		permit = false
+		error = errors.New("OAuth Google Client ID undefined")
 	}
 
 	if val, found := os.LookupEnv("OAUTH_GOOGLE_CLIENT_SECRET"); found {
 		res.OauthGoogleClientSecret = val
 	} else {
 		permit = false
+		error = errors.New("OAuth Google Client Secret undefined")
 	}
 
 	if val, found := os.LookupEnv("OAUTH_GOOGLE_REDIRECT_URL"); found {
 		res.OauthGoogleRedirectURL = val
 	} else {
 		permit = false
+		error = errors.New("OAuth Google Redirect URL undefined")
 	}
 
 	if val, found := os.LookupEnv("Cloud_URL"); found {
 		res.CloudinaryURL = val
 	} else {
 		permit = false
+		error = errors.New("Cloud URL undefined")
 	}
 
 	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
 		res.EmailSender = val
 	} else {
 		permit = false
+		error = errors.New("Email Sender undefined")
 	}
 
 	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
 		res.EmailPasswordSender = val
 	} else {
 		permit = false
+		error = errors.New("Email Password Sender undefined")
 	}
 
 	if val, found := os.LookupEnv("BASE_URL_FE"); found {
 		res.BaseURLFE = val
 	} else {
 		permit = false
+		error = errors.New("Base URL FE undefined")
 	}
 
 	if !permit {
-		return nil
+		return nil, error
 	}
 
-	return res
+	return res, nil
 }
