@@ -28,10 +28,10 @@ func InitCloud(config configs.ProgrammingConfig) CloudinaryInterface {
 func (cld *Cloudinary) UploadImageHelper(input interface{}) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Second)
 	defer cancel()
-	cl, err := cloudinary.NewFromURL(cld.cfg.CloudinaryURL)
+	// cl, err := cloudinary.NewFromURL(cld.cfg.CloudinaryURL)
 	//2TFjfPK1yqcIZ1hEKTZ_cZQsLlc
 	logrus.Info("Ini input: ", input)
-	// cl, err := cloudinary.NewFromURL("")
+	cl, err := cloudinary.NewFromURL("cloudinary://725787456725272:2TFjfPK1yqcIZ1hEKTZ_cZQsLlc@dlstnepvt")
 	if err != nil {
 		return "", err
 	}
