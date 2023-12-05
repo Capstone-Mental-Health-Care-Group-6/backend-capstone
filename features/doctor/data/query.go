@@ -2,8 +2,10 @@ package data
 
 import (
 	"FinalProject/features/doctor"
+	"FinalProject/features/users"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -225,6 +227,21 @@ func (pdata *DoctorData) Insert(newData doctor.Doctor) (*doctor.Doctor, error) {
 	newData.ID = dbData.ID
 
 	return &newData, nil
+}
+
+func (pdata *DoctorData) FindEmail(userID uint) (*string, error) {
+
+	var dbData = new(users.User)
+
+	if err := pdata.db.Table("users").Where("id = ?", userID).First(dbData).Error; err != nil {
+		logrus.Info("DB Error : ", err.Error())
+		return nil, err
+	}
+
+	var result = new(users.User)
+	result.Email = dbData.Email
+
+	return &result.Email, nil
 }
 
 func (pdata *DoctorData) InsertExpertise(newData doctor.DoctorExpertiseRelation) (*doctor.DoctorExpertiseRelation, error) {

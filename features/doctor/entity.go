@@ -207,4 +207,5 @@ type DoctorDataInterface interface {
 	InsertWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
+	FindEmail(userID uint) (*string, error)
 }

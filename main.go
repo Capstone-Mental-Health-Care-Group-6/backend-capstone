@@ -68,7 +68,7 @@ func main() {
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
-	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, jwtInterface)
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
@@ -83,7 +83,7 @@ func main() {
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, *config)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)

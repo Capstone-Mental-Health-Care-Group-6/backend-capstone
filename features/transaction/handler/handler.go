@@ -14,13 +14,15 @@ import (
 )
 
 type TransactionHandler struct {
-	s transaction.TransactionServiceInterface
+	s   transaction.TransactionServiceInterface
+	jwt helper.JWTInterface
 }
 
-func NewTransactionHandler(service transaction.TransactionServiceInterface) transaction.TransactionHandlerInterface {
+func NewTransactionHandler(service transaction.TransactionServiceInterface, jwt helper.JWTInterface) transaction.TransactionHandlerInterface {
 	// mt.InitMidtrans(c)
 	return &TransactionHandler{
-		s: service,
+		s:   service,
+		jwt: jwt,
 	}
 }
 
@@ -61,6 +63,10 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 
 func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		getID, err := th.jwt.GetID(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, cant get ID from JWT", nil))
+		}
 
 		var input = new(InputRequest)
 		if err := c.Bind(input); err != nil {
@@ -76,7 +82,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		serviceInput.PriceResult = input.PriceMethod + input.PriceDuration + input.PriceCounseling
 
-		serviceInput.UserID = input.UserID
+		serviceInput.UserID = getID
 		serviceInput.PaymentStatus = 5
 
 		serviceInput.TopicID = input.TopicID

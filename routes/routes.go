@@ -26,13 +26,13 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.POST("/transaksi", th.CreateTransaction())
+	e.POST("/transaksi", th.CreateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/transaksi/notif", th.NotifTransaction())
-	e.GET("/transaksi/:id", th.GetTransaction())
-	e.GET("/transaksi", th.GetTransactions())
-	e.DELETE("/transaksi/:id", th.DeleteTransaction())
-	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
-	e.PUT("/transaksi/:id", th.UpdateTransaction())
+	e.GET("/transaksi/:id", th.GetTransaction(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi", th.GetTransactions(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/transaksi/:id", th.DeleteTransaction(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/transaksi/:id", th.UpdateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 
@@ -73,7 +73,7 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.POST("/patient/login", ph.LoginPatient())
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
-  e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }

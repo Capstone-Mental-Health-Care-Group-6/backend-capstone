@@ -1,23 +1,39 @@
 package service
 
 import (
+	"FinalProject/configs"
 	"FinalProject/features/doctor"
 	"FinalProject/helper"
 	"FinalProject/utils/cloudinary"
 	"errors"
+	"math/rand"
+
+	"github.com/sirupsen/logrus"
 )
 
 type DoctorService struct {
 	data doctor.DoctorDataInterface
 	cld  cloudinary.CloudinaryInterface
 	jwt  helper.JWTInterface
+	c    configs.ProgrammingConfig
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, config configs.ProgrammingConfig) doctor.DoctorServiceInterface {
 	return &DoctorService{
 		data: data,
 		cld:  cloudinary,
+		c:    config,
 	}
+}
+
+func generateRandomCode(length int) string {
+	const charset = "0123456789"
+	code := make([]byte, length)
+	for i := range code {
+		code[i] = charset[rand.Intn(len(charset))]
+	}
+
+	return string(code)
 }
 
 func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorAll, error) {
@@ -72,6 +88,93 @@ func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, 
 	result, err := psvc.data.Insert(newData)
 	if err != nil {
 		return nil, errors.New("insert Process Failed")
+	}
+
+	email, err := psvc.data.FindEmail(result.UserID)
+
+	// emailUser, err := us.d.GetByEmail(email)
+
+	// email := emailUser
+
+	header := "Selamat " + result.DoctorName + ", pengajuan konselor Anda sudah kami terima!"
+	htmlBody := `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pengajuan Konselor</title>
+	</head>
+	<body style="margin: 0; padding: 0; box-sizing: border-box;">
+		<table align="center" cellpadding="0" cellspacing="0" width="95%">
+		<tr>
+			<td align="center">
+			<table align="center" cellpadding="0" cellspacing="0" width="600" style="border-spacing: 2px 5px;" bgcolor="#fff">
+				<tr>
+				<td style="padding: 5px 5px 5px 5px;">
+					<a href="#" target="_blank">
+					<img src="https://i.ibb.co/kgMjHSV/Logo.png" alt="Logo" style="width:200px; border:0; margin:0;"/>
+					</a>
+				</td>
+				</tr>
+				<tr>
+				<td bgcolor="#fff">
+					<table cellpadding="0" cellspacing="0" width="100%%">
+					<tr>
+						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 18px; font-weight: 900">
+						Halo,` + result.DoctorName + `
+						</td>
+					</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td bgcolor="#fff">
+					<table cellpadding="0" cellspacing="0" width="100%%">
+					<tr>
+						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
+						Selamat! Kami dengan senang hati ingin memberitahu Anda bahwa pengajuan Anda sebagai Konselor di EmpathiCare telah berhasil diterima. Kami sangat berterima kasih atas ketertarikan Anda untuk bergabung dengan kami.
+			<p></p>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
+						Terima kasih atas kontribusi Anda dalam meningkatkan pelayanan kesehatan kami.
+			 <p></p>
+						</td>
+					</tr>
+		  <tr>
+						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
+						Salam Sehat,
+						</td>
+					</tr>
+		   <tr>
+						<td style="font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
+						Team EmpathiCare
+						</td>
+					</tr>
+					</table>
+				</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+		</table>
+	</body>
+	</html>`
+
+	ress := helper.SendEmail(*email, header, htmlBody)
+
+	logrus.Info("Info send email ==[]==", nil)
+	logrus.Info("Email:", email, &email, *email)
+	logrus.Info("UserID:", result.UserID)
+	logrus.Info("Header: ", header)
+	logrus.Info("HTML Body: ", htmlBody)
+	logrus.Info("Result Pengiriman Email: ", ress)
+	logrus.Info("Info send email ==[]==", nil)
+
+	if ress != nil {
+		return nil, ress
 	}
 	return result, nil
 }
