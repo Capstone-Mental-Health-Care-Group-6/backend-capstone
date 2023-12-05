@@ -9,6 +9,9 @@ import (
 	DataTransaction "FinalProject/features/transaction/data"
 	DataUser "FinalProject/features/users/data"
 
+	message "FinalProject/features/chat_messages"
+	chat "FinalProject/features/chats"
+
 	"gorm.io/gorm"
 )
 
@@ -24,4 +27,6 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataDoctor.DoctorExpertiseRelation{})
 	db.AutoMigrate(DataDoctor.DoctorRating{})
 	db.AutoMigrate(DataDoctor.DoctorWorkadays{})
+	db.AutoMigrate(chat.Chat{})
+	db.AutoMigrate(message.Message{})
 }
