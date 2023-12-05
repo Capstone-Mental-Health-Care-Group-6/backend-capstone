@@ -15,7 +15,7 @@ type MessageData struct {
 	db *gorm.DB
 }
 
-func NewMessageData(db *gorm.DB) root.MessageDataInterface {
+func New(db *gorm.DB) root.MessageDataInterface {
 	return &MessageData{
 		db: db,
 	}

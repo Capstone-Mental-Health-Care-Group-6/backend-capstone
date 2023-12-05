@@ -11,17 +11,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ChatHttpHandler struct {
+type ChatHandler struct {
 	srv root.ChatServiceInterface
 }
 
-func NewChatHttpHandler(srv root.ChatServiceInterface) root.ChatHandlerInterface {
-	return &ChatHttpHandler{
+func New(srv root.ChatServiceInterface) root.ChatHandlerInterface {
+	return &ChatHandler{
 		srv: srv,
 	}
 }
 
-func (h *ChatHttpHandler) Establish() echo.HandlerFunc {
+func (h *ChatHandler) Establish() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		user, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
@@ -39,7 +39,7 @@ func (h *ChatHttpHandler) Establish() echo.HandlerFunc {
 	}
 }
 
-func (h *ChatHttpHandler) Index() echo.HandlerFunc {
+func (h *ChatHandler) Index() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		user, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
@@ -66,7 +66,7 @@ func (h *ChatHttpHandler) Index() echo.HandlerFunc {
 	}
 }
 
-func (h *ChatHttpHandler) Store() echo.HandlerFunc {
+func (h *ChatHandler) Store() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		request := &dto.CreateChatRequest{}
 		if err := ctx.Bind(request); err != nil || request.Patient == request.Doctor {
@@ -96,7 +96,7 @@ func (h *ChatHttpHandler) Store() echo.HandlerFunc {
 	}
 }
 
-func (h *ChatHttpHandler) Edit() echo.HandlerFunc {
+func (h *ChatHandler) Edit() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
@@ -134,7 +134,7 @@ func (h *ChatHttpHandler) Edit() echo.HandlerFunc {
 	}
 }
 
-func (h *ChatHttpHandler) Destroy() echo.HandlerFunc {
+func (h *ChatHandler) Destroy() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {

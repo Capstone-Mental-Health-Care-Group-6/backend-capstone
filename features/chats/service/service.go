@@ -15,7 +15,7 @@ type ChatService struct {
 	data root.ChatDataInterface
 }
 
-func NewChatServiceImpl(data root.ChatDataInterface, sock *websocket.Server) root.ChatServiceInterface {
+func New(data root.ChatDataInterface, sock *websocket.Server) root.ChatServiceInterface {
 	return &ChatService{
 		sock: sock,
 		data: data,

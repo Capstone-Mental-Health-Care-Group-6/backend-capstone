@@ -15,7 +15,7 @@ type MessageHandler struct {
 	srv root.MessageServiceInterface
 }
 
-func NewMessageHttpHandler(srv root.MessageServiceInterface) root.MessageHandlerInterface {
+func New(srv root.MessageServiceInterface) root.MessageHandlerInterface {
 	return &MessageHandler{
 		srv: srv,
 	}

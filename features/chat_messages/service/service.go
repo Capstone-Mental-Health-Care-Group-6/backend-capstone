@@ -12,7 +12,7 @@ type MessageService struct {
 	data root.MessageDataInterface
 }
 
-func NewMessageService(data root.MessageDataInterface) root.MessageServiceInterface {
+func New(data root.MessageDataInterface) root.MessageServiceInterface {
 	return &MessageService{
 		data: data,
 	}

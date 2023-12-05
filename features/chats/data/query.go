@@ -16,7 +16,7 @@ type ChatData struct {
 	db *gorm.DB
 }
 
-func NewChatData(db *gorm.DB) root.ChatDataInterface {
+func New(db *gorm.DB) root.ChatDataInterface {
 	return &ChatData{
 		db: db,
 	}
