@@ -27,8 +27,6 @@ type ProgrammingConfig struct {
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
-	EmailSender             string
-	EmailPasswordSender     string
 	BaseURLFE               string
 }
 
@@ -181,20 +179,6 @@ func loadConfig() (*ProgrammingConfig, error) {
 	} else {
 		permit = false
 		error = errors.New("Cloud URL undefined")
-	}
-
-	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
-		res.EmailSender = val
-	} else {
-		permit = false
-		error = errors.New("Email Sender undefined")
-	}
-
-	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
-		res.EmailPasswordSender = val
-	} else {
-		permit = false
-		error = errors.New("Email Password Sender undefined")
 	}
 
 	if val, found := os.LookupEnv("BASE_URL_FE"); found {

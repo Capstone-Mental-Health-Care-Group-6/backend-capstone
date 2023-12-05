@@ -50,6 +50,7 @@ services:
       - OAUTH_GOOGLE_CLIENT_SECRET=${OAUTH_GOOGLE_CLIENT_SECRET}
       - OAUTH_GOOGLE_REDIRECT_URL=${OAUTH_GOOGLE_REDIRECT_URL}
       - Cloud_URL=${CloudURL}
+      - BASE_URL_FE=${BASE_URL_FE}
     ports:
       - '80:80'
     networks:
