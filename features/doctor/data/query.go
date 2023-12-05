@@ -56,6 +56,43 @@ func (pdata *DoctorData) GetAll() ([]doctor.DoctorAll, error) {
 	return doctors, nil
 }
 
+func (pdata *DoctorData) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
+	var doctors []doctor.DoctorAll
+
+	qry := pdata.db.Table("doctors").
+		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Where("doctors.deleted_at IS NULL AND doctors.doctor_name LIKE ?", "%"+name+"%").
+		Scan(&doctors)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	for i, doctor := range doctors {
+		// Retrieve experience, education, and workday for each doctor
+		experience, err := pdata.GetByIDExperience(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+		education, err := pdata.GetByIDEducation(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+		workday, err := pdata.GetByIDWorkadays(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
+
+		// Assign the retrieved data to the corresponding fields in the Doctor struct
+		doctors[i].DoctorExperience = experience
+		doctors[i].DoctorEducation = education
+		doctors[i].DoctorWorkday = workday
+	}
+
+	return doctors, nil
+}
+
 func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 	var doctor doctor.DoctorAll
 
@@ -91,23 +128,6 @@ func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 
 	return &doctor, nil
 }
-
-// func (pdata *DoctorData) GetByID(id int) ([]doctor.DoctorInfo, error) {
-// 	var listDoctor []doctor.DoctorInfo
-
-// 	qry := pdata.db.Table("doctors").
-// 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id, doctors_workadays.workday_id AS workday_id, doctors_workadays.start_time AS start_time, doctors_workadays.end_time AS end_time").
-// 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
-// 		Joins("LEFT JOIN doctors_workadays ON doctors.id = doctors_workadays.doctor_id").
-// 		Where("doctors.id = ?", id).
-// 		Where("doctors.deleted_at IS NULL").
-// 		Scan(&listDoctor)
-
-// 	if err := qry.Error; err != nil {
-// 		return nil, err
-// 	}
-// 	return listDoctor, nil
-// }
 
 func (pdata *DoctorData) GetByIDExperience(id int) ([]doctor.DoctorInfoExperience, error) {
 	var doctorInfoExperience []doctor.DoctorInfoExperience

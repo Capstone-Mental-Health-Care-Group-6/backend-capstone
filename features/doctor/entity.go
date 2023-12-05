@@ -149,12 +149,6 @@ type DoctorExperience struct {
 	DoctorIsNow                 bool      `json:"doctor_is_now"`
 }
 
-type JwtMapClaims struct {
-	ID     uint `json:"id"`
-	Role   uint `json:"role"`
-	Status uint `json:"status"`
-}
-
 type DoctorAvatarPhoto struct {
 	DoctorAvatar multipart.File `json:"doctor_avatar"`
 }
@@ -179,10 +173,12 @@ type DoctorHandlerInterface interface {
 	GetDoctors() echo.HandlerFunc
 	GetDoctor() echo.HandlerFunc
 	CreateDoctor() echo.HandlerFunc
+	SearchDoctor() echo.HandlerFunc
 }
 
 type DoctorServiceInterface interface {
 	GetDoctors() ([]DoctorAll, error)
+	SearchDoctor(name string) ([]DoctorAll, error)
 	GetDoctor(id int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorInfoExperience, error)
 	GetDoctorEducation(id int) ([]DoctorInfoEducation, error)
@@ -197,7 +193,6 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
-	JwtExtractToken(authorizationHeader string) (JwtMapClaims, error)
 }
 
 type DoctorDataInterface interface {
@@ -206,6 +201,7 @@ type DoctorDataInterface interface {
 	GetByIDEducation(id int) ([]DoctorInfoEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorInfoWorkday, error)
 	GetByIDExperience(id int) ([]DoctorInfoExperience, error)
+	SearchDoctor(name string) ([]DoctorAll, error)
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkadays) (*DoctorWorkadays, error)

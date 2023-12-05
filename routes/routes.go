@@ -53,6 +53,7 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {

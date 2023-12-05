@@ -22,13 +22,36 @@ func NewHandlerDoctor(service doctor.DoctorServiceInterface, jwt helper.JWTInter
 	}
 }
 
+func (mdl *DoctorHandler) SearchDoctor() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		name := c.QueryParam("name")
+		if name == "" {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed", "Name parameter is required"))
+		}
+
+		result, err := mdl.svc.SearchDoctor(name)
+
+		if err != nil {
+			c.Logger().Fatal("Handler : Search Doctor by Name Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		if len(result) == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "No matching doctors found"))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
 func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := mdl.jwt.CheckRole(c)
-		fmt.Println(role)
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
-		}
+		// role := mdl.jwt.CheckRole(c)
+		// fmt.Println(role)
+		// if role != "Admin" || role != "Doctor" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		// }
 
 		result, err := mdl.svc.GetDoctors()
 
@@ -47,7 +70,6 @@ func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 
 func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
-
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -79,9 +101,10 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := mdl.jwt.CheckRole(c)
+		getID, err := mdl.jwt.GetID(c)
 		fmt.Println(role)
-		if role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, cant get ID from JWT", nil))
 		}
 
 		var input = new(DoctorRequest)
@@ -168,7 +191,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		var serviceInput = new(doctor.Doctor)
 
-		serviceInput.UserID = input.UserID
+		serviceInput.UserID = getID
 		serviceInput.DoctorName = input.DoctorName
 		serviceInput.DoctorExperienced = input.DoctorExperienced
 		serviceInput.DoctorDescription = input.DoctorDescription
