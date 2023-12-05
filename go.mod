@@ -11,6 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.11.3
 	github.com/labstack/gommon v0.4.1
 	github.com/midtrans/midtrans-go v1.3.7
+	github.com/sashabaranov/go-openai v1.17.6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.15.0

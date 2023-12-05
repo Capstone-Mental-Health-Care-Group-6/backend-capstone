@@ -5,6 +5,7 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	bundlecounseling "FinalProject/features/bundle_counseling"
+	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
@@ -26,13 +27,13 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.POST("/transaksi", th.CreateTransaction())
+	e.POST("/transaksi", th.CreateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/transaksi/notif", th.NotifTransaction())
-	e.GET("/transaksi/:id", th.GetTransaction())
-	e.GET("/transaksi", th.GetTransactions())
-	e.DELETE("/transaksi/:id", th.DeleteTransaction())
-	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID())
-	e.PUT("/transaksi/:id", th.UpdateTransaction())
+	e.GET("/transaksi/:id", th.GetTransaction(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi", th.GetTransactions(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/transaksi/:id", th.DeleteTransaction(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/transaksi/:id", th.UpdateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
 
@@ -54,9 +55,10 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 }
 
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/doctor", ph.GetDoctors())
-	e.GET("/doctor/:id", ph.GetDoctor())
-	e.POST("/doctor/register", ph.CreateDoctor())
+	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -84,4 +86,12 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/bundle/:id", ph.DeleteBundle(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/counseling", ph.GetAllCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/:id", ph.GetCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/counseling/:id", ph.DeleteCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 }
