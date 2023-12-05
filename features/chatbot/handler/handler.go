@@ -58,8 +58,18 @@ func (h *ChatbotHandler) CreateChatBot() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := h.jwt.CheckRole(c)
 
-		if role != "Patient" && role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only patient can access this page", nil))
+		allowedRoles := []string{"Doctor", "Patient"}
+
+		allowed := false
+		for _, allowedRole := range allowedRoles {
+			if role == allowedRole {
+				allowed = true
+				break
+			}
+		}
+
+		if !allowed {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("You don't have permission", nil))
 		}
 
 		idJwt, err := h.jwt.GetID(c)

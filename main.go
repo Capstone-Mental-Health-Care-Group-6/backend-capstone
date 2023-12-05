@@ -9,6 +9,9 @@ import (
 	handlerChatbot "FinalProject/features/chatbot/handler"
 	serviceChatbot "FinalProject/features/chatbot/service"
 	"fmt"
+	"io"
+	"net/http"
+	"text/template"
 
 	dataTransaksi "FinalProject/features/transaction/data"
 	handlerTransaksi "FinalProject/features/transaction/handler"
@@ -37,6 +40,10 @@ import (
 	dataBundle "FinalProject/features/bundle_counseling/data"
 	handlerBundle "FinalProject/features/bundle_counseling/handler"
 	serviceBundle "FinalProject/features/bundle_counseling/service"
+
+	dataChatbotCs "FinalProject/features/chatbotcs/data"
+	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
+	serviceChatbotCs "FinalProject/features/chatbotcs/service"
 
 	"FinalProject/helper"
 	"FinalProject/routes"
@@ -109,6 +116,10 @@ func main() {
 	chatbotService := serviceChatbot.New(chatbotModel, openai)
 	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
 
+	chatbotCsModel := dataChatbotCs.New(map[string]string{})
+	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -116,6 +127,12 @@ func main() {
 		middleware.LoggerConfig{
 			Format: "method=${method}, uri=${uri}, status=${status}, time=${time_rfc3339}\n",
 		}))
+
+	e.Renderer = NewRenderer("./*.html", true)
+
+	e.GET("/index", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "index.html", nil)
+	})
 
 	routes.RouteUser(e, userController, *config)
 	routes.RouteTransaction(e, transaksiController, *config)
@@ -126,7 +143,41 @@ func main() {
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)
+	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 	e.Logger.Debug(db)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
+}
+
+func NewRenderer(location string, debug bool) *Renderer {
+	tpl := new(Renderer)
+	tpl.location = location
+	tpl.debug = debug
+
+	tpl.ReloadTemplates()
+
+	return tpl
+}
+
+type Renderer struct {
+	template *template.Template
+	debug    bool
+	location string
+}
+
+func (t *Renderer) ReloadTemplates() {
+	t.template = template.Must(template.ParseGlob(t.location))
+}
+
+func (t *Renderer) Render(
+	w io.Writer,
+	name string,
+	data interface{},
+	c echo.Context,
+) error {
+	if t.debug {
+		t.ReloadTemplates()
+	}
+
+	return t.template.ExecuteTemplate(w, name, data)
 }

@@ -29,6 +29,10 @@ func (o *OpenAI) GenerateText(prompt string) (string, error) {
 			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
+					Role:    openai.ChatMessageRoleAssistant,
+					Content: "Kamu adalah seorang psikolog profesional dan seorang puitisi terkenal, kamu akan diberikan sebuah pertanyaan seputar kesehatan mental, jawaban yang kamu berikan harus berbentuk narasi",
+				},
+				{
 					Role:    openai.ChatMessageRoleUser,
 					Content: prompt,
 				},
