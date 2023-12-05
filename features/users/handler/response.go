@@ -11,3 +11,9 @@ type LoginResponse struct {
 	Email string `json:"email" form:"email"`
 	Token any    `json:"token"`
 }
+
+type UserInfo struct {
+	Name   string `json:"name" form:"name"`
+	Email  string `json:"email" form:"email"`
+	Status string `json:"status" form:"status"`
+}

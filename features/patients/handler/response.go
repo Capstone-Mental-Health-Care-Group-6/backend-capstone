@@ -17,3 +17,10 @@ type PatientLoginResponse struct {
 	Email string `json:"email"`
 	Token any    `json:"token"`
 }
+
+type DashboardResponse struct {
+	TotalUser         int `json:"total_user"`
+	TotalUserBaru     int `json:"total_user_baru"`
+	TotalUserActive   int `json:"total_user_active"`
+	TotalUserInactive int `json:"total_user_inactive"`
+}

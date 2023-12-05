@@ -3,6 +3,7 @@ package data
 import (
 	dataArticle "FinalProject/features/articles/data"
 	dataDoctor "FinalProject/features/doctor/data"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -19,6 +20,17 @@ type User struct {
 	Doctors        []dataDoctor.Doctor   `gorm:"foreignKey:UserID"`
 }
 
+type UserResetPass struct {
+	*gorm.Model
+	Email     string    `json:"email" gorm:"email"`
+	Code      string    `json:"code"  gorm:"code"`
+	ExpiresAt time.Time `json:"expiresat" gorm:"expiresat"`
+}
+
 func (User) TableName() string {
 	return "users"
+}
+
+func (UserResetPass) TableName() string {
+	return "user_reset_pass"
 }
