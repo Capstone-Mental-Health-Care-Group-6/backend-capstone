@@ -33,7 +33,7 @@ func (mdl *DoctorHandler) SearchDoctor() echo.HandlerFunc {
 		result, err := mdl.svc.SearchDoctor(name)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Search Doctor by Name Error : ", err.Error())
+			c.Logger().Info("Handler : Search Doctor by Name Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -56,7 +56,7 @@ func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 		result, err := mdl.svc.GetDoctors()
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
+			c.Logger().Info("Handler : Get All Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -83,7 +83,7 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		// resultEducation, err := mdl.svc.GetDoctorEducation(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -110,7 +110,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		var input = new(DoctorRequest)
 
 		if err := c.Bind(input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -369,7 +369,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 // 		var input = new(DoctorRequest)
 // 		if err := c.Bind(input); err != nil {
-// 			c.Logger().Fatal("Handler: Bind Input Error: ", err.Error())
+// 			c.Logger().Info("Handler: Bind Input Error: ", err.Error())
 // 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 // 		}
 
