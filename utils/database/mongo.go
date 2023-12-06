@@ -16,14 +16,14 @@ func InitMongoDb(c configs.ProgrammingConfig) (*mongo.Database, error) {
 	// Membuat klien MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		log.Fatalf("Error connecting to MongoDB Atlas: %v", err)
+		log.Error("Error connecting to MongoDB Atlas: %v", err)
 		return nil, err
 	}
 
 	// Memeriksa koneksi ke MongoDB Atlas
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
-		log.Fatalf("Error pinging MongoDB Atlas: %v", err)
+		log.Error("Error pinging MongoDB Atlas: %v", err)
 		return nil, err
 	}
 
