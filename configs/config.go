@@ -25,6 +25,9 @@ type ProgrammingConfig struct {
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
+  OpenAI                  string
+	DbMongoUrl              string
+	DbMongoName             string
 	EmailSender             string
 	EmailPasswordSender     string
 	BaseURLFE               string
@@ -155,24 +158,42 @@ func loadConfig() *ProgrammingConfig {
 		permit = false
 	}
 
-	if val, found := os.LookupEnv("Cloud_URL"); found {
+	if val, found := os.LookupEnv("CloudURL"); found {
 		res.CloudinaryURL = val
 	} else {
 		permit = false
 	}
-
+  
+	if val, found := os.LookupEnv("KEY_OPEN_AI"); found {
+		res.OpenAI = val
+  } else {
+		permit = false
+	}
+  
 	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
 		res.EmailSender = val
 	} else {
 		permit = false
 	}
 
+	if val, found := os.LookupEnv("DB_MONGO_URL"); found {
+		res.DbMongoUrl = val
+  } else {
+		permit = false
+	}
+  
 	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
 		res.EmailPasswordSender = val
 	} else {
 		permit = false
 	}
 
+	if val, found := os.LookupEnv("DB_MONGO_NAME"); found {
+		res.DbMongoName = val
+  } else {
+		permit = false
+	}
+  
 	if val, found := os.LookupEnv("BASE_URL_FE"); found {
 		res.BaseURLFE = val
 	} else {

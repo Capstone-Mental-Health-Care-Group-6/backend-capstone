@@ -5,6 +5,9 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -35,12 +38,17 @@ import (
 	handlerBundle "FinalProject/features/bundle_counseling/handler"
 	serviceBundle "FinalProject/features/bundle_counseling/service"
 
+	dataChatbotCs "FinalProject/features/chatbotcs/data"
+	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
+	serviceChatbotCs "FinalProject/features/chatbotcs/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/openai"
 
 	// "fmt"
 
@@ -51,11 +59,18 @@ import (
 func main() {
 	e := echo.New()
 	var config = configs.InitConfig()
+
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
+	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
+	}
+
+	mongo, err := database.InitMongoDb(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run mongo database, ", err.Error())
 	}
 
 	database.Migrate(db)
@@ -94,6 +109,14 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	chatbotModel := dataChatbot.New(mongo)
+	chatbotService := serviceChatbot.New(chatbotModel, openai)
+	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
+
+	chatbotCsModel := dataChatbotCs.New(map[string]string{})
+	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
+
 	e.Pre(middleware.RemoveTrailingSlash())
 
 	e.Use(middleware.CORS())
@@ -110,6 +133,8 @@ func main() {
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
+	routes.RouteChatBot(e, chatbotController, *config)
+	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
 	e.Logger.Debug(db)
 
