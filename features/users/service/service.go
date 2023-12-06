@@ -290,3 +290,11 @@ func (us *UserService) ResetPassword(code, email, password string) error {
 
 	return nil
 }
+
+func (us *UserService) UpdateProfile(id int, newData users.UpdateProfile) (bool, error) {
+	result, err := us.d.UpdateProfile(id, newData)
+	if err != nil {
+		return false, errors.New("update Process Failed")
+	}
+	return result, nil
+}
