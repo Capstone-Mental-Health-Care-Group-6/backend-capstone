@@ -125,11 +125,11 @@ func (h *MessageHandler) Edit() echo.HandlerFunc {
 		}
 		if result := h.srv.UpdateMessage(ctx, chat, message, request); result != nil {
 			response := helper.ApiResponse[any]{
-				Status:  http.StatusCreated,
+				Status:  http.StatusOK,
 				Message: "success",
 				Data:    result,
 			}
-			return ctx.JSON(http.StatusCreated, response)
+			return ctx.JSON(http.StatusOK, response)
 		}
 		return ctx.JSON(http.StatusInternalServerError, nil)
 	}
