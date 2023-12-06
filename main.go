@@ -78,8 +78,8 @@ func main() {
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface)
-	userController := handlerUser.NewHandler(userServices, oauth)
+	userServices := serviceUser.New(userModel, jwtInterface, *config)
+	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
@@ -91,7 +91,7 @@ func main() {
 
 	articleCategoryModel := dataArticleCategory.New(db)
 	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
-	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices)
+	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
 	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
@@ -135,6 +135,7 @@ func main() {
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)
 	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
+
 	e.Logger.Debug(db)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())

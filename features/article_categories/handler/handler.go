@@ -10,12 +10,14 @@ import (
 )
 
 type ArticleCategoryHandler struct {
-	s articlecategories.ArticleCategoryServiceInterface
+	s   articlecategories.ArticleCategoryServiceInterface
+	jwt helper.JWTInterface
 }
 
-func NewHandler(service articlecategories.ArticleCategoryServiceInterface) articlecategories.ArticleCategoryHandlerInterface {
+func NewHandler(service articlecategories.ArticleCategoryServiceInterface, j helper.JWTInterface) articlecategories.ArticleCategoryHandlerInterface {
 	return &ArticleCategoryHandler{
-		s: service,
+		s:   service,
+		jwt: j,
 	}
 }
 

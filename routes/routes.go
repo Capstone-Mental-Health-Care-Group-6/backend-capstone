@@ -22,6 +22,9 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 	e.POST("/login", uh.Login())
 	e.GET("/login/google", uh.LoginGoogle())
 	e.GET("/login/google/callback", uh.CallbackGoogle())
+	e.POST("/forget-password", uh.ForgetPasswordWeb())
+	e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
+	e.POST("/reset-password", uh.ResetPassword())
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -71,6 +74,9 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	e.POST("/patient/login", ph.LoginPatient())
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+  e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {
