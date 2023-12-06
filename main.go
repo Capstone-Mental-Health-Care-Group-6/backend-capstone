@@ -9,9 +9,6 @@ import (
 	handlerChatbot "FinalProject/features/chatbot/handler"
 	serviceChatbot "FinalProject/features/chatbot/service"
 	"fmt"
-	"io"
-	"net/http"
-	"text/template"
 
 	dataTransaksi "FinalProject/features/transaction/data"
 	handlerTransaksi "FinalProject/features/transaction/handler"
@@ -118,7 +115,7 @@ func main() {
 
 	chatbotCsModel := dataChatbotCs.New(map[string]string{})
 	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
-	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -127,12 +124,6 @@ func main() {
 		middleware.LoggerConfig{
 			Format: "method=${method}, uri=${uri}, status=${status}, time=${time_rfc3339}\n",
 		}))
-
-	e.Renderer = NewRenderer("./*.html", true)
-
-	e.GET("/index", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index.html", nil)
-	})
 
 	routes.RouteUser(e, userController, *config)
 	routes.RouteTransaction(e, transaksiController, *config)
@@ -147,37 +138,4 @@ func main() {
 	e.Logger.Debug(db)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
-}
-
-func NewRenderer(location string, debug bool) *Renderer {
-	tpl := new(Renderer)
-	tpl.location = location
-	tpl.debug = debug
-
-	tpl.ReloadTemplates()
-
-	return tpl
-}
-
-type Renderer struct {
-	template *template.Template
-	debug    bool
-	location string
-}
-
-func (t *Renderer) ReloadTemplates() {
-	t.template = template.Must(template.ParseGlob(t.location))
-}
-
-func (t *Renderer) Render(
-	w io.Writer,
-	name string,
-	data interface{},
-	c echo.Context,
-) error {
-	if t.debug {
-		t.ReloadTemplates()
-	}
-
-	return t.template.ExecuteTemplate(w, name, data)
 }

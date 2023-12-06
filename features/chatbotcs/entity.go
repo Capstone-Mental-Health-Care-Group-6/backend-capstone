@@ -13,9 +13,9 @@ type ChatbotCsHandlerInterface interface {
 }
 
 type ChatbotCsServiceInterface interface {
-	CreateMsg(message string)
-	JoinGroup() chan string
-	LeaveGroup(channel chan string)
+	CreateMsg(ip string, message ChatbotCs)
+	JoinGroup(ip string) chan ChatbotCs
+	LeaveGroup(ip string)
 	GetAnswer(question string) string
 }
 

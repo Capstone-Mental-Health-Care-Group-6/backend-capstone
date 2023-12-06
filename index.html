@@ -22,7 +22,7 @@
   </body>
   <script>
     const base_url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
-    const sse = new EventSource(base_url +'/chatbotcs')
+    const sse = new EventSource('http://localhost:8000/chatbotcs')
     const status = document.querySelector('.status')
     const list = document.querySelector('ul')
 
@@ -52,7 +52,7 @@
       const formData = new FormData(form)
       const message = formData.get('message')
 
-      const response = await fetch(base_url +'/chatbotcs', {
+      const response = await fetch('http://localhost:8000/chatbotcs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

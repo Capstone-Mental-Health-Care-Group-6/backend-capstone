@@ -5,37 +5,33 @@ import (
 )
 
 type ChatbotCsService struct {
-	channels []chan string
+	channels map[string]chan chatbotcs.ChatbotCs
 	data     chatbotcs.ChatbotCsDataInterface
 }
 
 func New(data chatbotcs.ChatbotCsDataInterface) chatbotcs.ChatbotCsServiceInterface {
 	return &ChatbotCsService{
-		channels: make([]chan string, 0),
+		channels: make(map[string]chan chatbotcs.ChatbotCs),
 		data:     data,
 	}
 }
 
-func (s *ChatbotCsService) CreateMsg(message string) {
-	for _, channel := range s.channels {
+func (s *ChatbotCsService) CreateMsg(ip string, message chatbotcs.ChatbotCs) {
+	if channel, ok := s.channels[ip]; ok {
 		channel <- message
 	}
 }
 
-func (s *ChatbotCsService) JoinGroup() chan string {
-	channel := make(chan string)
-	s.channels = append(s.channels, channel)
-
+func (s *ChatbotCsService) JoinGroup(ip string) chan chatbotcs.ChatbotCs {
+	channel := make(chan chatbotcs.ChatbotCs)
+	s.channels[ip] = channel
 	return channel
 }
 
-func (s *ChatbotCsService) LeaveGroup(channel chan string) {
-	close(channel)
-	for i, ch := range s.channels {
-		if ch == channel {
-			s.channels = append(s.channels[:i], s.channels[i+1:]...)
-			break
-		}
+func (s *ChatbotCsService) LeaveGroup(ip string) {
+	if channel, ok := s.channels[ip]; ok {
+		close(channel)
+		delete(s.channels, ip)
 	}
 }
 

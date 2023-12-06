@@ -3,7 +3,7 @@ package handler
 import (
 	"FinalProject/features/chatbotcs"
 	"FinalProject/helper"
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,29 +11,63 @@ import (
 
 type ChatbotCsHandler struct {
 	srv chatbotcs.ChatbotCsServiceInterface
+	jwt helper.JWTInterface
 }
 
-func New(srv chatbotcs.ChatbotCsServiceInterface) chatbotcs.ChatbotCsHandlerInterface {
+func New(srv chatbotcs.ChatbotCsServiceInterface, jwt helper.JWTInterface) chatbotcs.ChatbotCsHandlerInterface {
 	return &ChatbotCsHandler{
 		srv: srv,
+		jwt: jwt,
 	}
 }
 
 func (ch *ChatbotCsHandler) ChatBotCs() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		ip := c.RealIP() // Mengambil IP dari pengguna
+
 		c.Response().Header().Set("Content-Type", "text/event-stream")
 		c.Response().Header().Set("Cache-Control", "no-cache")
 		c.Response().Header().Set("Connection", "keep-alive")
 
-		messages := ch.srv.JoinGroup()
-		defer ch.srv.LeaveGroup(messages)
-		fmt.Fprintf(c.Response().Writer, "\n")
+		messages := ch.srv.JoinGroup(ip)
+		defer ch.srv.LeaveGroup(ip)
+
+		welcome := chatbotcs.ChatbotCs{
+			Message: "Hello , Halo! Selamat datang di EmpathiCare. Saya Salsa, Asistent Virtual EmpathiCare 😊. Silakan pilih opsi menu yang Sahabat inginkan",
+			Type:    "bot",
+		}
+
+		jsonWel, err := json.Marshal(welcome)
+		if err != nil {
+			return err
+		}
+
+		c.Response().Writer.Write([]byte("data: "))
+		c.Response().Writer.Write(jsonWel)
+		c.Response().Writer.Write([]byte("\n\n"))
 		c.Response().Flush()
 
 		for {
 			select {
 			case message := <-messages:
-				fmt.Fprintf(c.Response().Writer, "data: %s\n\n", message)
+				// fmt.Fprintf(c.Response().Writer, "data: %s\n\n", message)
+				// if message.Type == "bot" {
+				// 	fmt.Fprintf(c.Response().Writer, "data: %s\n\n", message.Message)
+				// 	c.Response().Flush()
+				// } else {
+				// 	fmt.Fprintf(c.Response().Writer, "data: %s\n\n", message.Message)
+				// }
+				// if err := json.NewEncoder(c.Response().Writer).Encode(message); err != nil {
+				// 	return err
+				// }
+
+				jsonMessage, err := json.Marshal(message)
+				if err != nil {
+					return err
+				}
+				c.Response().Writer.Write([]byte("data: "))
+				c.Response().Writer.Write(jsonMessage)
+				c.Response().Writer.Write([]byte("\n\n"))
 				c.Response().Flush()
 
 			case <-c.Request().Context().Done():
@@ -55,13 +89,22 @@ func (ch *ChatbotCsHandler) CreateMessage() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
-		req.Type = "user"
-
 		getResponBot := ch.srv.GetAnswer(req.Message)
 
-		ch.srv.CreateMsg(req.Message)
-		ch.srv.CreateMsg(getResponBot)
+		ip := c.RealIP() // Mengambil IP dari pengguna
 
-		return nil
+		chatUser := chatbotcs.ChatbotCs{
+			Message: req.Message,
+			Type:    "user",
+		}
+
+		responBot := chatbotcs.ChatbotCs{
+			Message: getResponBot,
+			Type:    "bot",
+		}
+		ch.srv.CreateMsg(ip, chatUser)
+		ch.srv.CreateMsg(ip, responBot)
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success send message", true))
 	}
 }
