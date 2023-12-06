@@ -19,10 +19,9 @@ func New(db *gorm.DB) counselingsession.CounselingSessionDataInterface {
 func (bc *CounselingSessionData) GetAll() ([]counselingsession.CounselingSession, error) {
 	var listCounselingSession = []counselingsession.CounselingSession{}
 
-	var qry = bc.db.Table("bundle_counseling").
-		Select("bundle_counseling.*").
-		Where("bundle_counseling.deleted_at is null").
-		Where("bundle_counseling.type = ?", "PREMIUM").
+	var qry = bc.db.Table("counseling_session").
+		Select("counseling_session.*").
+		Where("counseling_session.deleted_at is null").
 		Scan(&listCounselingSession)
 
 	if err := qry.Error; err != nil {
@@ -33,20 +32,16 @@ func (bc *CounselingSessionData) GetAll() ([]counselingsession.CounselingSession
 }
 
 func (bc *CounselingSessionData) Create(input counselingsession.CounselingSession) (*counselingsession.CounselingSession, error) {
-	// var newCounselingSession = &CounselingSession.CounselingSession{
-	// 	Name:         input.Name,
-	// 	Sessions:     input.Sessions,
-	// 	Type:         input.Type,
-	// 	Price:        input.Price,
-	// 	Description:  input.Description,
-	// 	ActivePriode: input.ActivePriode,
-	// 	Avatar:       input.Avatar,
-	// }
 
 	var newData = new(counselingsession.CounselingSession)
+	newData.TransactionID = input.TransactionID
+	newData.Date = input.Date
+	newData.Time = input.Time
+	newData.Duration = input.Duration
+	newData.Status = input.Status
 	// MASUKIN DATA
 
-	if err := bc.db.Table("bundle_counseling").Create(newData).Error; err != nil {
+	if err := bc.db.Table("counseling_session").Create(newData).Error; err != nil {
 		return nil, err
 	}
 
@@ -56,10 +51,10 @@ func (bc *CounselingSessionData) Create(input counselingsession.CounselingSessio
 func (bc *CounselingSessionData) GetById(id int) (*counselingsession.CounselingSession, error) {
 	var result = new(counselingsession.CounselingSession)
 
-	var qry = bc.db.Table("bundle_counseling").
-		Select("bundle_counseling.*").
-		Where("bundle_counseling.deleted_at is null").
-		Where("bundle_counseling.id = ?", id).
+	var qry = bc.db.Table("counseling_session").
+		Select("counseling_session.*").
+		Where("counseling_session.deleted_at is null").
+		Where("counseling_session.id = ?", id).
 		Scan(&result)
 
 	if err := qry.Error; err != nil {
@@ -70,24 +65,19 @@ func (bc *CounselingSessionData) GetById(id int) (*counselingsession.CounselingS
 }
 
 func (bc *CounselingSessionData) Update(id int, input counselingsession.CounselingSession) (bool, error) {
-	// var newData = map[string]interface{}{
-	// 	"name":          input.Name,
-	// 	"sessions":      input.Sessions,
-	// 	"type":          input.Type,
-	// 	"price":         input.Price,
-	// 	"description":   input.Description,
-	// 	"active_priode": input.ActivePriode,
-	// }
-
-	// if input.Avatar != "" {
-	// 	newData["avatar"] = input.Avatar
-	// }
+	var newData = map[string]interface{}{
+		"transaction_id": input.TransactionID,
+		"date":           input.Date,
+		"time":           input.Time,
+		"duration":       input.Duration,
+		"status":         input.Status,
+	}
 
 	//UPDATE DATA
 
-	// if err := bc.db.Table("counseling_session").Where("id = ?", id).Updates(newData).Error; err != nil {
-	// 	return false, err
-	// }
+	if err := bc.db.Table("counseling_session").Where("id = ?", id).Updates(newData).Error; err != nil {
+		return false, err
+	}
 
 	return true, nil
 }
