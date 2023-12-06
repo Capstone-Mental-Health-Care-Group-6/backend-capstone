@@ -180,7 +180,7 @@ func loadConfig() *ProgrammingConfig {
 	}
 
 	if !permit {
-		return res
+		return nil
 	}
 
 	return res
