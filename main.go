@@ -38,6 +38,14 @@ import (
 	handlerBundle "FinalProject/features/bundle_counseling/handler"
 	serviceBundle "FinalProject/features/bundle_counseling/service"
 
+	dataChat "FinalProject/features/chats/data"
+	handlerChat "FinalProject/features/chats/handler"
+	serviceChat "FinalProject/features/chats/service"
+
+	dataMessage "FinalProject/features/chat_messages/data"
+	handlerMessage "FinalProject/features/chat_messages/handler"
+	serviceMessage "FinalProject/features/chat_messages/service"
+
 	dataChatbotCs "FinalProject/features/chatbotcs/data"
 	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
 	serviceChatbotCs "FinalProject/features/chatbotcs/service"
@@ -48,6 +56,7 @@ import (
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/websocket"
 	"FinalProject/utils/openai"
 
 	// "fmt"
@@ -109,6 +118,14 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	chatData := dataChat.New(db)
+	chatServices := serviceChat.New(chatData, websocket.NewServer())
+	chatController := handlerChat.New(chatServices)
+
+	messageModel := dataMessage.New(db)
+	messageServices := serviceMessage.New(messageModel)
+	messageController := handlerMessage.New(messageServices)
+
 	chatbotModel := dataChatbot.New(mongo)
 	chatbotService := serviceChatbot.New(chatbotModel, openai)
 	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
@@ -133,6 +150,8 @@ func main() {
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
+	routes.RouteChat(e, chatController, *config)
+	routes.RouteMessage(e, messageController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)
 	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
