@@ -5,7 +5,7 @@ import "FinalProject/features/doctor"
 type DoctorResponse struct {
 	UserID     uint   `json:"user_id"`
 	DoctorName string `json:"doctor_name"`
-	// string `json:"doctor_experience"`
+	// DoctorExpestring `json:"doctor_experience"`
 	// DoctorDescription   string `json:"doctor_description"`
 	DoctorAvatar        string `json:"doctor_avatar"`
 	DoctorOfficeName    string `json:"doctor_office_name"`
