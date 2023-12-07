@@ -203,3 +203,29 @@ func (uh *UserHandler) ForgetPasswordVerify() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Token is valid", nil))
 	}
 }
+
+func (uh *UserHandler) UpdateProfile() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := uh.jwt.CheckID(c)
+		userIdInt := int(id.(float64))
+		var input = new(UpdateProfile)
+		if err := c.Bind(input); err != nil {
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		var serviceUpdate = new(users.UpdateProfile)
+		serviceUpdate.Name = input.Name
+		serviceUpdate.Email = input.Email
+		serviceUpdate.Password = input.Password
+
+		result, err := uh.s.UpdateProfile(userIdInt, *serviceUpdate)
+
+		if err != nil {
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}

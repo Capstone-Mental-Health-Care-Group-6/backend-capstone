@@ -5,6 +5,10 @@ import (
 	articlecategories "FinalProject/features/article_categories"
 	"FinalProject/features/articles"
 	bundlecounseling "FinalProject/features/bundle_counseling"
+	. "FinalProject/features/chat_messages"
+	"FinalProject/features/chatbot"
+	"FinalProject/features/chatbotcs"
+	. "FinalProject/features/chats"
 	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
@@ -24,6 +28,7 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 	e.POST("/forget-password", uh.ForgetPasswordWeb())
 	e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
 	e.POST("/reset-password", uh.ResetPassword())
+	e.PUT("/admin/update", uh.UpdateProfile(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -93,4 +98,32 @@ func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandler
 	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/counseling/:id", ph.DeleteCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/api/socket/:id", h.Establish())
+	group := e.Group("/api/chats")
+	group.GET("/users/:id", h.Index())
+	group.POST("", h.Store())
+	group.PUT("/:id", h.Edit())
+	group.DELETE("/:id", h.Destroy())
+}
+
+func RouteMessage(e *echo.Echo, h MessageHandlerInterface, cfg configs.ProgrammingConfig) {
+	group := e.Group("/api/chats/:id/messages")
+	group.GET("", h.Index())
+	group.GET("/:message", h.Observe())
+	group.POST("", h.Store())
+	group.PUT("/:message", h.Edit())
+	group.DELETE("/:message", h.Destroy())
+
+}
+func RouteChatBot(e *echo.Echo, ch chatbot.ChatbotHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/chatbot", ch.GetAllChatBot(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/chatbot", ch.CreateChatBot(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteChatBotCS(e *echo.Echo, ch chatbotcs.ChatbotCsHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/chatbotcs", ch.ChatBotCs())
+	e.POST("/chatbotcs", ch.CreateMessage())
 }
