@@ -56,8 +56,8 @@ import (
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
-	"FinalProject/utils/websocket"
 	"FinalProject/utils/openai"
+	"FinalProject/utils/websocket"
 
 	// "fmt"
 
@@ -118,8 +118,10 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	socket := websocket.NewServer()
+
 	chatData := dataChat.New(db)
-	chatServices := serviceChat.New(chatData, websocket.NewServer())
+	chatServices := serviceChat.New(chatData, socket, jwtInterface)
 	chatController := handlerChat.New(chatServices)
 
 	messageModel := dataMessage.New(db)
