@@ -20,7 +20,6 @@ type TransactionService struct {
 
 func New(data transaction.TransactionDataInterface, cloudinary cloudinary.CloudinaryInterface, mid midtrans.MidtransService) transaction.TransactionServiceInterface {
 	return &TransactionService{
-		d:   data,
 		cld: cloudinary,
 		mt:  mid,
 	}
