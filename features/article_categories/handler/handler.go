@@ -26,7 +26,7 @@ func (ach *ArticleCategoryHandler) GetArticleCategories() echo.HandlerFunc {
 		result, err := ach.s.GetArticleCategories()
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
+			c.Logger().Info("Handler : Get All Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -38,7 +38,7 @@ func (ach *ArticleCategoryHandler) CreateArticleCategory() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input = new(InputRequest)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -48,7 +48,7 @@ func (ach *ArticleCategoryHandler) CreateArticleCategory() echo.HandlerFunc {
 
 		result, err := ach.s.CreateArticleCategory(*serviceInput)
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -66,14 +66,14 @@ func (ach *ArticleCategoryHandler) GetArticleCategory() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		result, err := ach.s.GetArticleCategory(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get Process Error : ", err.Error())
+			c.Logger().Info("Handler : Get Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -87,13 +87,13 @@ func (ach *ArticleCategoryHandler) UpdateArticleCategory() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		var input = new(InputRequest)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -104,7 +104,7 @@ func (ach *ArticleCategoryHandler) UpdateArticleCategory() echo.HandlerFunc {
 		result, err := ach.s.UpdateArticleCategory(*serviceInput, id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Update Process Error : ", err.Error())
+			c.Logger().Info("Handler : Update Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -118,14 +118,14 @@ func (ach *ArticleCategoryHandler) DeleteArticleCategory() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		result, err := ach.s.DeleteArticleCategory(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Delete Process Error : ", err.Error())
+			c.Logger().Info("Handler : Delete Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success", result))
