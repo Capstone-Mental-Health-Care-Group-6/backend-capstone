@@ -14,13 +14,15 @@ import (
 )
 
 type TransactionHandler struct {
-	s transaction.TransactionServiceInterface
+	s   transaction.TransactionServiceInterface
+	jwt helper.JWTInterface
 }
 
-func NewTransactionHandler(service transaction.TransactionServiceInterface) transaction.TransactionHandlerInterface {
+func NewTransactionHandler(service transaction.TransactionServiceInterface, jwt helper.JWTInterface) transaction.TransactionHandlerInterface {
 	// mt.InitMidtrans(c)
 	return &TransactionHandler{
-		s: service,
+		s:   service,
+		jwt: jwt,
 	}
 }
 
@@ -55,12 +57,17 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
 	}
 }
 
 func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		getID, err := th.jwt.GetID(c)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, cant get ID from JWT", nil))
+		}
 
 		var input = new(InputRequest)
 		if err := c.Bind(input); err != nil {
@@ -76,7 +83,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 		serviceInput.PriceResult = input.PriceMethod + input.PriceDuration + input.PriceCounseling
 
-		serviceInput.UserID = input.UserID
+		serviceInput.UserID = getID
 		serviceInput.PaymentStatus = 5
 
 		serviceInput.TopicID = input.TopicID
@@ -233,13 +240,13 @@ func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		// id, err := strconv.Atoi(paramID)
 		// if err != nil {
-		// 	c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+		// 	c.Logger().Info("Handler : Param ID Error : ", err.Error())
 		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		// }
 
 		var input = new(UpdateRequest)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -254,7 +261,7 @@ func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 		result, err := th.s.UpdateTransactionManual(*serviceUpdate, paramID)
 
 		if err != nil {
-			// c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			// c.Logger().Info("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 

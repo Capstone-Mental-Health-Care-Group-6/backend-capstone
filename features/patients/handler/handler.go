@@ -30,7 +30,7 @@ func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
-		if role != "Admin" {
+		if role != "Admin" && role != "Patient" && role != "Doctor" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 
@@ -53,7 +53,7 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 		var input = new(PatientRequest)
 
 		if err := c.Bind(input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -217,7 +217,7 @@ func (mdl *PatientHandler) GetPatient() echo.HandlerFunc {
 		result, err := mdl.svc.GetPatient(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
+			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 

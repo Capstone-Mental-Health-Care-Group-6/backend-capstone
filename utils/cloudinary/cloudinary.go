@@ -31,7 +31,6 @@ func (cld *Cloudinary) UploadImageHelper(input interface{}) (string, error) {
 	cl, err := cloudinary.NewFromURL(cld.cfg.CloudinaryURL)
 	//2TFjfPK1yqcIZ1hEKTZ_cZQsLlc
 	logrus.Info("Ini input: ", input)
-	// cl, err := cloudinary.NewFromURL("")
 	if err != nil {
 		return "", err
 	}
