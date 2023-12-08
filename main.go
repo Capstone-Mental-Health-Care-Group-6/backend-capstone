@@ -38,6 +38,10 @@ import (
 	handlerBundle "FinalProject/features/bundle_counseling/handler"
 	serviceBundle "FinalProject/features/bundle_counseling/service"
 
+	dataCounseling "FinalProject/features/counseling_session/data"
+	handlerCounseling "FinalProject/features/counseling_session/handler"
+	serviceCounseling "FinalProject/features/counseling_session/service"
+
 	dataChat "FinalProject/features/chats/data"
 	handlerChat "FinalProject/features/chats/handler"
 	serviceChat "FinalProject/features/chats/service"
@@ -56,8 +60,8 @@ import (
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
-	"FinalProject/utils/websocket"
 	"FinalProject/utils/openai"
+	"FinalProject/utils/websocket"
 
 	// "fmt"
 
@@ -92,7 +96,7 @@ func main() {
 
 	transaksiModel := dataTransaksi.New(db)
 	transaksiServices := serviceTransaksi.New(transaksiModel, cld, midtrans)
-	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices)
+	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, jwtInterface)
 
 	articleModel := dataArticle.New(db)
 	articleServices := serviceArticle.New(articleModel)
@@ -107,8 +111,8 @@ func main() {
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld)
-	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, *config)
+	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)
 	withdrawServices := serviceWithdraw.New(withdrawModel)
@@ -117,6 +121,10 @@ func main() {
 	bundleModel := dataBundle.New(db)
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
+
+	counselingModel := dataCounseling.New(db)
+	counselingServices := serviceCounseling.New(counselingModel, cld)
+	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
 
 	chatData := dataChat.New(db)
 	chatServices := serviceChat.New(chatData, websocket.NewServer())
@@ -150,6 +158,8 @@ func main() {
 	routes.RouteDoctor(e, doctorController, *config)
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
+	routes.RouteCounseling(e, counselingController, *config)
+
 	routes.RouteChat(e, chatController, *config)
 	routes.RouteMessage(e, messageController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)
