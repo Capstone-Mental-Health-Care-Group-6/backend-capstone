@@ -43,18 +43,20 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/articles", ah.GetArticles(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/articles/:id", ah.GetArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles", ah.GetArticles())
+	e.GET("/articles/:id", ah.GetArticle())
 	e.POST("/articles", ah.CreateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id", ah.UpdateArticle(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/articles/:id", ah.DeleteArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/deny", ah.DenyArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/approve", ah.ApproveArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles/dashboard", ah.ArticleDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/article/categories", ach.GetArticleCategories(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/article/categories/:id", ach.GetArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/article/categories", ach.GetArticleCategories())
+	e.GET("/article/categories/:id", ach.GetArticleCategory())
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PATCH("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
@@ -118,7 +120,6 @@ func RouteMessage(e *echo.Echo, h MessageHandlerInterface, cfg configs.Programmi
 	group.DELETE("/:message", h.Destroy(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
-}
 func RouteChatBot(e *echo.Echo, ch chatbot.ChatbotHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/chatbot", ch.GetAllChatBot(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/chatbot", ch.CreateChatBot(), echojwt.JWT([]byte(cfg.Secret)))

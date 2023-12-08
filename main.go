@@ -8,6 +8,9 @@ import (
 	dataChatbot "FinalProject/features/chatbot/data"
 	handlerChatbot "FinalProject/features/chatbot/handler"
 	serviceChatbot "FinalProject/features/chatbot/service"
+	"FinalProject/helper/email"
+	"FinalProject/helper/enkrip"
+	"FinalProject/helper/slug"
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -58,6 +61,7 @@ import (
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
+	"FinalProject/utils/database/seeds"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
 	"FinalProject/utils/openai"
@@ -75,6 +79,9 @@ func main() {
 
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
+	var enkrip = enkrip.New()
+	var slug = slug.New()
+	var email = email.New(*config)
 	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
@@ -87,11 +94,18 @@ func main() {
 	}
 
 	database.Migrate(db)
+
+	for _, seed := range seeds.All() {
+		if err := seed.Run(db); err != nil {
+			fmt.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
+		}
+	}
+
 	oauth := oauth.NewOauthGoogleConfig(*config)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface, *config)
+	userServices := serviceUser.New(userModel, jwtInterface, email, enkrip)
 	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
@@ -99,19 +113,19 @@ func main() {
 	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, jwtInterface)
 
 	articleModel := dataArticle.New(db)
-	articleServices := serviceArticle.New(articleModel)
+	articleServices := serviceArticle.New(articleModel, slug, cld)
 	articleController := handlerArticle.NewHandler(articleServices, jwtInterface)
 
 	articleCategoryModel := dataArticleCategory.New(db)
-	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
+	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel, slug)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
-	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
+	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface, enkrip)
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, *config)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, email)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)
@@ -123,7 +137,7 @@ func main() {
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
 	socket := websocket.NewServer()
-  
+
 	counselingModel := dataCounseling.New(db)
 	counselingServices := serviceCounseling.New(counselingModel, cld)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
@@ -161,7 +175,6 @@ func main() {
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteCounseling(e, counselingController, *config)
-
 	routes.RouteChat(e, chatController, *config)
 	routes.RouteMessage(e, messageController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)
