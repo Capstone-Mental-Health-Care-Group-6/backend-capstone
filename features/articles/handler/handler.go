@@ -26,6 +26,9 @@ func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 		name := c.QueryParam("name")
 		kategori := c.QueryParam("kategori")
 		publication := c.QueryParam("publication")
+		limit := c.QueryParam("limit")
+
+		limitInt, _ := strconv.Atoi(limit)
 		var timePublication int
 
 		switch publication {
@@ -39,14 +42,14 @@ func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 			timePublication = -1
 		}
 
-		result, err := ah.s.GetArticles(name, kategori, timePublication)
+		result, err := ah.s.GetArticles(name, kategori, timePublication, limitInt)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get All Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Get All Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Get All Process Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get All Data", result))
 	}
 }
 
@@ -55,18 +58,18 @@ func (ah *ArticleHandler) GetArticle() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		result, err := ah.s.GetArticle(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Get By ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Get By ID Process Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Data", result))
 	}
 }
 
@@ -76,12 +79,12 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 		id, _ := ah.jwt.GetID(c)
 
 		if role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only doctor can access this page", nil))
 		}
 		var input = new(InputRequest)
-		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		if err := c.Bind(input); err != nil {
+			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		var serviceInput = new(articles.Article)
@@ -89,15 +92,31 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 		serviceInput.CategoryID = input.CategoryID
 		serviceInput.Title = input.Title
 		serviceInput.Content = input.Content
-		serviceInput.Thumbnail = input.Thumbnail
 		serviceInput.Status = "Pending"
-		serviceInput.Slug = input.Slug
+
+		formHeaderThumbnail, err := c.FormFile("thumbnail")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Thumbnail", nil))
+		}
+
+		formThumbnail, err := formHeaderThumbnail.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to get Thumbnail", nil))
+		}
+
+		// uploadUrlThumbnail, err := ah.s.ThumbnailUpload(articles.ThumbnailDataModel{ThumbnailPhoto: formThumbnail})
+
+		serviceInput.ThumbnailFile = formThumbnail
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
 
 		result, err := ah.s.CreateArticle(*serviceInput)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Input Process Error", nil))
 		}
 
 		var response = new(InputResponse)
@@ -105,11 +124,11 @@ func (ah *ArticleHandler) CreateArticle() echo.HandlerFunc {
 		response.CategoryID = result.CategoryID
 		response.Title = result.Title
 		response.Content = result.Content
-		response.Thumbnail = result.Thumbnail
+		response.Thumbnail = result.ThumbnailUrl
 		response.Status = result.Status
 		response.Slug = result.Slug
 
-		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Data", response))
 	}
 }
 
@@ -118,35 +137,50 @@ func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 		role := ah.jwt.CheckRole(c)
 
 		if role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only doctor can access this page", nil))
 		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		var input = new(UpdateRequest)
-		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		if err := c.Bind(input); err != nil {
+			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		var serviceUpdate = new(articles.UpdateArticle)
 		serviceUpdate.Title = input.Title
 		serviceUpdate.Content = input.Content
-		serviceUpdate.Thumbnail = input.Thumbnail
-		serviceUpdate.Slug = input.Slug
+		formHeaderThumbnail, err := c.FormFile("thumbnail")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Thumbnail", nil))
+		}
+
+		formThumbnail, err := formHeaderThumbnail.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to get Thumbnail", nil))
+		}
+
+		// uploadUrlThumbnail, err := ah.s.ThumbnailUpload(articles.ThumbnailDataModel{ThumbnailPhoto: formThumbnail})
+
+		serviceUpdate.ThumbnailFile = formThumbnail
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
 
 		result, err := ah.s.UpdateArticle(*serviceUpdate, id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Update Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Process Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Data", result))
 	}
 }
 
@@ -161,15 +195,15 @@ func (ah *ArticleHandler) DenyArticle() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		_, err = ah.s.DenyArticle(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Deny Article Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Deny Article Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Denny Article", nil))
@@ -187,18 +221,18 @@ func (ah *ArticleHandler) ApproveArticle() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		_, err = ah.s.ApproveArticle(id)
 
 		if err != nil {
-			c.Logger().Fatal("Handler : Approve Article Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Approve Article Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusNoContent, helper.FormatResponse("Success Approve Article", nil))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Approve Article", nil))
 	}
 }
 
@@ -212,8 +246,8 @@ func (ah *ArticleHandler) ArticleDashboard() echo.HandlerFunc {
 		res, err := ah.s.ArticleDashboard()
 
 		if err != nil {
-			c.Logger().Error("Handler: Callback process error: ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			c.Logger().Error("Handler: Article Dashboard Process Error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Article Dashboard Process Error", nil))
 		}
 
 		var response = new(DashboardResponse)
@@ -221,6 +255,6 @@ func (ah *ArticleHandler) ArticleDashboard() echo.HandlerFunc {
 		response.TotalArticleBaru = res.TotalArticleBaru
 		response.TotalArticlePending = res.TotalArticlePending
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success get article dashboard", response))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Article Dashboard", response))
 	}
 }

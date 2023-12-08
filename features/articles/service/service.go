@@ -2,21 +2,27 @@ package service
 
 import (
 	"FinalProject/features/articles"
+	"FinalProject/helper/slug"
+	"FinalProject/utils/cloudinary"
 	"errors"
 )
 
 type ArticleService struct {
-	d articles.ArticleDataInterface
+	d     articles.ArticleDataInterface
+	slug  slug.SlugInterface
+	cloud cloudinary.CloudinaryInterface
 }
 
-func New(data articles.ArticleDataInterface) articles.ArticleServiceInterface {
+func New(data articles.ArticleDataInterface, slug slug.SlugInterface, cld cloudinary.CloudinaryInterface) articles.ArticleServiceInterface {
 	return &ArticleService{
-		d: data,
+		d:     data,
+		slug:  slug,
+		cloud: cld,
 	}
 }
 
-func (as *ArticleService) GetArticles(name, kategori string, timePublication int) ([]articles.ArticleInfo, error) {
-	result, err := as.d.GetAll(name, kategori, timePublication)
+func (as *ArticleService) GetArticles(name, kategori string, timePublication, limit int) ([]articles.ArticleInfo, error) {
+	result, err := as.d.GetAll(name, kategori, timePublication, limit)
 	if err != nil {
 		return nil, errors.New("Get All Process Failed")
 	}
@@ -32,6 +38,11 @@ func (as *ArticleService) GetArticle(id int) ([]articles.ArticleInfo, error) {
 }
 
 func (as *ArticleService) CreateArticle(newData articles.Article) (*articles.Article, error) {
+	slug := as.slug.GenerateSlug(newData.Title)
+	uploadUrlThumbnail, err := as.cloud.UploadImageHelper(newData.ThumbnailFile)
+
+	newData.Slug = slug
+	newData.ThumbnailUrl = uploadUrlThumbnail
 	result, err := as.d.Insert(newData)
 	if err != nil {
 		return nil, errors.New("Insert Process Failed")
@@ -40,6 +51,11 @@ func (as *ArticleService) CreateArticle(newData articles.Article) (*articles.Art
 }
 
 func (as *ArticleService) UpdateArticle(newData articles.UpdateArticle, id int) (bool, error) {
+	slug := as.slug.GenerateSlug(newData.Title)
+	uploadUrlThumbnail, err := as.cloud.UploadImageHelper(newData.ThumbnailFile)
+
+	newData.Slug = slug
+	newData.ThumbnailUrl = uploadUrlThumbnail
 	result, err := as.d.Update(newData, id)
 
 	if err != nil {
@@ -53,7 +69,7 @@ func (as *ArticleService) DenyArticle(id int) (bool, error) {
 	result, err := as.d.Deny(id)
 
 	if err != nil {
-		return false, errors.New("Denny Process Failed")
+		return false, errors.New("Deny Process Failed")
 	}
 
 	return result, nil

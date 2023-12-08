@@ -25,10 +25,10 @@ func (ud *UserData) Register(newData users.User) (*users.User, error) {
 	dbData.Name = newData.Name
 	dbData.Email = newData.Email
 	dbData.Role = newData.Role
-	dbData.Status = "Active"
+	dbData.Status = newData.Status
 	dbData.Password = newData.Password
 
-	if err := ud.db.Create(dbData).Error; err != nil {
+	if err := ud.db.Create(newData).Error; err != nil {
 		return nil, err
 	}
 	return &newData, nil

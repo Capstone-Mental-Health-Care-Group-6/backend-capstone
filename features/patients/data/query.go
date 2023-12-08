@@ -170,10 +170,10 @@ func (pdata *PatientData) getTotalUser() (int, int, int, int) {
 	var now = time.Now()
 	var before = now.AddDate(0, 0, -30)
 
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Count(&totalUser)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Active").Count(&totalUserActive)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Inactive").Count(&totalUserInactive)
+	var _ = pdata.db.Table("patient_accounts").Count(&totalUser)
+	var _ = pdata.db.Table("patient_accounts").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
+	var _ = pdata.db.Table("patient_accounts").Where("status = ?", "Active").Count(&totalUserActive)
+	var _ = pdata.db.Table("patient_accounts").Where("status = ?", "Inactive").Count(&totalUserInactive)
 
 	totalUserInt := int(totalUser)
 	totalUserBaruInt := int(totalUserBaru)

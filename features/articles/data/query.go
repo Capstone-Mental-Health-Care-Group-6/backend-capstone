@@ -19,7 +19,7 @@ func New(db *gorm.DB) articles.ArticleDataInterface {
 	}
 }
 
-func (ad *ArticleData) GetAll(name, kategori string, timePublication int) ([]articles.ArticleInfo, error) {
+func (ad *ArticleData) GetAll(name, kategori string, timePublication, limit int) ([]articles.ArticleInfo, error) {
 	var listArticle = []articles.ArticleInfo{}
 	var now time.Time
 	var qry = ad.db.Table("articles").Select("articles.*,users.name as user_name,article_categories.name as category_name").
@@ -46,6 +46,10 @@ func (ad *ArticleData) GetAll(name, kategori string, timePublication int) ([]art
 		before := now.AddDate(0, 0, -30)
 		qry.Where("articles.created_at BETWEEN ? and ?", before, now)
 		break
+	}
+
+	if limit != 0 {
+		qry.Limit(limit)
 	}
 
 	if err := qry.Scan(&listArticle).Error; err != nil {
@@ -77,7 +81,7 @@ func (ad *ArticleData) Insert(newData articles.Article) (*articles.Article, erro
 	dbData.UserID = newData.UserID
 	dbData.Title = newData.Title
 	dbData.Content = newData.Content
-	dbData.Thumbnail = newData.Thumbnail
+	dbData.Thumbnail = newData.ThumbnailUrl
 	dbData.Status = newData.Status
 	dbData.Slug = newData.Slug
 
@@ -89,7 +93,7 @@ func (ad *ArticleData) Insert(newData articles.Article) (*articles.Article, erro
 }
 
 func (ad *ArticleData) Update(newData articles.UpdateArticle, id int) (bool, error) {
-	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Title: newData.Title, Content: newData.Content, Thumbnail: newData.Thumbnail, Slug: newData.Slug})
+	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Title: newData.Title, Content: newData.Content, Thumbnail: newData.ThumbnailUrl, Slug: newData.Slug})
 
 	if err := qry.Error; err != nil {
 		return false, err

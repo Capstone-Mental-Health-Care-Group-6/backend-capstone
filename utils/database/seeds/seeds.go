@@ -9,21 +9,45 @@ import (
 func All() []seed.Seed {
 	var seeds []seed.Seed = []seed.Seed{
 		{
-			Name: "CreateAdmin",
-			Run: func(db *gorm.DB) error {
-				return CreateUser(db, "Admin", "admin@gmail.com", "password", "Admin", "Active")
-			},
-		},
-		{
-			Name: "CreateUser",
-			Run: func(db *gorm.DB) error {
-				return CreateUser(db, "Irvan Hauwerich", "irvanhau@gmail.com", "password", "Doctor", "Active")
-			},
-		},
-		{
 			Name: "CreateArticleCategory1",
 			Run: func(db *gorm.DB) error {
-				return CreateArticleCategory(db, "Kecemasan", "slug")
+				return CreateArticleCategory(db, "Anxiety")
+			},
+		},
+		{
+			Name: "CreateArticleCategory2",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Depresi")
+			},
+		},
+		{
+			Name: "CreateArticleCategory3",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Emosi")
+			},
+		},
+		{
+			Name: "CreateArticleCategory4",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Kecemasan")
+			},
+		},
+		{
+			Name: "CreateArticleCategory5",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Stress")
+			},
+		},
+		{
+			Name: "CreateArticleCategory6",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Tips")
+			},
+		},
+		{
+			Name: "CreateArticleCategory7",
+			Run: func(db *gorm.DB) error {
+				return CreateArticleCategory(db, "Umum")
 			},
 		},
 	}

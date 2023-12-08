@@ -5,7 +5,9 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	"FinalProject/helper/email"
 	"FinalProject/helper/enkrip"
+	"FinalProject/helper/slug"
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -52,7 +54,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -61,6 +62,8 @@ func main() {
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
 	var enkrip = enkrip.New()
+	var slug = slug.New()
+	var email = email.New(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
@@ -70,7 +73,7 @@ func main() {
 
 	for _, seed := range seeds.All() {
 		if err := seed.Run(db); err != nil {
-			logrus.Info("Running seed '%s', failed with error: %s", seed.Name, err)
+			fmt.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
 		}
 	}
 
@@ -78,7 +81,7 @@ func main() {
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface, *config, enkrip)
+	userServices := serviceUser.New(userModel, jwtInterface, email, enkrip)
 	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
@@ -86,11 +89,11 @@ func main() {
 	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, jwtInterface)
 
 	articleModel := dataArticle.New(db)
-	articleServices := serviceArticle.New(articleModel)
+	articleServices := serviceArticle.New(articleModel, slug, cld)
 	articleController := handlerArticle.NewHandler(articleServices, jwtInterface)
 
 	articleCategoryModel := dataArticleCategory.New(db)
-	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
+	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel, slug)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
@@ -98,7 +101,7 @@ func main() {
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, *config)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, email)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)

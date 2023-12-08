@@ -1,17 +1,14 @@
 package handler
 
 type InputRequest struct {
-	CategoryID uint   `json:"category_id"`
-	UserID     uint   `json:"user_id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	Thumbnail  string `json:"thumbnail"`
-	Slug       string `json:"slug"`
+	CategoryID uint   `json:"category_id" form:"category_id"`
+	Title      string `json:"title" form:"title"`
+	Content    string `json:"content" form:"content"`
+	Thumbnail  string `json:"thumbnail" form:"thumbnail"`
 }
 
 type UpdateRequest struct {
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Thumbnail string `json:"thumbnail"`
-	Slug      string `json:"slug"`
+	Title     string `json:"title" form:"title"`
+	Content   string `json:"content" form:"content"`
+	Thumbnail string `json:"thumbnail" form:"thumbnail"`
 }

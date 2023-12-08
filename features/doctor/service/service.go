@@ -1,9 +1,9 @@
 package service
 
 import (
-	"FinalProject/configs"
 	"FinalProject/features/doctor"
 	"FinalProject/helper"
+	"FinalProject/helper/email"
 	"FinalProject/utils/cloudinary"
 	"errors"
 	"math/rand"
@@ -12,17 +12,17 @@ import (
 )
 
 type DoctorService struct {
-	data doctor.DoctorDataInterface
-	cld  cloudinary.CloudinaryInterface
-	jwt  helper.JWTInterface
-	c    configs.ProgrammingConfig
+	data  doctor.DoctorDataInterface
+	cld   cloudinary.CloudinaryInterface
+	jwt   helper.JWTInterface
+	email email.EmailInterface
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, config configs.ProgrammingConfig) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface) doctor.DoctorServiceInterface {
 	return &DoctorService{
-		data: data,
-		cld:  cloudinary,
-		c:    config,
+		data:  data,
+		cld:   cloudinary,
+		email: email,
 	}
 }
 
@@ -163,7 +163,7 @@ func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, 
 	</body>
 	</html>`
 
-	ress := helper.SendEmail(*email, header, htmlBody)
+	ress := psvc.email.SendEmail(*email, header, htmlBody)
 
 	logrus.Info("Info send email ==[]==", nil)
 	logrus.Info("Email:", email, &email, *email)

@@ -18,7 +18,7 @@ func New() SlugInterface {
 	return &slug{}
 }
 
-func (si *slug) GenerateSlug(name string) string {
+func (sl *slug) GenerateSlug(name string) string {
 	numberRand := func() string {
 		return strconv.Itoa(rand.Intn(1000))
 	}

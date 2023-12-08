@@ -60,4 +60,5 @@ type UserDataInterface interface {
 	DeleteCode(email string) error
 	GetByCode(code string) (*UserResetPass, error)
 	ResetPassword(code, email string, password string) error
+	// CheckByEmail(email string) error
 }

@@ -1,16 +1,21 @@
 package articles
 
-import "github.com/labstack/echo/v4"
+import (
+	"mime/multipart"
+
+	"github.com/labstack/echo/v4"
+)
 
 type Article struct {
-	ID         uint   `json:"id"`
-	CategoryID uint   `json:"category_id"`
-	UserID     uint   `json:"user_id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	Thumbnail  string `json:"thumbnail"`
-	Status     string `json:"status"`
-	Slug       string `json:"slug"`
+	ID            uint           `json:"id"`
+	CategoryID    uint           `json:"category_id"`
+	UserID        uint           `json:"user_id"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ThumbnailUrl  string         `json:"thumbnail_url"`
+	ThumbnailFile multipart.File `json:"thumbnail"`
+	Status        string         `json:"status"`
+	Slug          string         `json:"slug"`
 }
 
 type ArticleInfo struct {
@@ -25,10 +30,15 @@ type ArticleInfo struct {
 }
 
 type UpdateArticle struct {
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Thumbnail string `json:"thumbnail"`
-	Slug      string `json:"slug"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ThumbnailUrl  string         `json:"thumbnail_url"`
+	ThumbnailFile multipart.File `json:"thumbnail"`
+	Slug          string         `json:"slug"`
+}
+
+type ThumbnailDataModel struct {
+	ThumbnailPhoto multipart.File `json:"thumbnail"`
 }
 
 type ArticleDashboard struct {
@@ -48,7 +58,7 @@ type ArticleHandlerInterface interface {
 }
 
 type ArticleServiceInterface interface {
-	GetArticles(name, kategori string, timePublication int) ([]ArticleInfo, error)
+	GetArticles(name, kategori string, timePublication, limit int) ([]ArticleInfo, error)
 	GetArticle(id int) ([]ArticleInfo, error)
 	CreateArticle(newData Article) (*Article, error)
 	UpdateArticle(newData UpdateArticle, id int) (bool, error)
@@ -58,7 +68,7 @@ type ArticleServiceInterface interface {
 }
 
 type ArticleDataInterface interface {
-	GetAll(name, kategori string, timePublication int) ([]ArticleInfo, error)
+	GetAll(name, kategori string, timePublication, limit int) ([]ArticleInfo, error)
 	GetByID(id int) ([]ArticleInfo, error)
 	Insert(newData Article) (*Article, error)
 	Update(newData UpdateArticle, id int) (bool, error)
