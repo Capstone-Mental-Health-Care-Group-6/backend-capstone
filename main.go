@@ -122,12 +122,14 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	socket := websocket.NewServer()
+  
 	counselingModel := dataCounseling.New(db)
 	counselingServices := serviceCounseling.New(counselingModel, cld)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
 
 	chatData := dataChat.New(db)
-	chatServices := serviceChat.New(chatData, websocket.NewServer())
+	chatServices := serviceChat.New(chatData, socket, jwtInterface)
 	chatController := handlerChat.New(chatServices)
 
 	messageModel := dataMessage.New(db)
