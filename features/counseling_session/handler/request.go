@@ -1,16 +1,18 @@
 package handler
 
-import "mime/multipart"
+import "time"
 
 type InputRequest struct {
-	Name         string `json:"name" form:"name" validate:"required"`
-	Sessions     uint   `json:"sessions" form:"sessions" validate:"required"`
-	Type         string `json:"type" form:"type" validate:"required"`
-	Price        uint   `json:"price" form:"price" validate:"required"`
-	Description  string `json:"description" form:"description" validate:"required"`
-	ActivePriode uint   `json:"active_priode" form:"active_priode" validate:"required"`
+	TransactionID uint      `json:"transaction_id" form:"transaction_id"`
+	Date          time.Time `json:"date" form:"date"`
+	Time          time.Time `json:"time" form:"time"`
+	Duration      uint      `json:"duration" form:"duration"`
 }
 
-type InputFileRequest struct {
-	Avatar multipart.File `json:"avatar" form:"avatar" validate:"required"`
+type InputRequestUpdate struct {
+	TransactionID uint      `json:"transaction_id" form:"transaction_id"`
+	Date          time.Time `json:"date" form:"date"`
+	Time          time.Time `json:"time" form:"time"`
+	Duration      uint      `json:"duration" form:"duration"`
+	Status        string    `json:"status" form:"status"`
 }

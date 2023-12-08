@@ -3,6 +3,7 @@ package service
 import (
 	root "FinalProject/features/chats"
 	"FinalProject/features/chats/dto"
+	"FinalProject/helper"
 	"FinalProject/utils/websocket"
 	"fmt"
 	"time"
@@ -11,12 +12,14 @@ import (
 )
 
 type ChatService struct {
+	jwt  helper.JWTInterface
 	sock *websocket.Server
 	data root.ChatDataInterface
 }
 
-func New(data root.ChatDataInterface, sock *websocket.Server) root.ChatServiceInterface {
+func New(data root.ChatDataInterface, sock *websocket.Server, jwt helper.JWTInterface) root.ChatServiceInterface {
 	return &ChatService{
+		jwt:  jwt,
 		sock: sock,
 		data: data,
 	}
@@ -39,7 +42,7 @@ func (s *ChatService) SocketEstablish(ctx echo.Context, user int) *websocket.Cli
 func (s *ChatService) GetChats(ctx echo.Context, user int) []*dto.GetChatResponse {
 	// TODO: implement jwt authorization
 	if s.sock.FindClient(user) == nil {
-		ctx.Set("websocket.connection.error", true)
+		ctx.Set("ws.conn.error", true)
 		return nil
 	}
 	query := ctx.QueryParams()
@@ -73,8 +76,15 @@ func (s *ChatService) GetChats(ctx echo.Context, user int) []*dto.GetChatRespons
 }
 
 func (s *ChatService) CreateChat(ctx echo.Context, request *dto.CreateChatRequest) *dto.CreateChatResponse {
-	// TODO: implement jwt authorization
-	// TODO: check websocket connection
+	id, err := s.jwt.GetID(ctx)
+	if err != nil {
+		ctx.Set("jwt.token.error", true)
+		return nil
+	}
+	if s.sock.FindClient(int(id)) == nil {
+		ctx.Set("ws.conn.error", true)
+		return nil
+	}
 	data := &root.Chat{
 		PatientUserID: request.Patient,
 		DoctorUserID:  request.Doctor,
@@ -102,8 +112,15 @@ func (s *ChatService) CreateChat(ctx echo.Context, request *dto.CreateChatReques
 }
 
 func (s *ChatService) UpdateChat(ctx echo.Context, chat int, request *dto.UpdateChatRequest) *dto.UpdateChatResponse {
-	// TODO: implement jwt authorization
-	// TODO: check websocket connection
+	id, err := s.jwt.GetID(ctx)
+	if err != nil {
+		ctx.Set("jwt.token.error", true)
+		return nil
+	}
+	if s.sock.FindClient(int(id)) == nil {
+		ctx.Set("ws.conn.error", true)
+		return nil
+	}
 	data := &root.Chat{
 		ID:                  chat,
 		LastMessage:         request.Message,
@@ -124,8 +141,15 @@ func (s *ChatService) UpdateChat(ctx echo.Context, chat int, request *dto.Update
 }
 
 func (s *ChatService) DeleteChat(ctx echo.Context, chat int) bool {
-	// TODO: implement jwt authorization
-	// TODO: check websocket connection
+	id, err := s.jwt.GetID(ctx)
+	if err != nil {
+		ctx.Set("jwt.token.error", true)
+		return false
+	}
+	if s.sock.FindClient(int(id)) == nil {
+		ctx.Set("ws.conn.error", true)
+		return false
+	}
 	if s.sock.FindRoom(chat) != nil {
 		s.sock.DeleteRoom(chat)
 	}

@@ -57,6 +57,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
 	}
 }
@@ -239,13 +240,13 @@ func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		// id, err := strconv.Atoi(paramID)
 		// if err != nil {
-		// 	c.Logger().Fatal("Handler : Param ID Error : ", err.Error())
+		// 	c.Logger().Info("Handler : Param ID Error : ", err.Error())
 		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		// }
 
 		var input = new(UpdateRequest)
 		if err := c.Bind(&input); err != nil {
-			c.Logger().Fatal("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -260,7 +261,7 @@ func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 		result, err := th.s.UpdateTransactionManual(*serviceUpdate, paramID)
 
 		if err != nil {
-			// c.Logger().Fatal("Handler : Input Process Error : ", err.Error())
+			// c.Logger().Info("Handler : Input Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
