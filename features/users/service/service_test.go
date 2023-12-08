@@ -348,3 +348,49 @@ func TestResetPassword(t *testing.T) {
 		assert.EqualError(t, err, "Reset Password Process Failed")
 	})
 }
+
+func TestUpdateProfile(t *testing.T) {
+	jwt := helper.NewJWTInterface(t)
+	enkrip := helper.NewHashInterface(t)
+	data := mocks.NewUserDataInterface(t)
+	email := helper.NewEmailInterface(t)
+	service := New(data, jwt, email, enkrip)
+	userProfile := users.UpdateProfile{
+		Name:     "Irvan Hauwerich",
+		Email:    "irvanhau@gmail.com",
+		Password: "password",
+	}
+
+	t.Run("Hash Password Error", func(t *testing.T) {
+		enkrip.On("HashPassword", userProfile.Password).Return("", errors.New("Hash Password Error")).Once()
+
+		res, err := service.UpdateProfile(1, userProfile)
+
+		assert.Error(t, err)
+		assert.Equal(t, res, false)
+		assert.EqualError(t, err, "Hash Password Error")
+	})
+
+	t.Run("Update Profile Failed", func(t *testing.T) {
+		enkrip.On("HashPassword", userProfile.Password).Return(userProfile.Password, nil).Once()
+		data.On("UpdateProfile", 1, userProfile).Return(false, errors.New("Update Process Failed")).Once()
+
+		res, err := service.UpdateProfile(1, userProfile)
+
+		assert.Error(t, err)
+		assert.Equal(t, res, false)
+		assert.EqualError(t, err, "Update Process Failed")
+	})
+
+	t.Run("Success Update Profile", func(t *testing.T) {
+		enkrip.On("HashPassword", userProfile.Password).Return(userProfile.Password, nil).Once()
+		data.On("UpdateProfile", 1, userProfile).Return(true, nil).Once()
+
+		res, err := service.UpdateProfile(1, userProfile)
+
+		assert.Nil(t, err)
+		assert.Equal(t, res, true)
+		enkrip.AssertExpectations(t)
+		data.AssertExpectations(t)
+	})
+}

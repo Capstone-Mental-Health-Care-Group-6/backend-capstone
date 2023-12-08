@@ -13,20 +13,6 @@ type UserDataInterface struct {
 	mock.Mock
 }
 
-// CheckByEmail provides a mock function with given fields: email
-func (_m *UserDataInterface) CheckByEmail(email string) error {
-	ret := _m.Called(email)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(email)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // DeleteCode provides a mock function with given fields: email
 func (_m *UserDataInterface) DeleteCode(email string) error {
 	ret := _m.Called(email)
@@ -171,6 +157,30 @@ func (_m *UserDataInterface) ResetPassword(code string, email string, password s
 	}
 
 	return r0
+}
+
+// UpdateProfile provides a mock function with given fields: id, newData
+func (_m *UserDataInterface) UpdateProfile(id int, newData users.UpdateProfile) (bool, error) {
+	ret := _m.Called(id, newData)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int, users.UpdateProfile) (bool, error)); ok {
+		return rf(id, newData)
+	}
+	if rf, ok := ret.Get(0).(func(int, users.UpdateProfile) bool); ok {
+		r0 = rf(id, newData)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int, users.UpdateProfile) error); ok {
+		r1 = rf(id, newData)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewUserDataInterface creates a new instance of UserDataInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

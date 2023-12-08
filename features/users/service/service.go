@@ -144,3 +144,16 @@ func (us *UserService) ResetPassword(code, email, password string) error {
 
 	return nil
 }
+
+func (us *UserService) UpdateProfile(id int, newData users.UpdateProfile) (bool, error) {
+	hashPassword, err := us.e.HashPassword(newData.Password)
+	if err != nil {
+		return false, errors.New("Hash Password Error")
+	}
+	newData.Password = hashPassword
+	result, err := us.d.UpdateProfile(id, newData)
+	if err != nil {
+		return false, errors.New("Update Process Failed")
+	}
+	return result, nil
+}

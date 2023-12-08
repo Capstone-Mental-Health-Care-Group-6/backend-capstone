@@ -1,45 +1,46 @@
 package openai
 
 import (
+	"FinalProject/configs"
 	"context"
 
-	ai "github.com/sashabaranov/go-openai"
-	"github.com/sirupsen/logrus"
+	"github.com/sashabaranov/go-openai"
 )
 
-type OpenAiSrv struct {
-	client *ai.Client
+type OpenAIInterface interface {
+	GenerateText(prompt string) (string, error)
 }
 
-func NewOpenAiSrv() *OpenAiSrv {
-	env := NewOpenAiEnv()
-	key := NewOpenAiConfig(env).key
-	return &OpenAiSrv{
-		client: ai.NewClient(key),
+type OpenAI struct {
+	cfg configs.ProgrammingConfig
+}
+
+func InitOpenAI(config configs.ProgrammingConfig) OpenAIInterface {
+	return &OpenAI{
+		cfg: config,
 	}
 }
 
-func (srv *OpenAiSrv) Chatbot(prompt string) *ai.ChatCompletionMessage {
-	ctx := context.Background()
-	req := ai.ChatCompletionRequest{
-		Model:       ai.GPT3Dot5Turbo,
-		Temperature: 1,
-		MaxTokens:   2048,
-		Messages: []ai.ChatCompletionMessage{
-			{
-				Role:    ai.ChatMessageRoleAssistant,
-				Content: "Kamu adalah seorang psikolog profesional dan seorang puitisi terkenal, kamu akan diberikan sebuah pertanyaan seputar kesehatan mental, jawaban yang kamu berikan harus berbentuk narasi",
-			},
-			{
-				Role:    ai.ChatMessageRoleUser,
-				Content: prompt,
+func (o *OpenAI) GenerateText(prompt string) (string, error) {
+	client := openai.NewClient(o.cfg.OpenAI)
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleAssistant,
+					Content: "Kamu adalah seorang psikolog profesional dan seorang puitisi terkenal, kamu akan diberikan sebuah pertanyaan seputar kesehatan mental, jawaban yang kamu berikan harus berbentuk narasi",
+				},
+				{
+					Role:    openai.ChatMessageRoleUser,
+					Content: prompt,
+				},
 			},
 		},
-	}
-	res, err := srv.client.CreateChatCompletion(ctx, req)
+	)
 	if err != nil {
-		logrus.Error("[openai.srv]: ", err.Error())
-		return nil
+		return "", err
 	}
-	return &res.Choices[0].Message
+	return resp.Choices[0].Message.Content, nil
 }

@@ -5,6 +5,9 @@ import (
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
 	"FinalProject/helper/email"
 	"FinalProject/helper/enkrip"
 	"FinalProject/helper/slug"
@@ -42,6 +45,18 @@ import (
 	handlerCounseling "FinalProject/features/counseling_session/handler"
 	serviceCounseling "FinalProject/features/counseling_session/service"
 
+	dataChat "FinalProject/features/chats/data"
+	handlerChat "FinalProject/features/chats/handler"
+	serviceChat "FinalProject/features/chats/service"
+
+	dataMessage "FinalProject/features/chat_messages/data"
+	handlerMessage "FinalProject/features/chat_messages/handler"
+	serviceMessage "FinalProject/features/chat_messages/service"
+
+	dataChatbotCs "FinalProject/features/chatbotcs/data"
+	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
+	serviceChatbotCs "FinalProject/features/chatbotcs/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
@@ -49,6 +64,8 @@ import (
 	"FinalProject/utils/database/seeds"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/openai"
+	"FinalProject/utils/websocket"
 
 	// "fmt"
 
@@ -59,14 +76,21 @@ import (
 func main() {
 	e := echo.New()
 	var config = configs.InitConfig()
+
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
 	var enkrip = enkrip.New()
 	var slug = slug.New()
 	var email = email.New(*config)
+	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
+	}
+
+	mongo, err := database.InitMongoDb(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run mongo database, ", err.Error())
 	}
 
 	database.Migrate(db)
@@ -115,6 +139,21 @@ func main() {
 	counselingModel := dataCounseling.New(db)
 	counselingServices := serviceCounseling.New(counselingModel, cld)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
+	chatData := dataChat.New(db)
+	chatServices := serviceChat.New(chatData, websocket.NewServer())
+	chatController := handlerChat.New(chatServices)
+
+	messageModel := dataMessage.New(db)
+	messageServices := serviceMessage.New(messageModel)
+	messageController := handlerMessage.New(messageServices)
+
+	chatbotModel := dataChatbot.New(mongo)
+	chatbotService := serviceChatbot.New(chatbotModel, openai)
+	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
+
+	chatbotCsModel := dataChatbotCs.New(map[string]string{})
+	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -133,6 +172,10 @@ func main() {
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteCounseling(e, counselingController, *config)
+	routes.RouteChat(e, chatController, *config)
+	routes.RouteMessage(e, messageController, *config)
+	routes.RouteChatBot(e, chatbotController, *config)
+	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
 	e.Logger.Debug(db)
 

@@ -137,3 +137,21 @@ func (ud *UserData) ResetPassword(code, email string, password string) error {
 
 	return nil
 }
+
+func (ud *UserData) UpdateProfile(id int, newData users.UpdateProfile) (bool, error) {
+	var qry = ud.db.Table("users").Where("id = ?", id).Updates(User{
+		Name:     newData.Name,
+		Email:    newData.Email,
+		Password: newData.Password,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, nil
+	}
+
+	return true, nil
+}
