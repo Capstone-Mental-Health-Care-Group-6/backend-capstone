@@ -1,6 +1,13 @@
-.env
-go.sum
+# Exclude specific files and directories
+main.go
+utils/
+configs/
+
+# Exclude system-specific files
 .DS_Store
-./main.go
-./utils/
-./configs/
+
+# Exclude Go dependencies lock file
+go.sum
+
+# Exclude environment configuration file
+.env
