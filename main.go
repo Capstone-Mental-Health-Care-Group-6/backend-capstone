@@ -169,6 +169,7 @@ func main() {
 	e.Logger.Debug(db)
 
 	//DEVMODE
+	//test
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
