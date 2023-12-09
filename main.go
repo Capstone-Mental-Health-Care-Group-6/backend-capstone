@@ -43,6 +43,14 @@ import (
 	handlerChat "FinalProject/features/chats/handler"
 	serviceChat "FinalProject/features/chats/service"
 
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
+
+	dataChatbotCs "FinalProject/features/chatbotcs/data"
+	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
+	serviceChatbotCs "FinalProject/features/chatbotcs/service"
+
 	dataMessage "FinalProject/features/chat_messages/data"
 	handlerMessage "FinalProject/features/chat_messages/handler"
 	serviceMessage "FinalProject/features/chat_messages/service"
@@ -53,6 +61,7 @@ import (
 	"FinalProject/utils/database"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/openai"
 	"FinalProject/utils/websocket"
 
 	// "fmt"
@@ -67,16 +76,16 @@ func main() {
 
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
-	// var openai = openai.InitOpenAI(*config)
+	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
 	}
 
-	// mongo, err := database.InitMongoDb(*config)
-	// if err != nil {
-	// 	e.Logger.Fatal("cannot run mongo database, ", err.Error())
-	// }
+	mongo, err := database.InitMongoDb(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run mongo database, ", err.Error())
+	}
 
 	database.Migrate(db)
 	oauth := oauth.NewOauthGoogleConfig(*config)
@@ -126,13 +135,13 @@ func main() {
 	messageServices := serviceMessage.New(messageModel)
 	messageController := handlerMessage.New(messageServices)
 
-	// chatbotModel := dataChatbot.New(mongo)
-	// chatbotService := serviceChatbot.New(chatbotModel, openai)
-	// chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
+	chatbotModel := dataChatbot.New(mongo)
+	chatbotService := serviceChatbot.New(chatbotModel, openai)
+	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
 
-	// chatbotCsModel := dataChatbotCs.New(map[string]string{})
-	// chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
-	// chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
+	chatbotCsModel := dataChatbotCs.New(map[string]string{})
+	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -154,13 +163,13 @@ func main() {
 
 	routes.RouteChat(e, chatController, *config)
 	routes.RouteMessage(e, messageController, *config)
-	// routes.RouteChatBot(e, chatbotController, *config)
-	// routes.RouteChatBotCS(e, chatbotCsHandler, *config)
+	routes.RouteChatBot(e, chatbotController, *config)
+	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
 	e.Logger.Debug(db)
 
 	//DEVMODE
-	config.ServerPort = 8080
+	// config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

@@ -2,6 +2,7 @@ package database
 
 import (
 	"FinalProject/configs"
+	"fmt"
 
 	"github.com/labstack/gommon/log"
 	"gorm.io/driver/mysql"
@@ -9,16 +10,16 @@ import (
 )
 
 func InitDB(c configs.ProgrammingConfig) (*gorm.DB, error) {
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-	// 	c.DBUser,
-	// 	c.DBPass,
-	// 	c.DBHost,
-	// 	c.DBPort,
-	// 	c.DBName,
-	// )
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		c.DBUser,
+		c.DBPass,
+		c.DBHost,
+		c.DBPort,
+		c.DBName,
+	)
 
 	//DEV MODE
-	dsn := "root:@tcp(127.0.0.1:3306)/mentalhealth?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root:@tcp(127.0.0.1:3306)/mentalhealth?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Error("terjadi kesalahan pada database, error:", err.Error())
