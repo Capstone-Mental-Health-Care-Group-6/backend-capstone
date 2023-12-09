@@ -17,6 +17,8 @@ func InitDB(c configs.ProgrammingConfig) (*gorm.DB, error) {
 		c.DBPort,
 		c.DBName,
 	)
+
+	//DEV MODE
 	// dsn := "root:@tcp(127.0.0.1:3306)/mentalhealth?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

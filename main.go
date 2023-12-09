@@ -2,15 +2,15 @@ package main
 
 import (
 	"FinalProject/configs"
+
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
-	dataChatbot "FinalProject/features/chatbot/data"
-	handlerChatbot "FinalProject/features/chatbot/handler"
-	serviceChatbot "FinalProject/features/chatbot/service"
+
 	"FinalProject/helper/email"
 	"FinalProject/helper/enkrip"
 	"FinalProject/helper/slug"
+
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -49,13 +49,17 @@ import (
 	handlerChat "FinalProject/features/chats/handler"
 	serviceChat "FinalProject/features/chats/service"
 
-	dataMessage "FinalProject/features/chat_messages/data"
-	handlerMessage "FinalProject/features/chat_messages/handler"
-	serviceMessage "FinalProject/features/chat_messages/service"
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
 
 	dataChatbotCs "FinalProject/features/chatbotcs/data"
 	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
 	serviceChatbotCs "FinalProject/features/chatbotcs/service"
+
+	dataMessage "FinalProject/features/chat_messages/data"
+	handlerMessage "FinalProject/features/chat_messages/handler"
+	serviceMessage "FinalProject/features/chat_messages/service"
 
 	"FinalProject/helper"
 	"FinalProject/routes"
@@ -181,6 +185,9 @@ func main() {
 	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
 	e.Logger.Debug(db)
+
+	//DEVMODE
+	//test
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
