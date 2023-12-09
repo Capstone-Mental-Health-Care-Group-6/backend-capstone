@@ -218,7 +218,7 @@ func loadConfig() (*ProgrammingConfig, error) {
 		res.DbMongoName = val
 	} else {
 		permit = false
-		error = errors.New("DB MONGO NAMEundefined")
+		error = errors.New("DB MONGO NAME undefined")
 	}
 
 	if val, found := os.LookupEnv("BASE_URL_FE"); found {

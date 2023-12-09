@@ -45,16 +45,16 @@ jobs:
           OAUTH_GOOGLE_REDIRECT_URL: ${{ secrets.OAUTH_GOOGLE_REDIRECT_URL }}
           EMAIL_SENDER: ${{secrets.EMAIL_SENDER}}
           EMAIL_PASSWORD_SENDER: ${{secrets.EMAIL_PASSWORD_SENDER}}
-          BASE_URL_FE: ${{secrets.BASE_URL_FE}}
-          KEY_OPEN_AI: ${{secrets.KEY_OPEN_AI}}
-          DB_MONGO_URL: ${{secrets.DB_MONGO_URL}}
-          DB_MONGO_NAME: ${{secrets.DB_MONGO_NAME}}
+          BASEURLFE: ${{secrets.BASE_URL_FE}}
+          KEYOPENAI: ${{secrets.KEY_OPEN_AI}}
+          DBMONGOURL: ${{secrets.DB_MONGO_URL}}
+          DBMONGONAME: ${{secrets.DB_MONGO_NAME}}
         with:
           host: ${{secrets.HOST}}
           username: ${{secrets.USERNAME}}
           key: ${{secrets.KEY}}
           port: ${{secrets.PORT}}
-          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL,EMAIL_SENDER,EMAIL_PASSWORD_SENDER,BASE_URL_FE,KEY_OPEN_AI,DB_MONGO_URL,DB_MONGO_NAME
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL,EMAIL_SENDER,EMAIL_PASSWORD_SENDER,BASEURLFE,KEYOPENAI,DBMONGOURL,DBMONGONAME
           script: |
             export DBUSER=$DB_USER
             export DBPASS=$DB_PASS
@@ -72,10 +72,10 @@ jobs:
             export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
             export EMAIL_SENDER=$EMAIL_SENDER
             export EMAIL_PASSWORD_SENDER=$EMAIL_PASSWORD_SENDER
-            export BASE_URL_FE=$BASE_URL_FE
-            export KEY_OPEN_AI=$KEY_OPEN_AI
-            export DB_MONGO_URL=$DB_MONGO_URL
-            export DB_MONGO_NAME=$DB_MONGO_NAME
+            export BASE_URL_FE=$BASEURLFE
+            export KEY_OPEN_AI=$KEYOPENAI
+            export DB_MONGO_URL=$DBMONGOURL
+            export DB_MONGO_NAME=$DBMONGONAME
 
 
             sudo docker stop empathi-care-app
