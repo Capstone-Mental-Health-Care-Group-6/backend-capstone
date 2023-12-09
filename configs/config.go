@@ -202,6 +202,8 @@ func loadConfig() *ProgrammingConfig {
 
 	if !permit {
 		return nil
+		//DEV MODE
+		// return res
 	}
 
 	return res
