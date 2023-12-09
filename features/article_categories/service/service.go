@@ -2,16 +2,19 @@ package service
 
 import (
 	articlecategories "FinalProject/features/article_categories"
+	"FinalProject/helper/slug"
 	"errors"
 )
 
 type ArticleCategoryService struct {
-	d articlecategories.ArticleCategoryDataInterface
+	d    articlecategories.ArticleCategoryDataInterface
+	slug slug.SlugInterface
 }
 
-func New(data articlecategories.ArticleCategoryDataInterface) articlecategories.ArticleCategoryServiceInterface {
+func New(data articlecategories.ArticleCategoryDataInterface, slug slug.SlugInterface) articlecategories.ArticleCategoryServiceInterface {
 	return &ArticleCategoryService{
-		d: data,
+		d:    data,
+		slug: slug,
 	}
 }
 
@@ -26,6 +29,10 @@ func (acs *ArticleCategoryService) GetArticleCategories() ([]articlecategories.A
 }
 
 func (acs *ArticleCategoryService) CreateArticleCategory(newData articlecategories.ArticleCategory) (*articlecategories.ArticleCategory, error) {
+	slug := acs.slug.GenerateSlug(newData.Name)
+
+	newData.Slug = slug
+
 	result, err := acs.d.Insert(newData)
 
 	if err != nil {
@@ -39,13 +46,17 @@ func (acs *ArticleCategoryService) GetArticleCategory(id int) ([]articlecategori
 	result, err := acs.d.GetByID(id)
 
 	if err != nil {
-		return nil, errors.New("Get By Id Process Failed")
+		return nil, errors.New("Get By ID Process Failed")
 	}
 
 	return result, nil
 }
 
 func (acs *ArticleCategoryService) UpdateArticleCategory(newData articlecategories.UpdateArticleCategory, id int) (bool, error) {
+	slug := acs.slug.GenerateSlug(newData.Name)
+
+	newData.Slug = slug
+
 	result, err := acs.d.Update(newData, id)
 
 	if err != nil {

@@ -12,7 +12,7 @@ services:
       - '3306:3306'
     healthcheck:
       test: ["CMD", "mysql", "-u$DBUSER",  "-p$DBPASS", "-e", "show databases;"]
-      interval: 30s
+      interval: 60s
       
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.0.2
@@ -51,7 +51,7 @@ services:
       - OAUTH_GOOGLE_REDIRECT_URL=${OAUTH_GOOGLE_REDIRECT_URL}
       - Cloud_URL=${CloudURL}
     ports:
-      - '8000:8000'
+      - '80:80'
     networks:
       - mynet
   

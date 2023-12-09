@@ -43,18 +43,20 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 }
 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/articles", ah.GetArticles(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/articles/:id", ah.GetArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles", ah.GetArticles())
+	e.GET("/articles/:id", ah.GetArticle())
 	e.POST("/articles", ah.CreateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id", ah.UpdateArticle(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/articles/:id", ah.DeleteArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/deny", ah.DenyArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/approve", ah.ApproveArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/articles/dashboard", ah.ArticleDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/article/categories", ach.GetArticleCategories(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/article/categories/:id", ach.GetArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/article/categories", ach.GetArticleCategories())
+	e.GET("/article/categories/:id", ach.GetArticleCategory())
 	e.POST("/article/categories", ach.CreateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PATCH("/article/categories/:id", ach.UpdateArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/article/categories/:id", ach.DeleteArticleCategory(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
@@ -117,21 +119,21 @@ func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandler
 func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/api/socket/:id", h.Establish())
 	group := e.Group("/api/chats")
-	group.GET("/users/:id", h.Index())
-	group.POST("", h.Store())
-	group.PUT("/:id", h.Edit())
-	group.DELETE("/:id", h.Destroy())
+	group.GET("/users/:id", h.Index(), echojwt.JWT([]byte(cfg.Secret)))
+	group.POST("", h.Store(), echojwt.JWT([]byte(cfg.Secret)))
+	group.PUT("/:id", h.Edit(), echojwt.JWT([]byte(cfg.Secret)))
+	group.DELETE("/:id", h.Destroy(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteMessage(e *echo.Echo, h MessageHandlerInterface, cfg configs.ProgrammingConfig) {
 	group := e.Group("/api/chats/:id/messages")
-	group.GET("", h.Index())
-	group.GET("/:message", h.Observe())
-	group.POST("", h.Store())
-	group.PUT("/:message", h.Edit())
-	group.DELETE("/:message", h.Destroy())
-
+	group.GET("", h.Index(), echojwt.JWT([]byte(cfg.Secret)))
+	group.GET("/:message", h.Observe(), echojwt.JWT([]byte(cfg.Secret)))
+	group.POST("", h.Store(), echojwt.JWT([]byte(cfg.Secret)))
+	group.PUT("/:message", h.Edit(), echojwt.JWT([]byte(cfg.Secret)))
+	group.DELETE("/:message", h.Destroy(), echojwt.JWT([]byte(cfg.Secret)))
 }
+
 func RouteChatBot(e *echo.Echo, ch chatbot.ChatbotHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/chatbot", ch.GetAllChatBot(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/chatbot", ch.CreateChatBot(), echojwt.JWT([]byte(cfg.Secret)))

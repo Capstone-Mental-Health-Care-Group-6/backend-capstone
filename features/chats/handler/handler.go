@@ -50,7 +50,7 @@ func (h *ChatHandler) Index() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.GetChats(ctx, user)
-		if ctx.Get("websocket.connection.error") != nil {
+		if ctx.Get("ws.conn.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -68,6 +68,13 @@ func (h *ChatHandler) Index() echo.HandlerFunc {
 
 func (h *ChatHandler) Store() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
 		request := &dto.CreateChatRequest{}
 		if err := ctx.Bind(request); err != nil || request.Patient == request.Doctor {
 			response := helper.ApiResponse[any]{
@@ -77,7 +84,7 @@ func (h *ChatHandler) Store() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.CreateChat(ctx, request)
-		if ctx.Get("websocket.connection.error") != nil {
+		if ctx.Get("ws.conn.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -98,6 +105,13 @@ func (h *ChatHandler) Store() echo.HandlerFunc {
 
 func (h *ChatHandler) Edit() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			response := helper.ApiResponse[any]{
@@ -115,7 +129,7 @@ func (h *ChatHandler) Edit() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.UpdateChat(ctx, chat, request)
-		if ctx.Get("websocket.connection.error") != nil {
+		if ctx.Get("ws.conn.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -136,6 +150,13 @@ func (h *ChatHandler) Edit() echo.HandlerFunc {
 
 func (h *ChatHandler) Destroy() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			response := helper.ApiResponse[any]{
@@ -145,7 +166,7 @@ func (h *ChatHandler) Destroy() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.DeleteChat(ctx, chat)
-		if ctx.Get("websocket.connection.error") != nil {
+		if ctx.Get("ws.conn.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
