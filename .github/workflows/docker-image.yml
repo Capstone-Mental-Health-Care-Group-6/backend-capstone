@@ -75,7 +75,7 @@ jobs:
             export BASE_URL_FE=$BASEURLFE
             export KEY_OPEN_AI=$KEYOPENAI
             export DB_MONGO_URL=$DBMONGOURL
-            export DB_MONGO_NAME=empathicare
+            export DB_MONGO_NAME=$DBMONGONAME
 
 
             sudo docker stop empathi-care-app
