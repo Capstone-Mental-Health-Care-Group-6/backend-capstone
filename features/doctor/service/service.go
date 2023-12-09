@@ -1,9 +1,9 @@
 package service
 
 import (
-	"FinalProject/configs"
 	"FinalProject/features/doctor"
 	"FinalProject/helper"
+	"FinalProject/helper/email"
 	"FinalProject/utils/cloudinary"
 	"errors"
 	"math/rand"
@@ -12,17 +12,17 @@ import (
 )
 
 type DoctorService struct {
-	data doctor.DoctorDataInterface
-	cld  cloudinary.CloudinaryInterface
-	jwt  helper.JWTInterface
-	c    configs.ProgrammingConfig
+	data  doctor.DoctorDataInterface
+	cld   cloudinary.CloudinaryInterface
+	jwt   helper.JWTInterface
+	email email.EmailInterface
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, config configs.ProgrammingConfig) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface) doctor.DoctorServiceInterface {
 	return &DoctorService{
-		data: data,
-		cld:  cloudinary,
-		c:    config,
+		data:  data,
+		cld:   cloudinary,
+		email: email,
 	}
 }
 
@@ -122,7 +122,7 @@ func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, 
 					<table cellpadding="0" cellspacing="0" width="100%%">
 					<tr>
 						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 18px; font-weight: 900">
-						Halo,` + result.DoctorName + `
+						Halo, ` + result.DoctorName + `
 						</td>
 					</tr>
 					</table>
@@ -163,7 +163,7 @@ func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, 
 	</body>
 	</html>`
 
-	ress := helper.SendEmail(*email, header, htmlBody)
+	ress := psvc.email.SendEmail(*email, header, htmlBody)
 
 	logrus.Info("Info send email ==[]==", nil)
 	logrus.Info("Email:", email, &email, *email)
@@ -249,4 +249,36 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 		return "", errors.New("Upload Ijazah Failed")
 	}
 	return uploadUrl, nil
+}
+
+func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {
+	result, err := psvc.data.UpdateDoctorDatapokok(id, newData)
+	if err != nil {
+		return false, errors.New("Update Datapokok Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) UpdateDoctorEducation(id int, doctorID int, newData doctor.DoctorInfoEducation) (bool, error) {
+	result, err := psvc.data.UpdateDoctorEducation(id, doctorID, newData)
+	if err != nil {
+		return false, errors.New("Update Datapokok Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) UpdateDoctorExperience(id int, doctorID int, newData doctor.DoctorInfoExperience) (bool, error) {
+	result, err := psvc.data.UpdateDoctorExperience(id, doctorID, newData)
+	if err != nil {
+		return false, errors.New("Update Datapokok Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) UpdateDoctorWorkdays(id int, doctorID int, newData doctor.DoctorInfoWorkday) (bool, error) {
+	result, err := psvc.data.UpdateDoctorWorkdays(id, doctorID, newData)
+	if err != nil {
+		return false, errors.New("Update Datapokok Dokter Failed")
+	}
+	return result, nil
 }

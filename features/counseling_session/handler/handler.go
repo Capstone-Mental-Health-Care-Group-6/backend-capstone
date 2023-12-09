@@ -23,11 +23,11 @@ func New(s counselingsession.CounselingSessionServiceInterface, jwt helper.JWTIn
 
 func (h *CounselingSessionHandler) GetAllCounseling() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := h.jwt.CheckRole(c)
+		// role := h.jwt.CheckRole(c)
 
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
-		}
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		// }
 
 		result, err := h.s.GetAllCounseling()
 		if err != nil {
@@ -43,11 +43,11 @@ func (h *CounselingSessionHandler) GetAllCounseling() echo.HandlerFunc {
 
 func (h *CounselingSessionHandler) CreateCounseling() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := h.jwt.CheckRole(c)
+		// role := h.jwt.CheckRole(c)
 
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
-		}
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		// }
 
 		var req InputRequest
 
@@ -61,46 +61,39 @@ func (h *CounselingSessionHandler) CreateCounseling() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
-		file, _ := c.FormFile("avatar")
-
-		isValidFile, errorsFile := helper.ValidateFile(file, 5*1024*1024, "image/jpeg", "image/png")
-		if !isValidFile {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
-		}
-
-		// openFile, err := file.Open()
-		// if err != nil {
-		// 	c.Logger().Info("Handler : Open File Error : ", err.Error())
-		// 	return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
-		// }
-
-		// var serviceInput = new(counselingsession.CounselingSession)
-		// serviceInput.Name = req.Name
-		// serviceInput.Sessions = req.Sessions
-		// serviceInput.Price = req.Price
-		// serviceInput.Type = req.Type
-		// serviceInput.Description = req.Description
-		// serviceInput.ActivePriode = req.ActivePriode
+		var serviceInput = new(counselingsession.CounselingSession)
+		serviceInput.TransactionID = req.TransactionID
+		serviceInput.Date = req.Date
+		serviceInput.Time = req.Time
+		serviceInput.Duration = req.Duration
+		serviceInput.Status = "process"
 
 		//CREATE COUNSELING HANDLER
 
-		// result, err := h.s.CreateCounseling(*serviceInput, counselingsession.CounselingSessionFile{Avatar: openFile})
-		// if err != nil {
-		// 	c.Logger().Info("Handler : Input Process Error : ", err.Error())
-		// 	return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
-		// }
+		result, err := h.s.CreateCounseling(*serviceInput)
+		if err != nil {
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
+		}
 
-		return c.JSON(http.StatusCreated, helper.FormatResponse("Success to create bundle", nil))
+		var response = new(InputResponse)
+		response.TransactionID = result.TransactionID
+		response.Date = result.Date
+		response.Time = result.Time
+		response.Duration = result.Duration
+		response.Status = result.Status
+
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success to create counseling session", response))
 	}
 }
 
 func (h *CounselingSessionHandler) GetCounseling() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := h.jwt.CheckRole(c)
+		// role := h.jwt.CheckRole(c)
 
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
-		}
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		// }
 
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
@@ -114,12 +107,12 @@ func (h *CounselingSessionHandler) GetCounseling() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get bundle", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get counseling data", nil))
 		}
 
-		// if result.ID == 0 {
-		// 	return c.JSON(http.StatusNotFound, helper.FormatResponse("Success", "Data not found"))
-		// }
+		if result.TransactionID == 0 {
+			return c.JSON(http.StatusNotFound, helper.FormatResponse("Success", "Data not found"))
+		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get bundle", result))
 	}
@@ -127,21 +120,21 @@ func (h *CounselingSessionHandler) GetCounseling() echo.HandlerFunc {
 
 func (h *CounselingSessionHandler) UpdateCounseling() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		role := h.jwt.CheckRole(c)
+		// role := h.jwt.CheckRole(c)
 
-		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
-		}
-
-		// var paramID = c.Param("id")
-		// id, err := strconv.Atoi(paramID)
-
-		// if err != nil {
-		// 	c.Logger().Info("Handler : Param ID Error : ", err.Error())
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
 		// }
 
-		var req InputRequest
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		var req InputRequestUpdate
 
 		if err := c.Bind(&req); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
@@ -153,44 +146,21 @@ func (h *CounselingSessionHandler) UpdateCounseling() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
-		// var openFile multipart.File
-		// file, _ := c.FormFile("avatar")
-		// if file != nil {
-		// 	isValidFile, errorsFile := helper.ValidateFile(file, 5*1024*1024, "image/jpeg", "image/png")
-		// 	if !isValidFile {
-		// 		return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
-		// 	}
+		var serviceInput = new(counselingsession.CounselingSession)
+		serviceInput.TransactionID = req.TransactionID
+		serviceInput.Date = req.Date
+		serviceInput.Time = req.Time
+		serviceInput.Duration = req.Duration
+		serviceInput.Status = req.Status
 
-		// 	openFileForm, err := file.Open()
-		// 	if err != nil {
-		// 		c.Logger().Info("Handler : Open File Error : ", err.Error())
-		// 		return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create bundle", nil))
-		// 	}
+		result, err := h.s.UpdateCounseling(id, *serviceInput)
 
-		// 	openFile = openFileForm
-		// }
+		if err != nil {
+			c.Logger().Info("Handler : Input Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to update bundle", nil))
+		}
 
-		// var serviceInput = new(counselingsession.CounselingSession)
-		// serviceInput.Name = req.Name
-		// serviceInput.Sessions = req.Sessions
-		// serviceInput.Price = req.Price
-		// serviceInput.Type = req.Type
-		// serviceInput.Description = req.Description
-		// serviceInput.ActivePriode = req.ActivePriode
-
-		// var bundleFile counselingsession.CounselingSessionFile
-		// if openFile != nil {
-		// 	bundleFile.Avatar = openFile
-		// }
-
-		// result, err := h.s.UpdateCounseling(id, *serviceInput, bundleFile)
-
-		// if err != nil {
-		// 	c.Logger().Info("Handler : Input Process Error : ", err.Error())
-		// 	return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to update bundle", nil))
-		// }
-
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success to update bundle", nil))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to update bundle", result))
 	}
 }
 
@@ -214,7 +184,7 @@ func (h *CounselingSessionHandler) DeleteCounseling() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Info("Handler : Delete Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to delete bundle", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to delete counseling", nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete bundle", result))

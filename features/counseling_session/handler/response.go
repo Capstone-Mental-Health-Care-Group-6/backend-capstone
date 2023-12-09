@@ -1,12 +1,11 @@
 package handler
 
-type BundleCounselingResponse struct {
-	ID           uint   `json:"id"`
-	Name         string `json:"name"`
-	Sessions     uint   `json:"sessions"`
-	Type         string `json:"type"`
-	Price        uint   `json:"price"`
-	Description  string `json:"description"`
-	ActivePriode string `json:"active_priode"`
-	Avatar       string `json:"avatar"`
+import "time"
+
+type InputResponse struct {
+	TransactionID uint      `json:"transaction_id" form:"transaction_id"`
+	Date          time.Time `json:"date" form:"date"`
+	Time          time.Time `json:"time" form:"time"`
+	Duration      uint      `json:"duration" form:"duration"`
+	Status        string    `json:"status" form:"status"`
 }

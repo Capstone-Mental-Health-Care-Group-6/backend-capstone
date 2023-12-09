@@ -27,27 +27,20 @@ func (s *CounselingSessionService) GetAllCounseling() ([]counselingsession.Couns
 
 func (s *CounselingSessionService) CreateCounseling(input counselingsession.CounselingSession) (*counselingsession.CounselingSession, error) {
 
-	// uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
-	// if err != nil {
-	// 	return nil, errors.New("Upload Failed")
-	// }
+	newData := counselingsession.CounselingSession{
+		TransactionID: input.TransactionID,
+		Date:          input.Date,
+		Time:          input.Time,
+		Duration:      input.Duration,
+		Status:        input.Status,
+	}
 
-	// newData := counselingsession.counselingsession{
-	// 	Name:         input.Name,
-	// 	Sessions:     input.Sessions,
-	// 	Type:         input.Type,
-	// 	Price:        input.Price,
-	// 	Description:  input.Description,
-	// 	ActivePriode: input.ActivePriode,
-	// 	Avatar:       uploadUrl,
-	// }
+	result, err := s.d.Create(newData)
+	if err != nil {
+		return nil, err
+	}
 
-	// result, err := s.d.Create(newData)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	return nil, nil
+	return result, nil
 }
 
 func (s *CounselingSessionService) GetCounseling(id int) (*counselingsession.CounselingSession, error) {
@@ -61,30 +54,20 @@ func (s *CounselingSessionService) GetCounseling(id int) (*counselingsession.Cou
 
 func (s *CounselingSessionService) UpdateCounseling(id int, input counselingsession.CounselingSession) (bool, error) {
 
-	// newData := counselingsession.counselingsession{
-	// 	Name:         input.Name,
-	// 	Sessions:     input.Sessions,
-	// 	Type:         input.Type,
-	// 	Price:        input.Price,
-	// 	Description:  input.Description,
-	// 	ActivePriode: input.ActivePriode,
-	// }
+	newData := counselingsession.CounselingSession{
+		TransactionID: input.TransactionID,
+		Date:          input.Date,
+		Time:          input.Time,
+		Duration:      input.Duration,
+		Status:        input.Status,
+	}
 
-	// if file.Avatar != nil {
-	// 	uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)
-	// 	if err != nil {
-	// 		return false, errors.New("Upload Failed")
-	// 	}
+	result, err := s.d.Update(id, newData)
+	if err != nil {
+		return false, err
+	}
 
-	// 	newData.Avatar = uploadUrl
-	// }
-
-	// result, err := s.d.Update(id, newData)
-	// if err != nil {
-	// 	return false, err
-	// }
-
-	return true, nil
+	return result, nil
 }
 
 func (s *CounselingSessionService) DeleteCounseling(id int) (bool, error) {

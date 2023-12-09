@@ -2,7 +2,6 @@ package data
 
 import (
 	"FinalProject/features/users"
-	"FinalProject/helper"
 	"errors"
 	"time"
 
@@ -26,14 +25,10 @@ func (ud *UserData) Register(newData users.User) (*users.User, error) {
 	dbData.Name = newData.Name
 	dbData.Email = newData.Email
 	dbData.Role = newData.Role
-	dbData.Status = "Active"
-	hashPassword, err := helper.HashPassword(newData.Password)
-	if err != nil {
-		logrus.Info("Hash Password Error, ", err.Error())
-	}
-	dbData.Password = hashPassword
+	dbData.Status = newData.Status
+	dbData.Password = newData.Password
 
-	if err := ud.db.Create(dbData).Error; err != nil {
+	if err := ud.db.Create(newData).Error; err != nil {
 		return nil, err
 	}
 	return &newData, nil
@@ -131,12 +126,7 @@ func (ud *UserData) GetByCode(code string) (*users.UserResetPass, error) {
 }
 
 func (ud *UserData) ResetPassword(code, email string, password string) error {
-	hashPassword, err := helper.HashPassword(password)
-	if err != nil {
-		logrus.Info("Hash Password Error, ", err.Error())
-	}
-
-	if err := ud.db.Table("users").Where("email = ?", email).Update("password", hashPassword).Error; err != nil {
+	if err := ud.db.Table("users").Where("email = ?", email).Update("password", password).Error; err != nil {
 		return err
 	}
 
@@ -146,4 +136,22 @@ func (ud *UserData) ResetPassword(code, email string, password string) error {
 	}
 
 	return nil
+}
+
+func (ud *UserData) UpdateProfile(id int, newData users.UpdateProfile) (bool, error) {
+	var qry = ud.db.Table("users").Where("id = ?", id).Updates(User{
+		Name:     newData.Name,
+		Email:    newData.Email,
+		Password: newData.Password,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, nil
+	}
+
+	return true, nil
 }

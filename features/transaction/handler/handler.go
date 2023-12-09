@@ -57,6 +57,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
 	}
 }

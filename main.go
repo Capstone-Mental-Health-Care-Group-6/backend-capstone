@@ -2,9 +2,15 @@ package main
 
 import (
 	"FinalProject/configs"
+
 	dataArticle "FinalProject/features/articles/data"
 	handlerArticle "FinalProject/features/articles/handler"
 	serviceArticle "FinalProject/features/articles/service"
+
+	"FinalProject/helper/email"
+	"FinalProject/helper/enkrip"
+	"FinalProject/helper/slug"
+
 	"fmt"
 
 	dataTransaksi "FinalProject/features/transaction/data"
@@ -39,12 +45,31 @@ import (
 	handlerCounseling "FinalProject/features/counseling_session/handler"
 	serviceCounseling "FinalProject/features/counseling_session/service"
 
+	dataChat "FinalProject/features/chats/data"
+	handlerChat "FinalProject/features/chats/handler"
+	serviceChat "FinalProject/features/chats/service"
+
+	dataChatbot "FinalProject/features/chatbot/data"
+	handlerChatbot "FinalProject/features/chatbot/handler"
+	serviceChatbot "FinalProject/features/chatbot/service"
+
+	dataChatbotCs "FinalProject/features/chatbotcs/data"
+	handlerChatbotCs "FinalProject/features/chatbotcs/handler"
+	serviceChatbotCs "FinalProject/features/chatbotcs/service"
+
+	dataMessage "FinalProject/features/chat_messages/data"
+	handlerMessage "FinalProject/features/chat_messages/handler"
+	serviceMessage "FinalProject/features/chat_messages/service"
+
 	"FinalProject/helper"
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
+	"FinalProject/utils/database/seeds"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
+	"FinalProject/utils/openai"
+	"FinalProject/utils/websocket"
 
 	// "fmt"
 
@@ -55,19 +80,36 @@ import (
 func main() {
 	e := echo.New()
 	var config = configs.InitConfig()
+
 	var cld = cloudinary.InitCloud(*config)
 	var midtrans = midtrans.InitMidtrans(*config)
+	var enkrip = enkrip.New()
+	var slug = slug.New()
+	var email = email.New(*config)
+	var openai = openai.InitOpenAI(*config)
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
 	}
 
+	mongo, err := database.InitMongoDb(*config)
+	if err != nil {
+		e.Logger.Fatal("cannot run mongo database, ", err.Error())
+	}
+
 	database.Migrate(db)
+
+	for _, seed := range seeds.All() {
+		if err := seed.Run(db); err != nil {
+			fmt.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
+		}
+	}
+
 	oauth := oauth.NewOauthGoogleConfig(*config)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)
 
 	userModel := dataUser.New(db)
-	userServices := serviceUser.New(userModel, jwtInterface, *config)
+	userServices := serviceUser.New(userModel, jwtInterface, email, enkrip)
 	userController := handlerUser.NewHandler(userServices, oauth, jwtInterface)
 
 	transaksiModel := dataTransaksi.New(db)
@@ -75,19 +117,19 @@ func main() {
 	transaksiController := handlerTransaksi.NewTransactionHandler(transaksiServices, jwtInterface)
 
 	articleModel := dataArticle.New(db)
-	articleServices := serviceArticle.New(articleModel)
+	articleServices := serviceArticle.New(articleModel, slug, cld)
 	articleController := handlerArticle.NewHandler(articleServices, jwtInterface)
 
 	articleCategoryModel := dataArticleCategory.New(db)
-	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel)
+	articleCategoryServices := serviceArticleCategory.New(articleCategoryModel, slug)
 	articleCategoryController := handlerArticleCategory.NewHandler(articleCategoryServices, jwtInterface)
 
 	patientModel := dataPatient.New(db)
-	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface)
+	patientServices := servicePatient.NewPatient(patientModel, cld, jwtInterface, enkrip)
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, *config)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, email)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)
@@ -98,9 +140,27 @@ func main() {
 	bundleServices := serviceBundle.New(bundleModel, cld)
 	bundleController := handlerBundle.New(bundleServices, jwtInterface)
 
+	socket := websocket.NewServer()
+
 	counselingModel := dataCounseling.New(db)
 	counselingServices := serviceCounseling.New(counselingModel, cld)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
+
+	chatData := dataChat.New(db)
+	chatServices := serviceChat.New(chatData, socket, jwtInterface)
+	chatController := handlerChat.New(chatServices)
+
+	messageModel := dataMessage.New(db)
+	messageServices := serviceMessage.New(messageModel)
+	messageController := handlerMessage.New(messageServices)
+
+	chatbotModel := dataChatbot.New(mongo)
+	chatbotService := serviceChatbot.New(chatbotModel, openai)
+	chatbotController := handlerChatbot.New(chatbotService, jwtInterface)
+
+	chatbotCsModel := dataChatbotCs.New(map[string]string{})
+	chatbotCsService := serviceChatbotCs.New(chatbotCsModel)
+	chatbotCsHandler := handlerChatbotCs.New(chatbotCsService, jwtInterface)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -119,8 +179,15 @@ func main() {
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteCounseling(e, counselingController, *config)
+	routes.RouteChat(e, chatController, *config)
+	routes.RouteMessage(e, messageController, *config)
+	routes.RouteChatBot(e, chatbotController, *config)
+	routes.RouteChatBotCS(e, chatbotCsHandler, *config)
 
 	e.Logger.Debug(db)
+
+	//DEVMODE
+	//test
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

@@ -3,22 +3,27 @@ package service
 import (
 	"FinalProject/features/patients"
 	"FinalProject/helper"
+	"FinalProject/helper/enkrip"
 	"FinalProject/utils/cloudinary"
 	"errors"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type PatientService struct {
-	data patients.PatientDataInterface
-	cld  cloudinary.CloudinaryInterface
-	jwt  helper.JWTInterface
+	data   patients.PatientDataInterface
+	cld    cloudinary.CloudinaryInterface
+	jwt    helper.JWTInterface
+	enkrip enkrip.HashInterface
 }
 
-func NewPatient(data patients.PatientDataInterface, cloudinary cloudinary.CloudinaryInterface, jwt helper.JWTInterface) patients.PatientServiceInterface {
+func NewPatient(data patients.PatientDataInterface, cloudinary cloudinary.CloudinaryInterface, jwt helper.JWTInterface, enkrip enkrip.HashInterface) patients.PatientServiceInterface {
 	return &PatientService{
-		data: data,
-		cld:  cloudinary,
-		jwt:  jwt,
+		data:   data,
+		cld:    cloudinary,
+		jwt:    jwt,
+		enkrip: enkrip,
 	}
 }
 
@@ -39,6 +44,12 @@ func (psvc *PatientService) GetPatient(id int) (patients.Patientdetail, error) {
 }
 
 func (psvc *PatientService) CreatePatient(newData patients.Patiententity) (*patients.Patiententity, error) {
+	hashPassword, err := psvc.enkrip.HashPassword(newData.Password)
+	if err != nil {
+		logrus.Info("Hash Password Error, ", err.Error())
+	}
+
+	newData.Password = hashPassword
 	result, err := psvc.data.Insert(newData)
 	if err != nil {
 		return nil, errors.New("insert Process Failed")
@@ -86,6 +97,12 @@ func (psvc *PatientService) LoginPatient(email, password string) (*patients.Pati
 }
 
 func (psvc *PatientService) UpdatePassword(id int, newData patients.UpdatePassword) (bool, error) {
+	hashPassword, err := psvc.enkrip.HashPassword(newData.Password)
+	if err != nil {
+		logrus.Info("Hash Password Error, ", err.Error())
+	}
+
+	newData.Password = hashPassword
 	result, err := psvc.data.UpdatePassword(id, newData)
 	if err != nil {
 		return false, errors.New("update Process Failed")

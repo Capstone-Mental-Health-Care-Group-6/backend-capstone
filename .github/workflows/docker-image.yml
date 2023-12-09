@@ -43,13 +43,18 @@ jobs:
           OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
           OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
           OAUTH_GOOGLE_REDIRECT_URL: ${{ secrets.OAUTH_GOOGLE_REDIRECT_URL }}
-          BASEURLFE : ${{secrets.BASE_URL_FE}}
+          EMAIL_SENDER: ${{secrets.EMAIL_SENDER}}
+          EMAIL_PASSWORD_SENDER: ${{secrets.EMAIL_PASSWORD_SENDER}}
+          BASEURLFE: ${{secrets.BASE_URL_FE}}
+          KEYOPENAI: ${{secrets.KEY_OPEN_AI}}
+          DBMONGOURL: ${{secrets.DB_MONGO_URL}}
+          DBMONGONAME: ${{secrets.DB_MONGO_NAME}}
         with:
           host: ${{secrets.HOST}}
           username: ${{secrets.USERNAME}}
           key: ${{secrets.KEY}}
           port: ${{secrets.PORT}}
-          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL,BASEURLFE
+          envs: DB_USER, DB_PASS, DB_PORT, DB_NAME,SERVER_PORT,JWT_SECRET,REF_SECRET,MT_CLIENT_KEY,MT_SERVER_KEY,MT_ENVIRONMENT,CLOUDINARY_URL,OAUTH_GOOGLE_CLIENT_ID,OAUTH_GOOGLE_CLIENT_SECRET,OAUTH_GOOGLE_REDIRECT_URL,EMAIL_SENDER,EMAIL_PASSWORD_SENDER,BASEURLFE,KEYOPENAI,DBMONGOURL,DBMONGONAME
           script: |
             export DBUSER=$DB_USER
             export DBPASS=$DB_PASS
@@ -65,7 +70,13 @@ jobs:
             export OAUTH_GOOGLE_CLIENT_ID=$OAUTH_GOOGLE_CLIENT_ID
             export OAUTH_GOOGLE_CLIENT_SECRET=$OAUTH_GOOGLE_CLIENT_SECRET
             export OAUTH_GOOGLE_REDIRECT_URL=$OAUTH_GOOGLE_REDIRECT_URL
+            export EMAIL_SENDER=$EMAIL_SENDER
+            export EMAIL_PASSWORD_SENDER=$EMAIL_PASSWORD_SENDER
             export BASE_URL_FE=$BASEURLFE
+            export KEY_OPEN_AI=$KEYOPENAI
+            export DB_MONGO_URL=$DBMONGOURL
+            export DB_MONGO_NAME=empathicare
+
 
             sudo docker stop empathi-care-app
             sudo docker rm empathi-care-app

@@ -24,3 +24,9 @@ type DoctorResponse struct {
 	DoctorEducation  []*doctor.DoctorEducation  `json:"education"`
 	DoctorExperience []*doctor.DoctorExperience `json:"experience"`
 }
+
+type UpdateResponse struct {
+	ID          uint   `json:"id"`
+	Status      bool   `json:"status_updated"`
+	Description string `json:"description"`
+}

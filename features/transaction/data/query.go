@@ -1,10 +1,12 @@
 package data
 
 import (
+	CounselingSession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor/data"
 	"FinalProject/features/transaction"
 	"errors"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -69,6 +71,18 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 
 		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 			return false, errors.New("Update Data Error, No Data Affected")
+		}
+
+		var newData = new(CounselingSession.CounselingSession)
+		newData.TransactionID = transaction.ID
+		newData.Date = time.Now()
+		newData.Time = time.Now()
+		newData.Duration = transaction.DurationID
+		newData.Status = "process"
+		// MASUKIN DATA
+
+		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {
+			return false, err
 		}
 	}
 

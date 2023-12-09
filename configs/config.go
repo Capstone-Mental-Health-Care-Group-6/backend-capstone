@@ -27,6 +27,11 @@ type ProgrammingConfig struct {
 	OauthGoogleClientID     string
 	OauthGoogleClientSecret string
 	OauthGoogleRedirectURL  string
+	OpenAI                  string
+	EmailSender             string
+	EmailPasswordSender     string
+	DbMongoUrl              string
+	DbMongoName             string
 	BaseURLFE               string
 }
 
@@ -34,9 +39,9 @@ func InitConfig() *ProgrammingConfig {
 	var res = new(ProgrammingConfig)
 	res, errorRes := loadConfig()
 
-	fmt.Println(errorRes)
+	logrus.Error(errorRes)
 	if res == nil {
-		logrus.Fatal("Config : Cannot start program, failed to load configuration")
+		logrus.Error("Config : Cannot start program, failed to load configuration")
 		return nil
 	}
 
@@ -174,11 +179,46 @@ func loadConfig() (*ProgrammingConfig, error) {
 		error = errors.New("OAuth Google Redirect URL undefined")
 	}
 
-	if val, found := os.LookupEnv("Cloud_URL"); found {
+	if val, found := os.LookupEnv("CloudURL"); found {
 		res.CloudinaryURL = val
 	} else {
 		permit = false
 		error = errors.New("Cloud URL undefined")
+	}
+
+	if val, found := os.LookupEnv("KEY_OPEN_AI"); found {
+		res.OpenAI = val
+	} else {
+		permit = false
+		error = errors.New("KEY OPEN AI undefined")
+	}
+
+	if val, found := os.LookupEnv("EMAIL_SENDER"); found {
+		res.EmailSender = val
+	} else {
+		permit = false
+		error = errors.New("Email Sender undefined")
+	}
+
+	if val, found := os.LookupEnv("DB_MONGO_URL"); found {
+		res.DbMongoUrl = val
+	} else {
+		permit = false
+		error = errors.New("DB MONGO URL undefined")
+	}
+
+	if val, found := os.LookupEnv("EMAIL_PASSWORD_SENDER"); found {
+		res.EmailPasswordSender = val
+	} else {
+		permit = false
+		error = errors.New("EMAIL PASSWORD SENDER undefined")
+	}
+
+	if val, found := os.LookupEnv("DB_MONGO_NAME"); found {
+		res.DbMongoName = val
+	} else {
+		permit = false
+		error = errors.New("DB MONGO NAME undefined")
 	}
 
 	if val, found := os.LookupEnv("BASE_URL_FE"); found {
@@ -190,6 +230,8 @@ func loadConfig() (*ProgrammingConfig, error) {
 
 	if !permit {
 		return nil, error
+		//DEV MODE
+		// return res
 	}
 
 	return res, nil

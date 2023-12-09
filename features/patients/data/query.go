@@ -3,7 +3,6 @@ package data
 import (
 	//"net/url"
 	"FinalProject/features/patients"
-	"FinalProject/helper"
 	"time"
 
 	//mysql "FinalProject/utils/database/migration/mysql"
@@ -76,11 +75,7 @@ func (pdata *PatientData) Insert(newData patients.Patiententity) (*patients.Pati
 	dbData.Phone = newData.Phone
 	dbData.Role = "Patient"
 	dbData.Status = "Active"
-	hashPassword, err := helper.HashPassword(newData.Password)
-	if err != nil {
-		logrus.Info("Hash Password Error, ", err.Error())
-	}
-	dbData.Password = hashPassword
+	dbData.Password = newData.Password
 
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
@@ -138,7 +133,6 @@ func (pdata *PatientData) Update(id int, newData patients.UpdateProfile) (bool, 
 }
 
 func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword) (bool, error) {
-	newData.Password, _ = helper.HashPassword(newData.Password)
 	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{
 		Password: newData.Password,
 	})
@@ -176,10 +170,10 @@ func (pdata *PatientData) getTotalUser() (int, int, int, int) {
 	var now = time.Now()
 	var before = now.AddDate(0, 0, -30)
 
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Count(&totalUser)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Active").Count(&totalUserActive)
-	var _ = pdata.db.Table("users").Where("role = ?", "Patient").Where("status = ?", "Inactive").Count(&totalUserInactive)
+	var _ = pdata.db.Table("patient_accounts").Count(&totalUser)
+	var _ = pdata.db.Table("patient_accounts").Where("created_at BETWEEN ? and ?", before, now).Count(&totalUserBaru)
+	var _ = pdata.db.Table("patient_accounts").Where("status = ?", "Active").Count(&totalUserActive)
+	var _ = pdata.db.Table("patient_accounts").Where("status = ?", "Inactive").Count(&totalUserInactive)
 
 	totalUserInt := int(totalUser)
 	totalUserBaruInt := int(totalUserBaru)
