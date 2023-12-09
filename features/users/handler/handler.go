@@ -29,7 +29,7 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		var input = new(RegisterInput)
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Info("Handler: Bind input error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		isValid, errors := helper.ValidateForm(input)
@@ -62,7 +62,7 @@ func (uh *UserHandler) Login() echo.HandlerFunc {
 
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind input error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		result, err := uh.s.Login(input.Email, input.Password)
@@ -70,9 +70,9 @@ func (uh *UserHandler) Login() echo.HandlerFunc {
 		if err != nil {
 			c.Logger().Error("Handler: Login process error: ", err.Error())
 			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusNotFound, helper.FormatResponse("Data Not Found", nil))
 			}
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Login Process Error", nil))
 		}
 
 		var response = new(LoginResponse)
