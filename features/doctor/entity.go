@@ -83,6 +83,7 @@ type DoctorInfo struct {
 
 type DoctorInfoWorkday struct {
 	// DoctorWorkday []DoctorWorkadays `json:"doctor_workday"`
+	ID        uint      `json:"id"`
 	DoctorID  uint      `json:"doctor_id"`
 	WorkdayID uint      `json:"workday_id"`
 	StartTime time.Time `json:"start_time"`
@@ -91,6 +92,7 @@ type DoctorInfoWorkday struct {
 
 type DoctorInfoEducation struct {
 	// DoctorEducation    []DoctorEducation `json:"doctor_education"`
+	ID                 uint      `json:"id"`
 	DoctorID           uint      `json:"doctor_id"`
 	DoctorUniversity   string    `json:"doctor_university"`
 	DoctorStudyProgram string    `json:"doctor_study_program"`
@@ -99,6 +101,7 @@ type DoctorInfoEducation struct {
 
 type DoctorInfoExperience struct {
 	// DoctorExperience []DoctorExperience `json:"doctor_experience"`
+	ID                          uint      `json:"id"`
 	DoctorID                    uint      `json:"doctor_id"`
 	DoctorCompany               string    `json:"doctor_company"`
 	DoctorTitle                 string    `json:"doctor_title"`
@@ -108,10 +111,7 @@ type DoctorInfoExperience struct {
 	DoctorIsNow                 bool      `json:"doctor_is_now"`
 }
 
-// DoctorWorkadays string `json:"workday_id"`
-
-// StartTime time.Time `json:"start_time"`
-// EndTime   time.Time `json:"end_time"`
+// MODEL FOR REGISTERING
 
 type DoctorExpertiseRelation struct {
 	DoctorID    uint `json:"doctor_id"`
@@ -169,11 +169,45 @@ type DoctorIjazahDataModel struct {
 	DoctorIjazah multipart.File `json:"doctor_ijazah"`
 }
 
+//MODEL FOR UPDATE
+
+type DoctorDatapokokUpdate struct {
+	UserID              uint   `json:"user_id" form:"user_id"`
+	DoctorName          string `json:"doctor_name" form:"doctor_name"`
+	DoctorExperienced   string `json:"doctor_experienced" form:"doctor_experienced"`
+	DoctorDescription   string `json:"doctor_description" form:"doctor_description"`
+	DoctorAvatar        string `json:"doctor_avatar" form:"doctor_avatar"`
+	DoctorOfficeName    string `json:"doctor_office_name" form:"doctor_office_name"`
+	DoctorOfficeAddress string `json:"doctor_office_address" form:"doctor_office_address"`
+	DoctorOfficeCity    string `json:"doctor_office_city" form:"doctor_office_city"`
+	DoctorMeetLink      string `json:"doctor_meet_link" form:"doctor_meet_link"`
+	DoctorSIPP          uint   `json:"doctor_sipp" form:"doctor_sipp"`
+	DoctorSIPPFile      string `json:"doctor_sipp_file" form:"doctor_sipp_file"`
+	DoctorSTR           uint   `json:"doctor_str" form:"doctor_str"`
+	DoctorSTRFile       string `json:"doctor_str_file" form:"doctor_str_file"`
+	DoctorCV            string `json:"doctor_cv" form:"doctor_cv"`
+	DoctorIjazah        string `json:"doctor_ijazah" form:"doctor_ijazah"`
+
+	//FOR DOCTOR EXPERTISE
+	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id"`
+}
+
 type DoctorHandlerInterface interface {
 	GetDoctors() echo.HandlerFunc
 	GetDoctor() echo.HandlerFunc
 	CreateDoctor() echo.HandlerFunc
 	SearchDoctor() echo.HandlerFunc
+	UpdateDoctorDatapokok() echo.HandlerFunc
+	UpdateDoctorWorkdays() echo.HandlerFunc
+	UpdateDoctorEducation() echo.HandlerFunc
+	UpdateDoctorExperience() echo.HandlerFunc
+	InsertWorkday() echo.HandlerFunc
+	InsertEducation() echo.HandlerFunc
+	InsertExperience() echo.HandlerFunc
+	DeleteDoctor() echo.HandlerFunc
+	DeleteWorkday() echo.HandlerFunc
+	DeleteEducation() echo.HandlerFunc
+	DeleteExperience() echo.HandlerFunc
 }
 
 type DoctorServiceInterface interface {
@@ -193,6 +227,10 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
+	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
+	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
+	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
 }
 
 type DoctorDataInterface interface {
@@ -208,4 +246,8 @@ type DoctorDataInterface interface {
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
 	FindEmail(userID uint) (*string, error)
+	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
+	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
+	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
+	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
 }
