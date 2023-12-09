@@ -169,7 +169,7 @@ func main() {
 	e.Logger.Debug(db)
 
 	//DEVMODE
-	config.ServerPort = 8080
+	// config.ServerPort = 8080
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
