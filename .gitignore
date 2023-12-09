@@ -1,6 +1,6 @@
 .env
 go.sum
 .DS_Store
-# ./main.go
-# ./utils/
-# ./configs/
+./main.go
+./utils/
+./configs/
