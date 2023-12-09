@@ -33,7 +33,7 @@ func (mdl *DoctorHandler) SearchDoctor() echo.HandlerFunc {
 		result, err := mdl.svc.SearchDoctor(name)
 
 		if err != nil {
-			c.Logger().Info("Handler : Search Doctor by Name Error : ", err.Error())
+			c.Logger().Error("Handler : Search Doctor by Name Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -56,7 +56,7 @@ func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 		result, err := mdl.svc.GetDoctors()
 
 		if err != nil {
-			c.Logger().Info("Handler : Get All Process Error : ", err.Error())
+			c.Logger().Error("Handler : Get All Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -73,7 +73,7 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
 		}
 
@@ -83,7 +83,7 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		// resultEducation, err := mdl.svc.GetDoctorEducation(id)
 
 		if err != nil {
-			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
+			c.Logger().Error("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
@@ -110,7 +110,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		var input = new(DoctorRequest)
 
 		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -214,7 +214,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		result, err := mdl.svc.CreateDoctor(*serviceInput)
 
 		if err != nil {
-			c.Logger().Info("Handler: Input Process Error (CreateDoctor): ", err.Error())
+			c.Logger().Error("Handler: Input Process Error (CreateDoctor): ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -225,18 +225,18 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		resultExpertise, err := mdl.svc.CreateDoctorExpertise(*serviceInputExpertise)
 
 		if err != nil {
-			c.Logger().Info("Handler: Input Process Error (CreateDoctorExpertise): ", err.Error())
+			c.Logger().Error("Handler: Input Process Error (CreateDoctorExpertise): ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
 		if len(input.DoctorWorkdayID) != len(input.DoctorWorkStartTime) || len(input.DoctorWorkdayID) != len(input.DoctorWorkEndTime) {
-			c.Logger().Info("Handler: workday, start time, and end time must have the same array length!")
+			c.Logger().Error("Handler: workday, start time, and end time must have the same array length!")
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Workday, Start and End time mismatch array length.", nil))
 		}
 
 		// Validate array lengths for DoctorEducation
 		if len(input.DoctorUniversity) != len(input.DoctorStudyProgram) || len(input.DoctorUniversity) != len(input.DoctorGraduateYear) {
-			c.Logger().Info("Handler: university, study program, and graduate year must have the same array length!")
+			c.Logger().Error("Handler: university, study program, and graduate year must have the same array length!")
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: University, Study Program, and Graduate Year mismatch array length.", nil))
 		}
 
@@ -244,7 +244,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		if len(input.DoctorCompany) != len(input.DoctorTitle) || len(input.DoctorCompany) != len(input.DoctorExperienceDescription) ||
 			len(input.DoctorCompany) != len(input.DoctorStartDate) || len(input.DoctorCompany) != len(input.DoctorEndDate) ||
 			len(input.DoctorCompany) != len(input.DoctorIsNow) {
-			c.Logger().Info("Handler: company, title, experience, start date, end date, and is now must have the same array length!")
+			c.Logger().Error("Handler: company, title, experience, start date, end date, and is now must have the same array length!")
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Company, Title, Experience, Start Date, End Date, and Is Now mismatch array length.", nil))
 		}
 
@@ -268,7 +268,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			resultWorkadaysSlice = append(resultWorkadaysSlice, resultWorkadays)
 
 			if err != nil {
-				c.Logger().Info("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
+				c.Logger().Error("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -294,7 +294,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			resultEducationSlice = append(resultEducationSlice, resultEducation)
 
 			if err != nil {
-				c.Logger().Info("Handler: Input Process Error (CreateDoctorEducation): ", err.Error())
+				c.Logger().Error("Handler: Input Process Error (CreateDoctorEducation): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -325,7 +325,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			resultExperienceSlice = append(resultExperienceSlice, resultExperience)
 
 			if err != nil {
-				c.Logger().Info("Handler: Input Process Error (CreateDoctorExperience): ", err.Error())
+				c.Logger().Error("Handler: Input Process Error (CreateDoctorExperience): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -363,7 +363,7 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
 		}
 
@@ -376,7 +376,7 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 
 		var input = new(DoctorRequestDatapokok)
 		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -477,7 +477,7 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 		result, err := mdl.svc.UpdateDoctorDatapokok(id, *serviceInput)
 
 		if err != nil {
-			c.Logger().Info("Handler: Update Process Error (UpdateDoctor): ", err.Error())
+			c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -490,7 +490,7 @@ func (mdl *DoctorHandler) UpdateDoctorExperience() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
 		}
 
@@ -504,7 +504,7 @@ func (mdl *DoctorHandler) UpdateDoctorExperience() echo.HandlerFunc {
 		var input = new([]DoctorInfoExperience)
 
 		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -541,7 +541,7 @@ func (mdl *DoctorHandler) UpdateDoctorExperience() echo.HandlerFunc {
 			}
 
 			if err != nil {
-				c.Logger().Info("Handler: Update Process Error (UpdateDoctorExperience): ", err.Error())
+				c.Logger().Error("Handler: Update Process Error (UpdateDoctorExperience): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -555,7 +555,7 @@ func (mdl *DoctorHandler) UpdateDoctorEducation() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
 		}
 
@@ -568,7 +568,7 @@ func (mdl *DoctorHandler) UpdateDoctorEducation() echo.HandlerFunc {
 
 		var input = new([]DoctorInfoEducation)
 		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -602,7 +602,7 @@ func (mdl *DoctorHandler) UpdateDoctorEducation() echo.HandlerFunc {
 			}
 
 			if err != nil {
-				c.Logger().Info("Handler: Update Process Error (UpdateDoctorEducation): ", err.Error())
+				c.Logger().Error("Handler: Update Process Error (UpdateDoctorEducation): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -616,7 +616,7 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
 		}
 
@@ -629,7 +629,7 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 
 		var input = new([]DoctorInfoWorkday)
 		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
@@ -664,7 +664,7 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 			}
 
 			if err != nil {
-				c.Logger().Info("Handler: Update Process Error (UpdateDoctor): ", err.Error())
+				c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 			}
 		}
@@ -685,7 +685,7 @@ func (mdl *DoctorHandler) InsertEducation() echo.HandlerFunc {
 		// var input = new(doctor.DoctorEducation)
 
 		// if err := c.Bind(input); err != nil {
-		// 	c.Logger().Info("Handler : Bind Input Error : ", err.Error())
+		// 	c.Logger().Error("Handler : Bind Input Error : ", err.Error())
 		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		// }
 
@@ -700,7 +700,7 @@ func (mdl *DoctorHandler) InsertEducation() echo.HandlerFunc {
 		// result, err := mdl.svc.InsertEducation(*serviceInput)
 
 		// if err != nil {
-		// 	c.Logger().Info("Handler: Input Process Error (InsertEducation): ", err.Error())
+		// 	c.Logger().Error("Handler: Input Process Error (InsertEducation): ", err.Error())
 		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		// }
 
