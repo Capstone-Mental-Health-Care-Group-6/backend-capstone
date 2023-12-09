@@ -17,6 +17,8 @@ import (
 )
 
 func Migrate(db *gorm.DB) {
+	db.Migrator().DropTable(DataArticleCategory.ArticleCategory{})
+
 	db.AutoMigrate(DataUser.User{})
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
 	db.AutoMigrate(DataArticle.Article{})

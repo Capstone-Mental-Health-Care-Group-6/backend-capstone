@@ -28,7 +28,7 @@ func (ud *UserData) Register(newData users.User) (*users.User, error) {
 	dbData.Status = newData.Status
 	dbData.Password = newData.Password
 
-	if err := ud.db.Create(&newData).Error; err != nil {
+	if err := ud.db.Create(dbData).Error; err != nil {
 		return nil, err
 	}
 	return &newData, nil
