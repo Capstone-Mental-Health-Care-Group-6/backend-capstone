@@ -370,7 +370,7 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 		role := mdl.jwt.CheckRole(c)
 
 		fmt.Println(role)
-		if role != "Doctor" || role != "Admin" {
+		if role != "Doctor" && role != "Admin" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
 		}
 
