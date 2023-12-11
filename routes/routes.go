@@ -63,12 +63,10 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/user/:id", ph.GetDoctorByUserId(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/workday", ph.InsertWorkday(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/experience", ph.InsertExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/education", ph.InsertEducation(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/:type", ph.InsertDataDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.PUT("/doctor/datapokok/:id", ph.UpdateDoctorDatapokok(), echojwt.JWT([]byte(cfg.Secret)))
@@ -77,9 +75,9 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.PUT("/doctor/experience/:id", ph.UpdateDoctorExperience(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.DELETE("/doctor/:id", ph.DeleteDoctor(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/workday/:id", ph.DeleteWorkday(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/experience/:id", ph.DeleteExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/education/:id", ph.DeleteEducation(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/doctor/:type/:id", ph.DeleteDoctorData(), echojwt.JWT([]byte(cfg.Secret)))
+	// e.DELETE("/doctor/experience/:id", ph.DeleteExperience(), echojwt.JWT([]byte(cfg.Secret)))
+	// e.DELETE("/doctor/education/:id", ph.DeleteEducation(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {

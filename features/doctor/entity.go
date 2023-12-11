@@ -195,6 +195,7 @@ type DoctorDatapokokUpdate struct {
 type DoctorHandlerInterface interface {
 	GetDoctors() echo.HandlerFunc
 	GetDoctor() echo.HandlerFunc
+	GetDoctorByUserId() echo.HandlerFunc
 	CreateDoctor() echo.HandlerFunc
 	SearchDoctor() echo.HandlerFunc
 	UpdateDoctorDatapokok() echo.HandlerFunc
@@ -202,19 +203,18 @@ type DoctorHandlerInterface interface {
 	UpdateDoctorEducation() echo.HandlerFunc
 	UpdateDoctorExperience() echo.HandlerFunc
 	InsertDataDoctor() echo.HandlerFunc
-	InsertWorkday() echo.HandlerFunc
-	InsertEducation() echo.HandlerFunc
-	InsertExperience() echo.HandlerFunc
 	DeleteDoctor() echo.HandlerFunc
-	DeleteWorkday() echo.HandlerFunc
-	DeleteEducation() echo.HandlerFunc
-	DeleteExperience() echo.HandlerFunc
+	DeleteDoctorData() echo.HandlerFunc
+	// DeleteWorkday() echo.HandlerFunc
+	// DeleteEducation() echo.HandlerFunc
+	// DeleteExperience() echo.HandlerFunc
 }
 
 type DoctorServiceInterface interface {
 	GetDoctors() ([]DoctorAll, error)
 	SearchDoctor(name string) ([]DoctorAll, error)
 	GetDoctor(id int) (*DoctorAll, error)
+	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorInfoExperience, error)
 	GetDoctorEducation(id int) ([]DoctorInfoEducation, error)
 	GetDoctorWorkadays(id int) ([]DoctorInfoWorkday, error)
@@ -232,11 +232,17 @@ type DoctorServiceInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
+	DeleteDoctor(doctorID int) (bool, error)
+	// DeleteDoctorDatapokok(doctorID int) (bool, error)
+	DeleteDoctorExperience(doctorID int) (bool, error)
+	DeleteDoctorWorkdays(doctorID int) (bool, error)
+	DeleteDoctorEducation(doctorID int) (bool, error)
 }
 
 type DoctorDataInterface interface {
 	GetAll() ([]DoctorAll, error)
 	GetByID(id int) (*DoctorAll, error)
+	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetByIDEducation(id int) ([]DoctorInfoEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorInfoWorkday, error)
 	GetByIDExperience(id int) ([]DoctorInfoExperience, error)
@@ -251,4 +257,9 @@ type DoctorDataInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
+	DeleteDoctor(doctorID int) (bool, error)
+	// DeleteDoctorDatapokok(doctorID int) (bool, error)
+	DeleteDoctorExperience(doctorID int) (bool, error)
+	DeleteDoctorWorkdays(doctorID int) (bool, error)
+	DeleteDoctorEducation(doctorID int) (bool, error)
 }

@@ -52,6 +52,14 @@ func (psvc *DoctorService) GetDoctor(id int) (*doctor.DoctorAll, error) {
 	return result, nil
 }
 
+func (psvc *DoctorService) GetDoctorByUserId(userID int) (*doctor.DoctorAll, error) {
+	result, err := psvc.data.GetDoctorByUserId(userID)
+	if err != nil {
+		return nil, errors.New("get By User ID Process Failed")
+	}
+	return result, nil
+}
+
 func (psvc *DoctorService) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
 	result, err := psvc.data.SearchDoctor(name)
 	if err != nil {
@@ -279,6 +287,38 @@ func (psvc *DoctorService) UpdateDoctorWorkdays(id int, doctorID int, newData do
 	result, err := psvc.data.UpdateDoctorWorkdays(id, doctorID, newData)
 	if err != nil {
 		return false, errors.New("Update Datapokok Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) DeleteDoctor(doctorID int) (bool, error) {
+	result, err := psvc.data.DeleteDoctor(doctorID)
+	if err != nil {
+		return false, errors.New("Delete Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) DeleteDoctorEducation(doctorID int) (bool, error) {
+	result, err := psvc.data.DeleteDoctorEducation(doctorID)
+	if err != nil {
+		return false, errors.New("Delete Education Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) DeleteDoctorExperience(doctorID int) (bool, error) {
+	result, err := psvc.data.DeleteDoctorExperience(doctorID)
+	if err != nil {
+		return false, errors.New("Delete Experience Dokter Failed")
+	}
+	return result, nil
+}
+
+func (psvc *DoctorService) DeleteDoctorWorkdays(doctorID int) (bool, error) {
+	result, err := psvc.data.DeleteDoctorWorkdays(doctorID)
+	if err != nil {
+		return false, errors.New("Delete Workdays Dokter Failed")
 	}
 	return result, nil
 }

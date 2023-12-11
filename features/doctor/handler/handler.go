@@ -78,21 +78,31 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		}
 
 		result, err := mdl.svc.GetDoctor(id)
-		// resultExperience, err := mdl.svc.GetDoctorExperience(id)
-		// resultWorkadays, err := mdl.svc.GetDoctorWorkadays(id)
-		// resultEducation, err := mdl.svc.GetDoctorEducation(id)
 
 		if err != nil {
 			c.Logger().Error("Handler : Get By ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
-		// mapAllData := map[string]interface{}{
-		// 	"doctor":     result,
-		// 	"workadays":  resultWorkadays,
-		// 	"experience": resultExperience,
-		// 	"education":  resultEducation,
-		// }
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (mdl *DoctorHandler) GetDoctorByUserId() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param User ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid User ID"))
+		}
+
+		result, err := mdl.svc.GetDoctorByUserId(id)
+
+		if err != nil {
+			c.Logger().Error("Handler : Get By User ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
@@ -201,7 +211,8 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		serviceInput.DoctorOfficeAddress = input.DoctorOfficeAddress
 		serviceInput.DoctorOfficeCity = input.DoctorOfficeCity
 		serviceInput.DoctorMeetLink = input.DoctorMeetLink
-
+		serviceInput.DoctorSIPP = getID
+		serviceInput.DoctorSTR = getID
 		serviceInput.DoctorSIPPFile = uploadUrlSIPP
 		serviceInput.DoctorSTRFile = uploadUrlSTR
 		serviceInput.DoctorCV = uploadUrlCV
@@ -332,12 +343,11 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		var response = new(DoctorResponse)
 
-		// response.ID = result.
 		response.UserID = result.UserID
 		response.DoctorName = result.DoctorName
 		response.DoctorExpertise = resultExpertise.ExpertiseID
-		// response.DoctorExperience = result.DoctorExperience
-		// response.DoctorDescription = result.DoctorDescription
+		response.DoctorExperienced = result.DoctorExperienced
+		response.DoctorDescription = result.DoctorDescription
 		response.DoctorAvatar = result.DoctorAvatar
 		response.DoctorOfficeName = result.DoctorOfficeName
 		response.DoctorOfficeAddress = result.DoctorOfficeAddress
@@ -354,7 +364,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		response.DoctorEducation = resultEducationSlice
 		response.DoctorExperience = resultExperienceSlice
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
 	}
 }
 
@@ -673,83 +683,91 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 	}
 }
 
-func (mdl *DoctorHandler) InsertEducation() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		// role := mdl.jwt.CheckRole(c)
-		// getID, err := mdl.jwt.GetID(c)
-		// fmt.Println(role)
-		// if err != nil {
-		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, cant get ID from JWT", nil))
-		// }
-
-		// var input = new(doctor.DoctorEducation)
-
-		// if err := c.Bind(input); err != nil {
-		// 	c.Logger().Error("Handler : Bind Input Error : ", err.Error())
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
-		// }
-
-		// var serviceInput = new(doctor.DoctorEducation)
-
-		// serviceInput.DoctorID = getID
-		// serviceInput.DoctorUniversity = input.DoctorUniversity
-		// serviceInput.DoctorGraduateYear = input.DoctorGraduateYear
-		// serviceInput.DoctorStudyProgram = input.DoctorStudyProgram
-		// //INPUT REQUEST
-
-		// result, err := mdl.svc.InsertEducation(*serviceInput)
-
-		// if err != nil {
-		// 	c.Logger().Error("Handler: Input Process Error (InsertEducation): ", err.Error())
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
-		// }
-
-		// var response = new(doctor.DoctorEducation)
-		// response = result
-
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
-	}
-}
-
-func (mdl *DoctorHandler) InsertExperience() echo.HandlerFunc {
-	return func(c echo.Context) error {
-
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
-	}
-}
-
-func (mdl *DoctorHandler) InsertWorkday() echo.HandlerFunc {
-	return func(c echo.Context) error {
-
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
-	}
-}
-
 func (mdl *DoctorHandler) DeleteDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+
+		if role != "Doctor" && role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+		}
+
+		result, err := mdl.svc.DeleteDoctor(id)
+
+		if err != nil {
+			c.Logger().Info("Handler: Delete Process Error (Delete Doctor Workdays): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor workadays data", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
 
-func (mdl *DoctorHandler) DeleteEducation() echo.HandlerFunc {
+func (mdl *DoctorHandler) DeleteDoctorData() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var paramType = c.Param("type")
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
-	}
-}
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
 
-func (mdl *DoctorHandler) DeleteExperience() echo.HandlerFunc {
-	return func(c echo.Context) error {
+		if role != "Doctor" && role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
-	}
-}
+		if paramType == "workday" {
 
-func (mdl *DoctorHandler) DeleteWorkday() echo.HandlerFunc {
-	return func(c echo.Context) error {
+			result, err := mdl.svc.DeleteDoctorWorkdays(id)
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
+			if err != nil {
+				c.Logger().Info("Handler: Delete Process Error (Delete Doctor Workdays): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor workadays data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		} else if paramType == "education" {
+
+			result, err := mdl.svc.DeleteDoctorEducation(id)
+
+			if err != nil {
+				c.Logger().Info("Handler: Delete Process Error (Delete Doctor Education): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor education data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		} else if paramType == "experience" {
+			var input = new(DoctorInfoExperience)
+			if err := c.Bind(input); err != nil {
+				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+
+			result, err := mdl.svc.DeleteDoctorExperience(id)
+
+			if err != nil {
+				c.Logger().Info("Handler: Delete Process Error (Delete Doctor Experience): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor experience data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		}
+
+		return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail, type or id not found", nil))
 	}
 }
 

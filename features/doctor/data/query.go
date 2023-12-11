@@ -152,6 +152,42 @@ func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 	return &doctor, nil
 }
 
+func (pdata *DoctorData) GetDoctorByUserId(userId int) (*doctor.DoctorAll, error) {
+	var doctor doctor.DoctorAll
+
+	qry := pdata.db.Table("doctors").
+		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Where("doctors.user_id = ?", userId).
+		Where("doctors.deleted_at IS NULL").
+		Scan(&doctor)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	// Retrieve experience, education, and workday for the doctor
+	experience, err := pdata.GetByIDExperience(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
+	education, err := pdata.GetByIDEducation(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
+	workday, err := pdata.GetByIDWorkadays(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	// Assign the retrieved data to the corresponding fields in the Doctor struct
+	doctor.DoctorExperience = experience
+	doctor.DoctorEducation = education
+	doctor.DoctorWorkday = workday
+
+	return &doctor, nil
+}
+
 func (pdata *DoctorData) GetByIDExperience(id int) ([]doctor.DoctorInfoExperience, error) {
 	var doctorInfoExperience []doctor.DoctorInfoExperience
 
@@ -414,6 +450,46 @@ func (pdata *DoctorData) UpdateDoctorWorkdays(id int, doctorID int, newData doct
 
 	if err := qry.Error; err != nil {
 		return false, nil
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DeleteDoctorWorkdays(doctorID int) (bool, error) {
+	var deleteData = new(doctor.DoctorInfoWorkday)
+
+	if err := pdata.db.Table("doctors_workadays").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DeleteDoctorExperience(doctorID int) (bool, error) {
+	var deleteData = new(doctor.DoctorInfoExperience)
+
+	if err := pdata.db.Table("doctors_experience").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DeleteDoctorEducation(doctorID int) (bool, error) {
+	var deleteData = new(doctor.DoctorInfoEducation)
+
+	if err := pdata.db.Table("doctors_education").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DeleteDoctor(doctorID int) (bool, error) {
+	var deleteData = new(doctor.DoctorAll)
+
+	if err := pdata.db.Table("doctor").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+		return false, err
 	}
 
 	return true, nil
