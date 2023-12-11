@@ -69,6 +69,7 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.POST("/doctor/insert/workday", ph.InsertWorkday(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/experience", ph.InsertExperience(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/education", ph.InsertEducation(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/insert/:type", ph.InsertDataDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.PUT("/doctor/datapokok/:id", ph.UpdateDoctorDatapokok(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/workday/:id", ph.UpdateDoctorWorkdays(), echojwt.JWT([]byte(cfg.Secret)))

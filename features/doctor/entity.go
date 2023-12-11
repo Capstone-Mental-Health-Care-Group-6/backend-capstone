@@ -201,6 +201,7 @@ type DoctorHandlerInterface interface {
 	UpdateDoctorWorkdays() echo.HandlerFunc
 	UpdateDoctorEducation() echo.HandlerFunc
 	UpdateDoctorExperience() echo.HandlerFunc
+	InsertDataDoctor() echo.HandlerFunc
 	InsertWorkday() echo.HandlerFunc
 	InsertEducation() echo.HandlerFunc
 	InsertExperience() echo.HandlerFunc

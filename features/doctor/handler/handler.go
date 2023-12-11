@@ -752,3 +752,91 @@ func (mdl *DoctorHandler) DeleteWorkday() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
 	}
 }
+
+func (mdl *DoctorHandler) InsertDataDoctor() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramType = c.Param("type")
+
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+
+		if role != "Doctor" && role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+		}
+
+		if paramType == "workday" {
+
+			var input = new(DoctorInfoWorkday)
+			if err := c.Bind(input); err != nil {
+				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+
+			var serviceInput = new(doctor.DoctorWorkadays)
+			serviceInput.DoctorID = input.DoctorID
+			serviceInput.WorkdayID = input.WorkdayID
+			serviceInput.StartTime = input.StartTime
+			serviceInput.EndTime = input.EndTime
+
+			result, err := mdl.svc.CreateDoctorWorkadays(*serviceInput)
+
+			if err != nil {
+				c.Logger().Info("Handler: Insert Process Error (Insert Doctor Workdays): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor workadays data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		} else if paramType == "education" {
+
+			var input = new(DoctorInfoEducation)
+			if err := c.Bind(input); err != nil {
+				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+
+			var serviceInput = new(doctor.DoctorEducation)
+			serviceInput.DoctorID = input.DoctorID
+			serviceInput.DoctorStudyProgram = input.DoctorStudyProgram
+			serviceInput.DoctorUniversity = input.DoctorUniversity
+			serviceInput.DoctorGraduateYear = input.DoctorGraduateYear
+
+			result, err := mdl.svc.CreateDoctorEducation(*serviceInput)
+
+			if err != nil {
+				c.Logger().Info("Handler: Insert Process Error (Insert Doctor Education): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor education data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		} else if paramType == "experience" {
+			var input = new(DoctorInfoExperience)
+			if err := c.Bind(input); err != nil {
+				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			}
+
+			var serviceInput = new(doctor.DoctorExperience)
+			serviceInput.DoctorID = input.DoctorID
+			serviceInput.DoctorExperienceDescription = input.DoctorExperienceDescription
+			serviceInput.DoctorCompany = input.DoctorCompany
+			serviceInput.DoctorTitle = input.DoctorTitle
+			serviceInput.DoctorStartDate = input.DoctorStartDate
+			serviceInput.DoctorEndDate = input.DoctorEndDate
+			serviceInput.DoctorIsNow = input.DoctorIsNow
+
+			result, err := mdl.svc.CreateDoctorExperience(*serviceInput)
+
+			if err != nil {
+				c.Logger().Info("Handler: Insert Process Error (Insert Doctor Experience): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor experience data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		}
+
+		return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail, insert type not found", nil))
+	}
+}
