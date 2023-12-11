@@ -9,6 +9,7 @@ import (
 	DataPatient "FinalProject/features/patients/data"
 	DataTransaction "FinalProject/features/transaction/data"
 	DataUser "FinalProject/features/users/data"
+	DataWithdraw "FinalProject/features/withdraw/data"
 
 	message "FinalProject/features/chat_messages"
 	chat "FinalProject/features/chats"
@@ -17,6 +18,8 @@ import (
 )
 
 func Migrate(db *gorm.DB) {
+	db.Migrator().DropTable(DataArticleCategory.ArticleCategory{})
+
 	db.AutoMigrate(DataUser.User{})
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
 	db.AutoMigrate(DataArticle.Article{})
@@ -33,4 +36,5 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(DataCounseling.CounselingSession{})
 	db.AutoMigrate(chat.Chat{})
 	db.AutoMigrate(message.Message{})
+	db.AutoMigrate(DataWithdraw.Withdraw{})
 }
