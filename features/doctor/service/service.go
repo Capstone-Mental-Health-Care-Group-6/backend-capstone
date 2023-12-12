@@ -68,7 +68,7 @@ func (psvc *DoctorService) SearchDoctor(name string) ([]doctor.DoctorAll, error)
 	return result, nil
 }
 
-func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorInfoWorkday, error) {
+func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorWorkdays, error) {
 	result, err := psvc.data.GetByIDWorkadays(id)
 	if err != nil {
 		return nil, errors.New("get By ID Process Failed")
@@ -76,7 +76,7 @@ func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorInfoWorkda
 	return result, nil
 }
 
-func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorInfoEducation, error) {
+func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorEducation, error) {
 	result, err := psvc.data.GetByIDEducation(id)
 	if err != nil {
 		return nil, errors.New("get By ID Process Failed")
@@ -84,7 +84,7 @@ func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorInfoEducat
 	return result, nil
 }
 
-func (psvc *DoctorService) GetDoctorExperience(id int) ([]doctor.DoctorInfoExperience, error) {
+func (psvc *DoctorService) GetDoctorExperience(id int) ([]doctor.DoctorExperience, error) {
 	result, err := psvc.data.GetByIDExperience(id)
 	if err != nil {
 		return nil, errors.New("get By ID Process Failed")
@@ -195,7 +195,7 @@ func (psvc *DoctorService) CreateDoctorExpertise(newData doctor.DoctorExpertiseR
 	return resultExpertise, nil
 }
 
-func (psvc *DoctorService) CreateDoctorWorkadays(newData doctor.DoctorWorkadays) (*doctor.DoctorWorkadays, error) {
+func (psvc *DoctorService) CreateDoctorWorkadays(newData doctor.DoctorWorkdays) (*doctor.DoctorWorkdays, error) {
 	resultWorkadays, err := psvc.data.InsertWorkadays(newData)
 	if err != nil {
 		return nil, errors.New("insert Process Failed")
@@ -267,7 +267,7 @@ func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDa
 	return result, nil
 }
 
-func (psvc *DoctorService) UpdateDoctorEducation(id int, doctorID int, newData doctor.DoctorInfoEducation) (bool, error) {
+func (psvc *DoctorService) UpdateDoctorEducation(id int, doctorID int, newData doctor.DoctorEducation) (bool, error) {
 	result, err := psvc.data.UpdateDoctorEducation(id, doctorID, newData)
 	if err != nil {
 		return false, errors.New("Update Datapokok Dokter Failed")
@@ -275,7 +275,7 @@ func (psvc *DoctorService) UpdateDoctorEducation(id int, doctorID int, newData d
 	return result, nil
 }
 
-func (psvc *DoctorService) UpdateDoctorExperience(id int, doctorID int, newData doctor.DoctorInfoExperience) (bool, error) {
+func (psvc *DoctorService) UpdateDoctorExperience(id int, doctorID int, newData doctor.DoctorExperience) (bool, error) {
 	result, err := psvc.data.UpdateDoctorExperience(id, doctorID, newData)
 	if err != nil {
 		return false, errors.New("Update Datapokok Dokter Failed")
@@ -283,7 +283,7 @@ func (psvc *DoctorService) UpdateDoctorExperience(id int, doctorID int, newData 
 	return result, nil
 }
 
-func (psvc *DoctorService) UpdateDoctorWorkdays(id int, doctorID int, newData doctor.DoctorInfoWorkday) (bool, error) {
+func (psvc *DoctorService) UpdateDoctorWorkdays(id int, doctorID int, newData doctor.DoctorWorkdays) (bool, error) {
 	result, err := psvc.data.UpdateDoctorWorkdays(id, doctorID, newData)
 	if err != nil {
 		return false, errors.New("Update Datapokok Dokter Failed")
