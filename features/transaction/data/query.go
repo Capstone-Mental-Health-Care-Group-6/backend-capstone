@@ -112,16 +112,16 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
         counseling_durations.name as duration_name,
         transactions.created_at,
         transactions.updated_at,
-        doctor_ratings.id as doctor_rating_id,
-        doctor_ratings.doctor_star_rating,
-        doctor_ratings.doctor_review
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
     `).
 		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		Joins("LEFT JOIN doctor_ratings ON doctor_ratings.doctor_id = transactions.doctor_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.midtrans_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -175,16 +175,16 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
         counseling_durations.name as duration_name,
         transactions.created_at,
         transactions.updated_at,
-        doctor_ratings.id as doctor_rating_id,
-        doctor_ratings.doctor_star_rating,
-        doctor_ratings.doctor_review
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
     `).
 		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		Joins("LEFT JOIN doctor_ratings ON doctor_ratings.doctor_id = transactions.doctor_id").
+		Joins("LEFT JOIN doctors_rating ON doctor_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.user_id = ?", id).
 		Where("transactions.deleted_at is null")
 
