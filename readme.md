@@ -1,6 +1,6 @@
 # Instruction
 
-## Library yang dipaka
+## Library yang dipakai
 ```go
 go get github.com/labstack/echo/v4
 go get -u gorm.io/gorm
