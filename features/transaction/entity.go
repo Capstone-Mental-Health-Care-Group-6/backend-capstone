@@ -54,7 +54,7 @@ type TransactionInfo struct {
 	PaymentStatus uint   `json:"payment_status"`
 	PaymentType   string `json:"payment_type"`
 
-	DoctorRatingID   uint   `json:"doctor_rating_id"`
+	DoctorRatingID   uint   `json:"doctors_rating_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
 	DoctorReview     string `json:"doctor_review"`
 

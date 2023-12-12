@@ -7,6 +7,7 @@ import (
 )
 
 type CounselingSession struct {
+	ID              uint      `json:"id"`
 	TransactionID   uint      `json:"transaction_id"`
 	UserID          uint      `json:"user_id"`
 	DoctorAvatar    string    `json:"doctor_avatar"`
@@ -22,6 +23,7 @@ type CounselingSession struct {
 }
 
 type CounselingSessionInfo struct {
+	ID              uint              `json:"id"`
 	TransactionID   uint              `json:"transaction_id"`
 	TransactionInfo []TransactionInfo `json:"transaction_info"`
 	Date            time.Time         `json:"date"`
