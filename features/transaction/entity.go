@@ -55,7 +55,7 @@ type TransactionInfo struct {
 	PaymentType   string         `json:"payment_type"`
 	CreatedAt     time.Time      `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt     time.Time      `json:"updated_at" gorm:"column:updated_at"`
-	Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
+	// Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
 }
 
 type CounselingSession struct {
