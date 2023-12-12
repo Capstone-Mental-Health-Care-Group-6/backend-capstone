@@ -121,7 +121,7 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
 		Where("transactions.midtrans_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -190,7 +190,8 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.user_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -251,6 +252,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	var dbDataRating = new(data.DoctorRating)
 	dbDataRating.DoctorID = newData.DoctorID
 	dbDataRating.DoctorReview = ""
+	dbDataRating.TransactionID = newData.MidtransID
 	dbDataRating.DoctorStarRating = 0
 	dbDataRating.PatientID = newData.PatientID
 

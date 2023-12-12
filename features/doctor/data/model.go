@@ -74,6 +74,7 @@ type DoctorRating struct {
 	*gorm.Model
 	DoctorID         uint   `gorm:"column:doctor_id;index"`
 	PatientID        uint   `gorm:"column:patient_id"`
+	TransactionID    string `gorm:"column:transaction_id"`
 	DoctorStarRating uint   `gorm:"column:doctor_star_rating"`
 	DoctorReview     string `gorm:"column:doctor_review;type:varchar(255)"`
 }

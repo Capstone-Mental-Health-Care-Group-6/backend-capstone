@@ -141,6 +141,7 @@ type DoctorRating struct {
 	ID               uint   `json:"id"`
 	DoctorID         uint   `json:"doctor_id"`
 	PatientID        uint   `json:"patient_id"`
+	TransactionID    string `json:"transaction_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
 	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
 }
