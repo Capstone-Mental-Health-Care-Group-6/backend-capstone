@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"mime/multipart"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,14 +28,42 @@ type Transaction struct {
 	PaymentProof  string `json:"payment_proof"`
 	PaymentStatus uint   `json:"payment_status"`
 	PaymentType   string `json:"payment_type"`
+	CreatedAt     string `json:"created_at" gorm:"column:created_at"`
 }
 
 type TransactionInfo struct {
-	UserID        uint   `json:"user_id"`
-	MidtransID    string `json:"transaction_id"`
-	PriceResult   uint   `json:"price_result"`
-	PaymentStatus uint   `json:"payment_status"`
-	PaymentType   string `json:"payment_type"`
+	TopicName    uint `json:"topic_name"`
+	PatientName  uint `json:"patient_name"`
+	DoctorName   uint `json:"doctor_name"`
+	MethodName   uint `json:"method_name"`
+	DurationName uint `json:"duration_name"`
+	CounselingID uint `json:"counseling_id"`
+
+	UserID     uint   `json:"user_id"`
+	MidtransID string `json:"transaction_id"`
+
+	CounselingSession CounselingSession `json:"counseling_session"`
+	CounselingType    string            `json:"counseling_type"`
+
+	PriceMethod     uint `json:"price_method"`
+	PriceDuration   uint `json:"price_duration"`
+	PriceCounseling uint `json:"price_counseling"`
+	PriceResult     uint `json:"price_result"`
+
+	PaymentProof  string       `json:"payment_proof"`
+	PaymentStatus uint         `json:"payment_status"`
+	PaymentType   string       `json:"payment_type"`
+	CreatedAt     time.Time    `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt     time.Time    `json:"updated_at" gorm:"column:updated_at"`
+	Ratings       DoctorRating `json:"ratings"`
+}
+
+type CounselingSession struct {
+	TransactionID uint      `json:"transaction_id"`
+	Date          time.Time `json:"date"`
+	Time          time.Time `json:"time"`
+	Duration      uint      `json:"duration"`
+	Status        string    `json:"status"`
 }
 
 type PaymentProofDataModel struct {
@@ -49,6 +78,14 @@ type UpdateTransactionManual struct {
 	PriceResult     uint   `json:"price_result"`
 	PaymentStatus   uint   `json:"payment_status"`
 	PaymentType     string `json:"payment_type"`
+}
+
+type DoctorRating struct {
+	ID               uint   `json:"id"`
+	DoctorID         uint   `json:"doctor_id"`
+	PatientID        uint   `json:"patient_id"`
+	DoctorStarRating uint   `json:"doctor_star_rating"`
+	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
 }
 
 type UpdateTransaction struct {
@@ -68,7 +105,7 @@ type TransactionHandlerInterface interface {
 type TransactionServiceInterface interface {
 	GetTransactions(sort string) ([]TransactionInfo, error)
 	// GetTransactionsSort(sort string) ([]TransactionInfo, error)
-	GetTransaction(id int, sort string) ([]Transaction, error)
+	GetTransaction(id int, sort string) ([]TransactionInfo, error)
 	CreateTransaction(newData Transaction) (*Transaction, map[string]interface{}, error)
 	CreateManualTransaction(newData Transaction) (*Transaction, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
@@ -81,7 +118,7 @@ type TransactionServiceInterface interface {
 type TransactionDataInterface interface {
 	GetAll(sort string) ([]TransactionInfo, error)
 	// GetAllSort(sort string) ([]TransactionInfo, error)
-	GetByID(id int, sort string) ([]Transaction, error)
+	GetByID(id int, sort string) ([]TransactionInfo, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
 	Insert(newData Transaction) (*Transaction, error)
 	Update(newData UpdateTransactionManual, id int) (bool, error)
