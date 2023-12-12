@@ -91,7 +91,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.Status = "pending"
 		// MASUKIN DATA
 
-		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {
+		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
 			return false, err
 		}
 	}
@@ -348,7 +348,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		newData.Status = "pending"
 		// MASUKIN DATA
 
-		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {
+		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
 			return false, err
 		}
 	}
