@@ -1,7 +1,7 @@
 package data
 
 import (
-	CounselingSession "FinalProject/features/counseling_session"
+	counselingsession "FinalProject/features/counseling_session/data"
 	"FinalProject/features/doctor/data"
 	"FinalProject/features/transaction"
 	"errors"
@@ -79,7 +79,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
 
-		var newData = new(CounselingSession.CounselingSession)
+		var newData = new(counselingsession.CounselingSession)
 		newData.TransactionID = transaction.ID
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
@@ -112,9 +112,9 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
         counseling_durations.name as duration_name,
         transactions.created_at,
         transactions.updated_at,
-        doctors_rating.id as doctors_rating_id,
-        doctors_rating.doctor_star_rating,
-        doctors_rating.doctor_review
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating as doctor_star_rating,
+        doctors_rating.doctor_review as doctor_review
     `).
 		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
@@ -124,6 +124,12 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.midtrans_id = ?", id).
 		Where("transactions.deleted_at is null")
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	qry = qry.Scan(&transactionInfos)
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -175,7 +181,7 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
         counseling_durations.name as duration_name,
         transactions.created_at,
         transactions.updated_at,
-        doctors_rating.id as doctors_rating_id,
+        doctors_rating.id as doctor_rating_id,
         doctors_rating.doctor_star_rating,
         doctors_rating.doctor_review
     `).
@@ -192,7 +198,7 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 		qry = qry.Where("transactions.payment_type = ?", sort)
 	}
 
-	qry = qry.Find(&transactionInfo)
+	qry = qry.Scan(&transactionInfo)
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -330,7 +336,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
 
-		var newData = new(CounselingSession.CounselingSession)
+		var newData = new(counselingsession.CounselingSession)
 		newData.TransactionID = existingData.ID
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
