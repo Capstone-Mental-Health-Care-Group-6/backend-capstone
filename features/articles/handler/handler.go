@@ -21,6 +21,25 @@ func NewHandler(service articles.ArticleServiceInterface, jwt helper.JWTInterfac
 	}
 }
 
+func (ah *ArticleHandler) GetArticlesByDoctorID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := ah.jwt.GetID(c)
+		if err != nil {
+			c.Logger().Error("Handler : Get ID With JWT Error : ", err)
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Cannot Get ID With JWT", nil))
+		}
+
+		result, err := ah.s.GetArticleByDoctor(int(id))
+
+		if err != nil {
+			c.Logger().Error("Handler : Get Article By Doctor ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Get Article By Doctor ID", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Data", result))
+	}
+}
+
 func (ah *ArticleHandler) GetArticles() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		name := c.QueryParam("name")

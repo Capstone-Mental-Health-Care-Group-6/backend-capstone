@@ -137,6 +137,32 @@ func (_m *ArticleServiceInterface) GetArticle(id int) ([]articles.ArticleInfo, e
 	return r0, r1
 }
 
+// GetArticleByDoctor provides a mock function with given fields: id
+func (_m *ArticleServiceInterface) GetArticleByDoctor(id int) ([]articles.ArticleInfo, error) {
+	ret := _m.Called(id)
+
+	var r0 []articles.ArticleInfo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) ([]articles.ArticleInfo, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) []articles.ArticleInfo); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]articles.ArticleInfo)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetArticles provides a mock function with given fields: name, kategori, timePublication, limit
 func (_m *ArticleServiceInterface) GetArticles(name string, kategori string, timePublication int, limit int) ([]articles.ArticleInfo, error) {
 	ret := _m.Called(name, kategori, timePublication, limit)

@@ -45,6 +45,18 @@ import (
 	handlerCounseling "FinalProject/features/counseling_session/handler"
 	serviceCounseling "FinalProject/features/counseling_session/service"
 
+	dataCounselingMethod "FinalProject/features/counseling_methods/data"
+	handlerCounselingMethod "FinalProject/features/counseling_methods/handler"
+	serviceCounselingMethod "FinalProject/features/counseling_methods/service"
+
+	dataCounselingDuration "FinalProject/features/counseling_durations/data"
+	handlerCounselingDuration "FinalProject/features/counseling_durations/handler"
+	serviceCounselingDuration "FinalProject/features/counseling_durations/service"
+
+	dataCounselingTopic "FinalProject/features/counseling_topics/data"
+	handlerCounselingTopic "FinalProject/features/counseling_topics/handler"
+	serviceCounselingTopic "FinalProject/features/counseling_topics/service"
+
 	dataChat "FinalProject/features/chats/data"
 	handlerChat "FinalProject/features/chats/handler"
 	serviceChat "FinalProject/features/chats/service"
@@ -146,6 +158,18 @@ func main() {
 	counselingServices := serviceCounseling.New(counselingModel, cld)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
 
+	counselingMethodModel := dataCounselingMethod.New(db)
+	counselingMethodServices := serviceCounselingMethod.New(counselingMethodModel)
+	counselingMethodController := handlerCounselingMethod.NewHandler(counselingMethodServices)
+
+	counselingDurationModel := dataCounselingDuration.New(db)
+	counselingDurationServices := serviceCounselingDuration.New(counselingDurationModel)
+	counselingDurationController := handlerCounselingDuration.NewHandler(counselingDurationServices)
+
+	counselingTopicModel := dataCounselingTopic.New(db)
+	counselingTopicServices := serviceCounselingTopic.New(counselingTopicModel)
+	counselingTopicController := handlerCounselingTopic.NewHandler(counselingTopicServices)
+
 	chatData := dataChat.New(db)
 	chatServices := serviceChat.New(chatData, socket, jwtInterface)
 	chatController := handlerChat.New(chatServices)
@@ -179,6 +203,9 @@ func main() {
 	routes.RouteWithdraw(e, withdrawController, *config)
 	routes.RouteBundle(e, bundleController, *config)
 	routes.RouteCounseling(e, counselingController, *config)
+	routes.RouteCounselingMethod(e, counselingMethodController, *config)
+	routes.RouteCounselingDuration(e, counselingDurationController, *config)
+	routes.RouteCounselingTopic(e, counselingTopicController, *config)
 	routes.RouteChat(e, chatController, *config)
 	routes.RouteMessage(e, messageController, *config)
 	routes.RouteChatBot(e, chatbotController, *config)

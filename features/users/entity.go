@@ -48,6 +48,7 @@ type UserHandlerInterface interface {
 	ResetPassword() echo.HandlerFunc
 	ForgetPasswordVerify() echo.HandlerFunc
 	UpdateProfile() echo.HandlerFunc
+	RefreshToken() echo.HandlerFunc
 }
 
 type UserServiceInterface interface {

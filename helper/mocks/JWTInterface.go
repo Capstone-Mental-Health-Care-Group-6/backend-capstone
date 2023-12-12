@@ -117,6 +117,32 @@ func (_m *JWTInterface) GetID(c echo.Context) (uint, error) {
 	return r0, r1
 }
 
+// RefreshJWT provides a mock function with given fields: accessToken, refreshToken
+func (_m *JWTInterface) RefreshJWT(accessToken string, refreshToken *jwt.Token) (map[string]interface{}, error) {
+	ret := _m.Called(accessToken, refreshToken)
+
+	var r0 map[string]interface{}
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, *jwt.Token) (map[string]interface{}, error)); ok {
+		return rf(accessToken, refreshToken)
+	}
+	if rf, ok := ret.Get(0).(func(string, *jwt.Token) map[string]interface{}); ok {
+		r0 = rf(accessToken, refreshToken)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]interface{})
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, *jwt.Token) error); ok {
+		r1 = rf(accessToken, refreshToken)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ValidateToken provides a mock function with given fields: token
 func (_m *JWTInterface) ValidateToken(token string) (*jwt.Token, error) {
 	ret := _m.Called(token)
