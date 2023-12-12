@@ -237,6 +237,7 @@ func (pdata *DoctorData) Insert(newData doctor.Doctor) (*doctor.Doctor, error) {
 	dbData.DoctorName = newData.DoctorName
 	dbData.UserID = newData.UserID
 	dbData.DoctorNIK = newData.DoctorNIK
+	dbData.DoctorDOB = newData.DoctorDOB
 	dbData.DoctorProvinsi = newData.DoctorProvinsi
 	dbData.DoctorKota = newData.DoctorKota
 	dbData.DoctorNumberPhone = newData.DoctorNumberPhone

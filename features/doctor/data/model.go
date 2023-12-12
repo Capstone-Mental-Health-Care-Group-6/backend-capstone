@@ -16,7 +16,7 @@ type Doctor struct {
 	DoctorProvinsi    string `gorm:"column:doctor_provinsi;type:varchar(255)"`
 	DoctorKota        string `gorm:"column:doctor_kota;type:varchar(255)"`
 	DoctorNumberPhone string `gorm:"column:doctor_number_phone;type:varchar(255)"`
-	DoctorGender      string `gorm:"column:doctor_gender;type:enum('request','confirmed')"`
+	DoctorGender      string `gorm:"column:doctor_gender;type:enum('laki','perempuan')"`
 	DoctorAvatar      string `gorm:"column:doctor_avatar;type:varchar(255)"`
 	DoctorDescription string `gorm:"column:doctor_description;type:varchar(255)"`
 
