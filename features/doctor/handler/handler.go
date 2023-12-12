@@ -78,6 +78,10 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
+		if result.ID == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
+		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
@@ -96,6 +100,10 @@ func (mdl *DoctorHandler) GetDoctorByUserId() echo.HandlerFunc {
 		if err != nil {
 			c.Logger().Error("Handler : Get By User ID Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		if result.ID == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -687,6 +695,51 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 	}
 }
 
+func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		var paramIDPatient = c.Param("patient")
+		patientID, err := strconv.Atoi(paramIDPatient)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid Patient ID"))
+		}
+
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+
+		if role != "Patient" && role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+		}
+
+		var input = new(doctor.DoctorRating)
+		if err := c.Bind(input); err != nil {
+			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		var serviceInput = new(doctor.DoctorRating)
+
+		serviceInput.DoctorReview = input.DoctorReview
+		serviceInput.DoctorStarRating = input.DoctorStarRating
+
+		result, err := mdl.svc.UpdateDoctorRating(id, patientID, *serviceInput)
+
+		if err != nil {
+			c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
 func (mdl *DoctorHandler) DeleteDoctor() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var paramID = c.Param("id")
@@ -759,6 +812,17 @@ func (mdl *DoctorHandler) DeleteDoctorData() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Info("Handler: Delete Process Error (Delete Doctor Experience): ", err.Error())
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor experience data", nil))
+			}
+
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success", result))
+
+		} else if paramType == "rating" {
+
+			result, err := mdl.svc.DeleteDoctorRating(id)
+
+			if err != nil {
+				c.Logger().Info("Handler: Delete Process Error (Delete Doctor Rating): ", err.Error())
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create doctor experience data", nil))
 			}
 

@@ -196,6 +196,7 @@ type DoctorHandlerInterface interface {
 	UpdateDoctorWorkdays() echo.HandlerFunc
 	UpdateDoctorEducation() echo.HandlerFunc
 	UpdateDoctorExperience() echo.HandlerFunc
+	UpdateDoctorRating() echo.HandlerFunc
 	InsertDataDoctor() echo.HandlerFunc
 	DeleteDoctor() echo.HandlerFunc
 	DeleteDoctorData() echo.HandlerFunc
@@ -226,11 +227,12 @@ type DoctorServiceInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorEducation) (bool, error)
+	UpdateDoctorRating(id int, patientID int, newData DoctorRating) (bool, error)
 	DeleteDoctor(doctorID int) (bool, error)
-	// DeleteDoctorDatapokok(doctorID int) (bool, error)
 	DeleteDoctorExperience(doctorID int) (bool, error)
 	DeleteDoctorWorkdays(doctorID int) (bool, error)
 	DeleteDoctorEducation(doctorID int) (bool, error)
+	DeleteDoctorRating(doctorID int) (bool, error)
 }
 
 type DoctorDataInterface interface {
@@ -251,9 +253,11 @@ type DoctorDataInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorEducation) (bool, error)
+	UpdateDoctorRating(id int, pateintID int, newData DoctorRating) (bool, error)
 	DeleteDoctor(doctorID int) (bool, error)
 	// DeleteDoctorDatapokok(doctorID int) (bool, error)
 	DeleteDoctorExperience(doctorID int) (bool, error)
 	DeleteDoctorWorkdays(doctorID int) (bool, error)
 	DeleteDoctorEducation(doctorID int) (bool, error)
+	DeleteDoctorRating(doctorID int) (bool, error)
 }

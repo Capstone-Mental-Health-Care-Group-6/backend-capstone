@@ -32,12 +32,12 @@ type Transaction struct {
 }
 
 type TransactionInfo struct {
-	TopicName     string   `json:"topic_name"`
-	PatientName   string   `json:"patient_name"`
+	TopicName     string `json:"topic_name"`
+	PatientName   string `json:"patient_name"`
 	PatientAvatar string `json:"patient_avatar"`
-	DoctorName    string   `json:"doctor_name"`
-	MethodName    string   `json:"method_name"`
-	DurationName  string   `json:"duration_name"`
+	DoctorName    string `json:"doctor_name"`
+	MethodName    string `json:"method_name"`
+	DurationName  string `json:"duration_name"`
 	CounselingID  uint   `json:"counseling_id"`
 
 	UserID     uint   `json:"user_id"`
@@ -50,12 +50,16 @@ type TransactionInfo struct {
 	PriceCounseling uint `json:"price_counseling"`
 	PriceResult     uint `json:"price_result"`
 
-	PaymentProof  string         `json:"payment_proof"`
-	PaymentStatus uint           `json:"payment_status"`
-	PaymentType   string         `json:"payment_type"`
-	CreatedAt     time.Time      `json:"created_at" gorm:"column:created_at"`
-	UpdatedAt     time.Time      `json:"updated_at" gorm:"column:updated_at"`
-	// Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
+	PaymentProof  string `json:"payment_proof"`
+	PaymentStatus uint   `json:"payment_status"`
+	PaymentType   string `json:"payment_type"`
+
+	DoctorRatingID   uint   `json:"doctor_rating_id"`
+	DoctorStarRating uint   `json:"doctor_star_rating"`
+	DoctorReview     string `json:"doctor_review"`
+
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"column:updated_at"`
 }
 
 type CounselingSession struct {

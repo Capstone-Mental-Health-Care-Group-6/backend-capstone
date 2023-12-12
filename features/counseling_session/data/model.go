@@ -17,7 +17,7 @@ type CounselingSession struct {
 	Date            time.Time `gorm:"column:date"`
 	Time            time.Time `gorm:"column:time"`
 	Duration        uint      `gorm:"column:duration"`
-	Status          string    `gorm:"column:status;type:enum('process','done')"`
+	Status          string    `gorm:"column:status;type:enum('rejected','pending','not_finished','finished')"`
 }
 
 func (CounselingSession) TableName() string {

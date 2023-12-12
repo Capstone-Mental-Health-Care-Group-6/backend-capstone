@@ -88,7 +88,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = transaction.DurationID
-		newData.Status = "not_finished"
+		newData.Status = "pending"
 		// MASUKIN DATA
 
 		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {
@@ -103,23 +103,28 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 	var transactionInfos []transaction.TransactionInfo
 	// var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Select("user_id, midtrans_id, payment_status, payment_type, price_result").Find(&transactionInfos)
 	var qry = ad.db.Table("transactions").Select(`
-	transactions.*,
-		counseling_topics.name as topic_name,
-		patient_accounts.name as patient_name,
-		patient_accounts.avatar as patient_avatar,
-		doctors.doctor_name as doctor_name,
-		counseling_methods.name as method_name,
-		counseling_durations.name as duration_name,
-		transactions.created_at,
-		transactions.updated_at
-	`).
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctor_ratings.id as doctor_rating_id,
+        doctor_ratings.doctor_star_rating,
+        doctor_ratings.doctor_review
+    `).
 		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctor_ratings ON doctor_ratings.doctor_id = transactions.doctor_id").
 		Where("transactions.midtrans_id = ?", id).
 		Where("transactions.deleted_at is null")
+
 	if qry.Error != nil {
 		return nil, qry.Error
 	}
@@ -161,21 +166,25 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 	var transactionInfo []transaction.TransactionInfo
 
 	var qry = ad.db.Table("transactions").Select(`
-		transactions.*,
-		counseling_topics.name as topic_name,
-		patient_accounts.name as patient_name,
-		patient_accounts.avatar as patient_avatar,
-		doctors.doctor_name as doctor_name,
-		counseling_methods.name as method_name,
-		counseling_durations.name as duration_name,
-		transactions.created_at,
-		transactions.updated_at
-	`).
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctor_ratings.id as doctor_rating_id,
+        doctor_ratings.doctor_star_rating,
+        doctor_ratings.doctor_review
+    `).
 		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
 		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctor_ratings ON doctor_ratings.doctor_id = transactions.doctor_id").
 		Where("transactions.user_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -230,6 +239,16 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
 
 	if err := ad.db.Create(dbData).Error; err != nil {
+		return nil, err
+	}
+
+	var dbDataRating = new(data.DoctorRating)
+	dbDataRating.DoctorID = newData.DoctorID
+	dbDataRating.DoctorReview = ""
+	dbDataRating.DoctorStarRating = 0
+	dbDataRating.PatientID = newData.PatientID
+
+	if err := ad.db.Create(dbDataRating).Error; err != nil {
 		return nil, err
 	}
 
@@ -289,6 +308,12 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 			return false, err
 		}
 
+		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
+		if err := ad.db.Table("doctors_expertise_relation").Where("doctor_id = ?", existingData.DoctorID).First(&existingDataDoctorRelation).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
 		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
@@ -303,6 +328,22 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 
 		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 			return false, errors.New("Update Data Error, No Data Affected")
+		}
+
+		var newData = new(CounselingSession.CounselingSession)
+		newData.TransactionID = existingData.ID
+		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
+		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
+		newData.DoctorName = existingDataDoctor.DoctorName
+		newData.UserID = existingData.UserID
+		newData.Date = time.Now()
+		newData.Time = time.Now()
+		newData.Duration = existingData.DurationID
+		newData.Status = "pending"
+		// MASUKIN DATA
+
+		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {
+			return false, err
 		}
 	}
 

@@ -459,6 +459,32 @@ func (pdata *DoctorData) UpdateDoctorWorkdays(id int, doctorID int, newData doct
 	return true, nil
 }
 
+func (pdata *DoctorData) UpdateDoctorRating(id int, patientID int, newData doctor.DoctorRating) (bool, error) {
+
+	var checkData doctor.DoctorRating
+
+	qryCheck := pdata.db.Table("doctors_rating").Where("id = ?", id).First(&checkData)
+
+	if err := qryCheck.Error; err != nil {
+		return false, nil
+	}
+
+	if int(checkData.PatientID) != patientID {
+		return false, nil
+	}
+
+	qry := pdata.db.Table("doctors_rating").Where("id = ?", id).Updates(doctor.DoctorRating{
+		DoctorStarRating: newData.DoctorStarRating,
+		DoctorReview:     newData.DoctorReview,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (pdata *DoctorData) DeleteDoctorWorkdays(doctorID int) (bool, error) {
 	var deleteData = new(doctor.DoctorWorkdays)
 
@@ -489,10 +515,20 @@ func (pdata *DoctorData) DeleteDoctorEducation(doctorID int) (bool, error) {
 	return true, nil
 }
 
+func (pdata *DoctorData) DeleteDoctorRating(doctorID int) (bool, error) {
+	var deleteData = new(doctor.DoctorRating)
+
+	if err := pdata.db.Table("doctors_education").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (pdata *DoctorData) DeleteDoctor(doctorID int) (bool, error) {
 	var deleteData = new(doctor.DoctorAll)
 
-	if err := pdata.db.Table("doctor").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
+	if err := pdata.db.Table("doctors_rating").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
 		return false, err
 	}
 
