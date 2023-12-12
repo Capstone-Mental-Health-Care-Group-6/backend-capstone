@@ -32,30 +32,30 @@ type Transaction struct {
 }
 
 type TransactionInfo struct {
-	TopicName    uint `json:"topic_name"`
-	PatientName  uint `json:"patient_name"`
-	DoctorName   uint `json:"doctor_name"`
-	MethodName   uint `json:"method_name"`
-	DurationName uint `json:"duration_name"`
-	CounselingID uint `json:"counseling_id"`
+	TopicName     uint   `json:"topic_name"`
+	PatientName   uint   `json:"patient_name"`
+	PatientAvatar string `json:"patient_avatar"`
+	DoctorName    uint   `json:"doctor_name"`
+	MethodName    uint   `json:"method_name"`
+	DurationName  uint   `json:"duration_name"`
+	CounselingID  uint   `json:"counseling_id"`
 
 	UserID     uint   `json:"user_id"`
 	MidtransID string `json:"transaction_id"`
 
-	CounselingSession CounselingSession `json:"counseling_session"`
-	CounselingType    string            `json:"counseling_type"`
+	CounselingType string `json:"counseling_type"`
 
 	PriceMethod     uint `json:"price_method"`
 	PriceDuration   uint `json:"price_duration"`
 	PriceCounseling uint `json:"price_counseling"`
 	PriceResult     uint `json:"price_result"`
 
-	PaymentProof  string       `json:"payment_proof"`
-	PaymentStatus uint         `json:"payment_status"`
-	PaymentType   string       `json:"payment_type"`
-	CreatedAt     time.Time    `json:"created_at" gorm:"column:created_at"`
-	UpdatedAt     time.Time    `json:"updated_at" gorm:"column:updated_at"`
-	Ratings       DoctorRating `json:"ratings"`
+	PaymentProof  string         `json:"payment_proof"`
+	PaymentStatus uint           `json:"payment_status"`
+	PaymentType   string         `json:"payment_type"`
+	CreatedAt     time.Time      `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt     time.Time      `json:"updated_at" gorm:"column:updated_at"`
+	Ratings       []DoctorRating `json:"ratings"`
 }
 
 type CounselingSession struct {
@@ -64,6 +64,14 @@ type CounselingSession struct {
 	Time          time.Time `json:"time"`
 	Duration      uint      `json:"duration"`
 	Status        string    `json:"status"`
+}
+
+type DoctorRating struct {
+	ID               uint   `json:"id"`
+	DoctorID         uint   `json:"doctor_id"`
+	PatientID        uint   `json:"patient_id"`
+	DoctorStarRating uint   `json:"doctor_star_rating"`
+	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
 }
 
 type PaymentProofDataModel struct {
@@ -78,14 +86,6 @@ type UpdateTransactionManual struct {
 	PriceResult     uint   `json:"price_result"`
 	PaymentStatus   uint   `json:"payment_status"`
 	PaymentType     string `json:"payment_type"`
-}
-
-type DoctorRating struct {
-	ID               uint   `json:"id"`
-	DoctorID         uint   `json:"doctor_id"`
-	PatientID        uint   `json:"patient_id"`
-	DoctorStarRating uint   `json:"doctor_star_rating"`
-	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
 }
 
 type UpdateTransaction struct {

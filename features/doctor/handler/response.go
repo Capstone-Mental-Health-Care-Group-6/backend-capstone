@@ -12,7 +12,7 @@ type DoctorResponse struct {
 	DoctorDOB         string `json:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_numberphone"`
+	DoctorNumberPhone string `json:"doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender"`
 
 	DoctorMeetLink  string `json:"doctor_meet_link"`

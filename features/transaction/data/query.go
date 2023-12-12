@@ -139,16 +139,15 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 	// 	Where("articles.deleted_at is null").
 	// 	Scan(&listArticle)
 
-	var qry = ad.db.Table("transactions").Select("transactions.*, counseling_topics.name as topic_name, patient_accounts.name as patient_name,doctors.doctor_name as doctor_name, counseling_methods.name as method_name, counseling_durations.name as duration_name, counseling_session.* as counseling_session, doctor_rating.* as ratings").
+	var qry = ad.db.Table("transactions").Select("transactions.*, counseling_topics.name as topic_name, patient_accounts.name as patient_name,patient_accounts.avatar as patient_avatar,doctors.doctor_name as doctor_name, counseling_methods.name as method_name, counseling_durations.name as duration_name, doctors_rating.*").
 		Joins("LEFT JOIN counseling_topics on counseling_topics.id = transactions.topic_id").
 		Joins("LEFT JOIN patient_accounts on patient_accounts.id = transactions.patient_id").
 		Joins("LEFT JOIN doctors on doctors.id = transactions.doctor_id").
 		Joins("LEFT JOIN counseling_methods on counseling_methods.id = transactions.method_id").
-		Joins("LEFT JOIN counseling_session on counseling_session.id = transactions.counseling_session").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		Joins("LEFT JOIN doctor_rating ON doctor_rating.doctor_id = transactions.counseling_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("user_id = ?", id).
-		Where("articles.deleted_at is null").
+		Where("transactions.deleted_at is null").
 		Scan(&transactionInfo)
 
 	if sort != "" {
