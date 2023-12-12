@@ -114,6 +114,7 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 
 func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/counseling", ph.GetAllCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/user/:id", ph.GetCounselingByUserID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/counseling/:id", ph.GetCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))

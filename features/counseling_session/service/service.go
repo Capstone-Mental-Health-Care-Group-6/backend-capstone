@@ -52,6 +52,14 @@ func (s *CounselingSessionService) GetCounseling(id int) (*counselingsession.Cou
 	return result, nil
 }
 
+func (s *CounselingSessionService) GetAllCounselingByUserID(userID int) ([]counselingsession.CounselingSession, error) {
+	result, err := s.d.GetAllCounselingByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
 func (s *CounselingSessionService) UpdateCounseling(id int, input counselingsession.CounselingSession) (bool, error) {
 
 	newData := counselingsession.CounselingSession{
