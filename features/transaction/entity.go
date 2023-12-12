@@ -32,12 +32,12 @@ type Transaction struct {
 }
 
 type TransactionInfo struct {
-	TopicName     uint   `json:"topic_name"`
-	PatientName   uint   `json:"patient_name"`
+	TopicName     string   `json:"topic_name"`
+	PatientName   string   `json:"patient_name"`
 	PatientAvatar string `json:"patient_avatar"`
-	DoctorName    uint   `json:"doctor_name"`
-	MethodName    uint   `json:"method_name"`
-	DurationName  uint   `json:"duration_name"`
+	DoctorName    string   `json:"doctor_name"`
+	MethodName    string   `json:"method_name"`
+	DurationName  string   `json:"duration_name"`
 	CounselingID  uint   `json:"counseling_id"`
 
 	UserID     uint   `json:"user_id"`
