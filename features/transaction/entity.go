@@ -50,12 +50,12 @@ type TransactionInfo struct {
 	PriceCounseling uint `json:"price_counseling"`
 	PriceResult     uint `json:"price_result"`
 
-	PaymentProof  string         `json:"payment_proof"`
-	PaymentStatus uint           `json:"payment_status"`
-	PaymentType   string         `json:"payment_type"`
-	CreatedAt     time.Time      `json:"created_at" gorm:"column:created_at"`
-	UpdatedAt     time.Time      `json:"updated_at" gorm:"column:updated_at"`
-	Ratings       []DoctorRating `json:"ratings" gorm:"foreignkey:DoctorID"`
+	PaymentProof  string    `json:"payment_proof"`
+	PaymentStatus uint      `json:"payment_status"`
+	PaymentType   string    `json:"payment_type"`
+	CreatedAt     time.Time `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt     time.Time `json:"updated_at" gorm:"column:updated_at"`
+	// Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
 }
 
 type CounselingSession struct {
