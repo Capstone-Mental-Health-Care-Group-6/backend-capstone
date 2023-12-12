@@ -133,25 +133,27 @@ func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, e
 func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.TransactionInfo, error) {
 	var transactionInfo []transaction.TransactionInfo
 
-	// var qry = ad.db.Table("articles").Select("articles.*,users.name as user_name,article_categories.name as category_name").
-	// 	Joins("LEFT JOIN users on users.id = articles.user_id").Joins("LEFT JOIN article_categories ON article_categories.id = articles.category_id").
-	// 	Where("articles.id = ?", id).
-	// 	Where("articles.deleted_at is null").
-	// 	Scan(&listArticle)
-
-	var qry = ad.db.Table("transactions").Select("transactions.*, counseling_topics.name as topic_name, patient_accounts.name as patient_name,patient_accounts.avatar as patient_avatar,doctors.doctor_name as doctor_name, counseling_methods.name as method_name, counseling_durations.name as duration_name").
-		Joins("LEFT JOIN counseling_topics on counseling_topics.id = transactions.topic_id").
-		Joins("LEFT JOIN patient_accounts on patient_accounts.id = transactions.patient_id").
-		Joins("LEFT JOIN doctors on doctors.id = transactions.doctor_id").
-		Joins("LEFT JOIN counseling_methods on counseling_methods.id = transactions.method_id").
+	var qry = ad.db.Table("transactions").Select(`
+		transactions.*,
+		counseling_topics.name as topic_name,
+		patient_accounts.name as patient_name,
+		patient_accounts.avatar as patient_avatar,
+		doctors.doctor_name as doctor_name,
+		counseling_methods.name as method_name,
+		counseling_durations.name as duration_name,
+		transactions.created_at,
+		transactions.updated_at
+	`).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
-		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.user_id = ?", id).
-		Where("transactions.deleted_at is null").
-		Scan(&transactionInfo)
+		Where("transactions.deleted_at is null")
 
 	if sort != "" {
-		qry = qry.Where("payment_type = ?", sort)
+		qry = qry.Where("transactions.payment_type = ?", sort)
 	}
 
 	qry = qry.Find(&transactionInfo)
@@ -162,6 +164,7 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 
 	return transactionInfo, nil
 }
+
 
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
 	if newData.DoctorID == 0 {
