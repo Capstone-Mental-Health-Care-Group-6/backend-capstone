@@ -78,7 +78,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = transaction.DurationID
-		newData.Status = "process"
+		newData.Status = "not_finished"
 		// MASUKIN DATA
 
 		if err := ad.db.Table("counseling_session").Create(newData).Error; err != nil {

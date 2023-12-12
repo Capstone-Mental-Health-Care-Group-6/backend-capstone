@@ -50,6 +50,84 @@ func All() []seed.Seed {
 				return CreateArticleCategory(db, "Umum")
 			},
 		},
+		{
+			Name: "CreateCounselingMethod1",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingMethod(db, "Chat", 20000)
+			},
+		},
+		{
+			Name: "CreateCounselingMethod2",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingMethod(db, "VideoCall", 40000)
+			},
+		},
+		{
+			Name: "CreateCounselingDuration1",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingDuration(db, "60 Minute", 10000)
+			},
+		},
+		{
+			Name: "CreateCounselingDuration2",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingDuration(db, "90 Minute", 20000)
+			},
+		},
+		{
+			Name: "CreateCounselingTopic1",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Pekerjaan")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic2",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Kendali Emosi")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic3",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Percintaan")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic4",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Pendidikan")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic5",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Keluarga")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic6",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Kecanduan")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic7",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Kesepian")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic8",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Sosial")
+			},
+		},
+		{
+			Name: "CreateCounselingTopic9",
+			Run: func(db *gorm.DB) error {
+				return CreateCounselingTopic(db, "Lainnya")
+			},
+		},
 	}
 	return seeds
 }

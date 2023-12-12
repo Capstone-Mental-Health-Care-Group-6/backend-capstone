@@ -55,6 +55,7 @@ type ArticleHandlerInterface interface {
 	ArticleDashboard() echo.HandlerFunc
 	DenyArticle() echo.HandlerFunc
 	ApproveArticle() echo.HandlerFunc
+	GetArticlesByDoctorID() echo.HandlerFunc
 }
 
 type ArticleServiceInterface interface {
@@ -65,6 +66,7 @@ type ArticleServiceInterface interface {
 	ArticleDashboard() (ArticleDashboard, error)
 	DenyArticle(id int) (bool, error)
 	ApproveArticle(id int) (bool, error)
+	GetArticleByDoctor(id int) ([]ArticleInfo, error)
 }
 
 type ArticleDataInterface interface {
@@ -75,4 +77,5 @@ type ArticleDataInterface interface {
 	ArticleDashboard() (ArticleDashboard, error)
 	Deny(id int) (bool, error)
 	Approve(id int) (bool, error)
+	GetByIDDoctor(id int) ([]ArticleInfo, error)
 }

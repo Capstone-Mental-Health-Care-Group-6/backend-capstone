@@ -164,3 +164,18 @@ func (ad *ArticleData) getTotalArticle() (int, int, int) {
 
 	return totalArticleInt, totalArticleBaruInt, totalArticlePendingInt
 }
+
+func (ad *ArticleData) GetByIDDoctor(id int) ([]articles.ArticleInfo, error) {
+	var listArticle = []articles.ArticleInfo{}
+	var qry = ad.db.Table("articles").Select("articles.*,users.name as user_name,article_categories.name as category_name").
+		Joins("LEFT JOIN users on users.id = articles.user_id").Joins("LEFT JOIN article_categories ON article_categories.id = articles.category_id").
+		Where("users.id = ?", id).
+		Where("articles.deleted_at is null").
+		Order("articles.created_at DESC")
+
+	if err := qry.Scan(&listArticle).Error; err != nil {
+		logrus.Info("DB error : ", err.Error())
+		return nil, err
+	}
+	return listArticle, nil
+}

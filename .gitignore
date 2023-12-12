@@ -1,8 +1,3 @@
-# Exclude specific files and directories
-main.go
-utils/
-configs/
-
 # Exclude system-specific files
 .DS_Store
 
