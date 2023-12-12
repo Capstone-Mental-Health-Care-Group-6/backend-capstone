@@ -234,10 +234,6 @@ func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
-		if len(result) == 0 {
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
-		}
-
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
