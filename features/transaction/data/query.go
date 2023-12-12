@@ -150,7 +150,7 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
 		Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
-		Where("user_id = ?", id).
+		Where("transactions.user_id = ?", id).
 		Where("transactions.deleted_at is null").
 		Scan(&transactionInfo)
 
