@@ -34,7 +34,7 @@ func (as *TransactionService) GetTransactions(sort string) ([]transaction.Transa
 	return result, nil
 }
 
-func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.Transaction, error) {
+func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.TransactionInfo, error) {
 	result, err := as.d.GetByID(id, sort)
 	if err != nil {
 		return nil, errors.New("Get By ID Process Failed")
