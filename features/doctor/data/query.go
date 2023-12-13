@@ -321,3 +321,8 @@ func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*docto
 
 	return &newData, nil
 }
+
+func (pdata *DoctorData) IsLinkUsed(meetLink string) bool {
+
+	return true
+}

@@ -6,7 +6,9 @@ import (
 	"FinalProject/helper"
 	"FinalProject/utils/cloudinary"
 	"errors"
+	"fmt"
 	"math/rand"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -249,4 +251,25 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 		return "", errors.New("Upload Ijazah Failed")
 	}
 	return uploadUrl, nil
+}
+
+func (psvc *DoctorService) GetMeetLink() (string, error) {
+
+	allMeetLinks := []string{
+		"meetlink1",
+		"meetlink2",
+		// Tambahkan link-link lainnya
+	}
+
+	random := rand.New(rand.NewSource(time.Now().UnixNano()))
+	random.Shuffle(len(allMeetLinks), func(i, j int) {
+		allMeetLinks[i], allMeetLinks[j] = allMeetLinks[j], allMeetLinks[i]
+	})
+
+	for _, meetLink := range allMeetLinks {
+		if !psvc.data.IsLinkUsed(meetLink) {
+			return meetLink, nil
+		}
+	}
+	return "", fmt.Errorf("Semua link sudah digunakan")
 }

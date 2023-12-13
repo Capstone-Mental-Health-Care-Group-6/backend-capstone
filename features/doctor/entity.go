@@ -193,6 +193,7 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+	GetMeetLink() (string, error)
 }
 
 type DoctorDataInterface interface {
@@ -208,4 +209,5 @@ type DoctorDataInterface interface {
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
 	FindEmail(userID uint) (*string, error)
+	IsLinkUsed(meetLink string) bool
 }
