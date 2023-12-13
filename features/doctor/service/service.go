@@ -266,3 +266,23 @@ func (psvc *DoctorService) DeleteDoctorRating(doctorID int) (bool, error) {
 	}
 	return result, nil
 }
+
+func (psvc *DoctorService) DoctorDashboard(id int) (doctor.DoctorDashboard, error) {
+	res, err := psvc.data.DoctorDashboard(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}
+
+func (psvc *DoctorService) DoctorDashboardPatient(id int) ([]doctor.DoctorDashboardPatient, error) {
+	res, err := psvc.data.DoctorDashboardPatient(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}

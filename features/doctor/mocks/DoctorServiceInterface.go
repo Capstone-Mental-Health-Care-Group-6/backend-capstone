@@ -311,6 +311,56 @@ func (_m *DoctorServiceInterface) DoctorCVUpload(newData doctor.DoctorCVDataMode
 	return r0, r1
 }
 
+// DoctorDashboard provides a mock function with given fields: id
+func (_m *DoctorServiceInterface) DoctorDashboard(id int) (doctor.DoctorDashboard, error) {
+	ret := _m.Called(id)
+
+	var r0 doctor.DoctorDashboard
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (doctor.DoctorDashboard, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) doctor.DoctorDashboard); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(doctor.DoctorDashboard)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DoctorDashboardPatient provides a mock function with given fields: id
+func (_m *DoctorServiceInterface) DoctorDashboardPatient(id int) ([]doctor.DoctorDashboardPatient, error) {
+	ret := _m.Called(id)
+
+	var r0 []doctor.DoctorDashboardPatient
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) ([]doctor.DoctorDashboardPatient, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) []doctor.DoctorDashboardPatient); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]doctor.DoctorDashboardPatient)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DoctorIjazahUpload provides a mock function with given fields: newData
 func (_m *DoctorServiceInterface) DoctorIjazahUpload(newData doctor.DoctorIjazahDataModel) (string, error) {
 	ret := _m.Called(newData)

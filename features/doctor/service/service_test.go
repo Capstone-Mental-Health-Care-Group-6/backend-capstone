@@ -943,3 +943,61 @@ func TestGetMeetLink(t *testing.T) {
 		meet.AssertExpectations(t)
 	})
 }
+
+func TestDoctorDashboard(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	var dashboard doctor.DoctorDashboard
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("DoctorDashboard", 1).Return(dashboard, errors.New("Process Failed")).Once()
+
+		res, err := service.DoctorDashboard(1)
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Process Failed")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("DoctorDashboard", 1).Return(dashboard, nil).Once()
+
+		res, err := service.DoctorDashboard(1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestDoctorDashboardPatient(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	dashboard := []doctor.DoctorDashboardPatient{}
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("DoctorDashboardPatient", 1).Return(dashboard, errors.New("Process Failed")).Once()
+
+		res, err := service.DoctorDashboardPatient(1)
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Process Failed")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("DoctorDashboardPatient", 1).Return(dashboard, nil).Once()
+
+		res, err := service.DoctorDashboardPatient(1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		data.AssertExpectations(t)
+	})
+}
