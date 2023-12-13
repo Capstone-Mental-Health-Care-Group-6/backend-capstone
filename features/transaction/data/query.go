@@ -153,7 +153,27 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 
 func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, error) {
 	var listTransactions []transaction.TransactionInfo
-	var qry = ad.db.Table("transactions")
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		Where("transactions.deleted_at is null")
 
 	if sort != "" {
 		qry = qry.Where("payment_type = ?", sort)

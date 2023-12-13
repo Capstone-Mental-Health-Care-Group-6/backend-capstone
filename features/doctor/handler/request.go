@@ -95,3 +95,8 @@ type DoctorExperience struct {
 	DoctorStartDate      time.Time `json:"doctor_start_date"`
 	DoctorEndDate        time.Time `json:"doctor_end_date"`
 }
+
+type DoctorRating struct {
+	DoctorStarRating uint   `json:"doctor_star_rating"`
+	DoctorReview     string `json:"doctor_review"`
+}

@@ -718,7 +718,7 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
 		}
 
-		var input = new(doctor.DoctorRating)
+		var input = new(DoctorRating)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))

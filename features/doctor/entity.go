@@ -143,7 +143,7 @@ type DoctorRating struct {
 	PatientID        uint   `json:"patient_id"`
 	TransactionID    string `json:"transaction_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
-	DoctorReview     string `json:"doctor_review;type:varchar(255)"`
+	DoctorReview     string `json:"doctor_review"`
 }
 
 type DoctorEducation struct {
