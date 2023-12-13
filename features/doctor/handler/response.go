@@ -1,6 +1,8 @@
 package handler
 
-import "FinalProject/features/doctor"
+import (
+	"FinalProject/features/doctor"
+)
 
 type DoctorResponse struct {
 	UserID            uint   `json:"user_id"`
@@ -33,4 +35,20 @@ type UpdateResponse struct {
 	ID          uint   `json:"id"`
 	Status      bool   `json:"status_updated"`
 	Description string `json:"description"`
+}
+
+type DashboardResponse struct {
+	TotalPatient          int `json:"total_patient"`
+	TotalJamPraktek       int `json:"total_jam_praktek"`
+	TotalLayananChat      int `json:"total_layanan_chat"`
+	TotalLayananVideoCall int `json:"total_layanan_video_call"`
+}
+
+type ManageResponse struct {
+	DoctorID    uint   `json:"doctor_id"`
+	PatientID   uint   `json:"patient_id"`
+	PatientName string `json:"patient_name"`
+	Gender      string `json:"gender"`
+	Topic       string `json:"topic"`
+	Layanan     string `json:"layanan"`
 }

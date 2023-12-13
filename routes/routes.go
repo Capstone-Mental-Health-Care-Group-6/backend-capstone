@@ -69,8 +69,9 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/dashboard/:id", ph.DoctorDashboard(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/patientlist/:id", ph.DoctorDashboardPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/user/:id", ph.GetDoctorByUserId(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/:type", ph.InsertDataDoctor(), echojwt.JWT([]byte(cfg.Secret)))
@@ -89,9 +90,11 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/withdraw", wh.GetAllWithdrawDokter(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+
 }
 
 func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
