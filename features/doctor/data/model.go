@@ -73,6 +73,14 @@ type DoctorRating struct {
 	DoctorReview     string `gorm:"column:doctor_review;type:varchar(255)"`
 }
 
+//type ManagePatient struct {
+//	*gorm.Model
+//	DoctorID     uint   `gorm:"column:doctor_id"`
+//	PatientID    uint   `gorm:"column:patient_id"`
+//	Alasan       string `gorm:"column:alasan;type:enum('Overbook','Time_limit','The_doctor_has_other_activities')"`
+//	DetailAlasan string `gorm:"column:detail_alasan"`
+//}
+
 func (Doctor) TableName() string {
 	return "doctors"
 }
@@ -96,3 +104,7 @@ func (DoctorEducation) TableName() string {
 func (DoctorExperience) TableName() string {
 	return "doctors_experience"
 }
+
+//func (ManagePatient) TableName() string {
+//	return "manage_patient"
+//}

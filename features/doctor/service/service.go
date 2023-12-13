@@ -282,3 +282,23 @@ func (psvc *DoctorService) UpdateDoctorWorkdays(id int, doctorID int, newData do
 	}
 	return result, nil
 }
+
+func (psvc *DoctorService) DoctorDashboard(id int) (doctor.DoctorDashboard, error) {
+	res, err := psvc.data.DoctorDashboard(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}
+
+func (psvc *DoctorService) DoctorDashboardPatient(id int) ([]doctor.DoctorDashboardPatient, error) {
+	res, err := psvc.data.DoctorDashboardPatient(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}

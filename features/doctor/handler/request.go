@@ -90,3 +90,10 @@ type DoctorInfoExperience struct {
 	DoctorEndDate               time.Time `json:"doctor_end_date"`
 	DoctorIsNow                 bool      `json:"doctor_is_now"`
 }
+
+type ManagePatient struct {
+	DoctorID     uint   `json:"doctor_id"`
+	PatientID    uint   `json:"patient_id"`
+	Alasan       string `json:"alasan"`
+	DetailAlasan string `json:"detail_alasan"`
+}

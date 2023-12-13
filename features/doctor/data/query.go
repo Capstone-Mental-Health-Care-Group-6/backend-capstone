@@ -4,7 +4,6 @@ import (
 	"FinalProject/features/doctor"
 	"FinalProject/features/users"
 	"fmt"
-
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -417,4 +416,56 @@ func (pdata *DoctorData) UpdateDoctorWorkdays(id int, doctorID int, newData doct
 	}
 
 	return true, nil
+}
+
+func (pdata *DoctorData) getTotalConseling(id int) (int, int, int, int) {
+	var totalPatient int64
+	var tipe1 int64
+	var tipe2 int64
+	var totalJamPraktek int64
+	var totalLayananChat int64
+	var totalLayananVideoCall int64
+
+	var _ = pdata.db.Table("transactions").Where("doctor_id = ? ", id).Count(&totalPatient)
+	var _ = pdata.db.Table("transactions").Where("doctor_id = ? AND duration_id = ? ", id, "1").Count(&tipe1)
+	var _ = pdata.db.Table("transactions").Where("doctor_id = ? AND duration_id = ? ", id, "2").Count(&tipe2)
+	var _ = pdata.db.Table("transactions").Where("doctor_id = ? AND method_id = ?", id, "1").Count(&totalLayananChat)
+	var _ = pdata.db.Table("transactions").Where("doctor_id = ? AND method_id = ?", id, "2").Count(&totalLayananVideoCall)
+
+	totalJamPraktek = ((tipe1 * 60) + (tipe2 * 90))
+	totalPatientInt := int(totalPatient)
+	totalJamPraktekInt := int(totalJamPraktek / 60)
+	totalLayananChatInt := int(totalLayananChat)
+	totalLayananVideoCallInt := int(totalLayananVideoCall)
+
+	return totalPatientInt, totalJamPraktekInt, totalLayananChatInt, totalLayananVideoCallInt
+}
+
+func (pdata *DoctorData) DoctorDashboard(id int) (doctor.DoctorDashboard, error) {
+	var dashboardDoctor doctor.DoctorDashboard
+	tPatient, tJamPraktek, tLayananChat, tLayananVideoCall := pdata.getTotalConseling(id)
+
+	dashboardDoctor.TotalPatient = tPatient
+	dashboardDoctor.TotalJamPraktek = tJamPraktek
+	dashboardDoctor.TotalLayananChat = tLayananChat
+	dashboardDoctor.TotalLayananVideoCall = tLayananVideoCall
+
+	return dashboardDoctor, nil
+}
+
+func (pdata *DoctorData) DoctorDashboardPatient(id int) ([]doctor.DoctorDashboardPatient, error) {
+	var doctors = []doctor.DoctorDashboardPatient{}
+
+	var qry = pdata.db.Table("transactions").Select("transactions.*,patient_accounts.name as patient_name,patient_accounts.gender as gender, counseling_topics.name as topic, counseling_methods.name as Layanan").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Where("transactions.doctor_id = ?", id).
+		Where("transactions.deleted_at is null").
+		Scan(&doctors)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+	return doctors, nil
 }

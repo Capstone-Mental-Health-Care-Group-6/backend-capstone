@@ -752,3 +752,56 @@ func (mdl *DoctorHandler) DeleteWorkday() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", nil))
 	}
 }
+
+func (mdl *DoctorHandler) DoctorDashboard() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		res, err := mdl.svc.DoctorDashboard(id)
+
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		var response = new(DashboardResponse)
+		response.TotalPatient = res.TotalPatient
+		response.TotalJamPraktek = res.TotalJamPraktek
+		response.TotalLayananChat = res.TotalLayananChat
+		response.TotalLayananVideoCall = res.TotalLayananVideoCall
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get dashboard doctor", response))
+	}
+}
+
+func (mdl *DoctorHandler) DoctorDashboardPatient() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+		res, err := mdl.svc.DoctorDashboardPatient(id)
+		if err != nil {
+			c.Logger().Error("Handler: Callback process error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", res))
+	}
+}

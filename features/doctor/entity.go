@@ -192,6 +192,28 @@ type DoctorDatapokokUpdate struct {
 	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id"`
 }
 
+type DoctorDashboard struct {
+	TotalPatient          int `json:"total_patient"`
+	TotalJamPraktek       int `json:"total_jam_praktek"`
+	TotalLayananChat      int `json:"total_layanan_chat"`
+	TotalLayananVideoCall int `json:"total_layanan_video_call"`
+}
+
+type DoctorDashboardPatient struct {
+	PatientID   uint   `json:"patient_id"`
+	PatientName string `json:"patient_name"`
+	Gender      string `json:"gender"`
+	Topic       string `json:"topic"`
+	Layanan     string `json:"layanan"`
+}
+
+type DoctorManagePatient struct {
+	DoctorID     uint   `json:"doctor_id"`
+	PatientID    uint   `json:"patient_id"`
+	Alasan       string `json:"alasan"`
+	DetailAlasan string `json:"detail_alasan"`
+}
+
 type DoctorHandlerInterface interface {
 	GetDoctors() echo.HandlerFunc
 	GetDoctor() echo.HandlerFunc
@@ -208,6 +230,8 @@ type DoctorHandlerInterface interface {
 	DeleteWorkday() echo.HandlerFunc
 	DeleteEducation() echo.HandlerFunc
 	DeleteExperience() echo.HandlerFunc
+	DoctorDashboard() echo.HandlerFunc
+	DoctorDashboardPatient() echo.HandlerFunc
 }
 
 type DoctorServiceInterface interface {
@@ -231,6 +255,8 @@ type DoctorServiceInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
+	DoctorDashboard(id int) (DoctorDashboard, error)
+	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
 }
 
 type DoctorDataInterface interface {
@@ -250,4 +276,7 @@ type DoctorDataInterface interface {
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorInfoExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorInfoWorkday) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorInfoEducation) (bool, error)
+	DoctorDashboard(id int) (DoctorDashboard, error)
+	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
+	DoctorManagePatient(id int) (DoctorManagePatient, error)
 }

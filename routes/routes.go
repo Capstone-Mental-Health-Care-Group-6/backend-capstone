@@ -64,6 +64,8 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/dashboard/:id", ph.DoctorDashboard(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/patientlist/:id", ph.DoctorDashboardPatient(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/workday", ph.InsertWorkday(), echojwt.JWT([]byte(cfg.Secret)))
