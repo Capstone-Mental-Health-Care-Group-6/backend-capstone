@@ -248,7 +248,7 @@ func (th *TransactionHandler) GetTransactionByPatientID() echo.HandlerFunc {
 
 		blank := ""
 
-		result, err := th.s.GetTransaction(id, blank)
+		result, err := th.s.GetTransactionByPatientID(id, blank)
 
 		if err != nil {
 			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
