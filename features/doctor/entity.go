@@ -224,6 +224,7 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+	GetMeetLink() (string, error)
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
@@ -250,6 +251,7 @@ type DoctorDataInterface interface {
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
 	FindEmail(userID uint) (*string, error)
+	IsLinkUsed(meetLink string) bool
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)

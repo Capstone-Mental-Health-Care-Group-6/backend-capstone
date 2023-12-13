@@ -17,7 +17,8 @@ func TestGetDoctors(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := []doctor.DoctorAll{}
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -45,7 +46,8 @@ func TestGetDoctor(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var dataDoctor doctor.DoctorAll
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -73,7 +75,8 @@ func TestGetDoctorByUserId(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var dataDoctor doctor.DoctorAll
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -101,7 +104,8 @@ func TestGetDoctorWorkadays(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := []doctor.DoctorWorkdays{}
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -129,7 +133,8 @@ func TestGetDoctorEducation(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := []doctor.DoctorEducation{}
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -157,7 +162,8 @@ func TestGetDoctorExperience(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := []doctor.DoctorExperience{}
 
 	t.Run("Server Error", func(t *testing.T) {
@@ -185,7 +191,8 @@ func TestCreateDoctor(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.Doctor{
 		UserID:            1,
 		DoctorName:        "Hau",
@@ -269,7 +276,8 @@ func TestCreateDoctorExpertise(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorExpertiseRelation{
 		DoctorID:    1,
 		ExpertiseID: 2,
@@ -302,7 +310,8 @@ func TestCreateDoctorWorkadays(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorWorkdays{
 		DoctorID:  1,
 		WorkdayID: 1,
@@ -339,7 +348,8 @@ func TestCreateDoctorEducation(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorEducation{
 		DoctorID:           1,
 		DoctorUniversity:   "univ",
@@ -378,7 +388,8 @@ func TestCreateDoctorExperience(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorExperience{
 		DoctorID:             1,
 		DoctorCompany:        "company",
@@ -419,7 +430,8 @@ func TestDoctorAvatarUpload(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var mockFile multipart.File
 	dataDoctor := doctor.DoctorAvatarPhoto{
 		DoctorAvatar: mockFile,
@@ -451,7 +463,8 @@ func TestDoctorSTRUpload(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var mockFile multipart.File
 	dataDoctor := doctor.DoctorSTRFileDataModel{
 		DoctorSTRFile: mockFile,
@@ -483,7 +496,8 @@ func TestDoctorSIPPUpload(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var mockFile multipart.File
 	dataDoctor := doctor.DoctorSIPPFileDataModel{
 		DoctorSIPPFile: mockFile,
@@ -515,7 +529,8 @@ func TestDoctorCVUpload(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var mockFile multipart.File
 	dataDoctor := doctor.DoctorCVDataModel{
 		DoctorCV: mockFile,
@@ -547,7 +562,8 @@ func TestDoctorIjazahUpload(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	var mockFile multipart.File
 	dataDoctor := doctor.DoctorIjazahDataModel{
 		DoctorIjazah: mockFile,
@@ -579,7 +595,8 @@ func TestUpdateDoctorDatapokok(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorDatapokokUpdate{
 		UserID:            1,
 		DoctorName:        "Hau",
@@ -621,7 +638,8 @@ func TestUpdateDoctorEducation(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorEducation{
 		DoctorID:           1,
 		DoctorUniversity:   "univ",
@@ -654,7 +672,8 @@ func TestUpdateDoctorExperience(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorExperience{
 		DoctorID:             1,
 		DoctorCompany:        "company",
@@ -688,7 +707,8 @@ func TestUpdateDoctorWorkdays(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorWorkdays{
 		DoctorID:  1,
 		WorkdayID: 1,
@@ -720,7 +740,8 @@ func TestUpdateDoctorRating(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 	dataDoctor := doctor.DoctorRating{
 		DoctorID:         1,
 		PatientID:        1,
@@ -753,7 +774,8 @@ func TestDeleteDoctor(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 
 	t.Run("Server Error", func(t *testing.T) {
 		data.On("DeleteDoctor", 1).Return(false, errors.New("Delete Dokter Failed")).Once()
@@ -780,7 +802,8 @@ func TestDeleteDoctorEducation(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 
 	t.Run("Server Error", func(t *testing.T) {
 		data.On("DeleteDoctorEducation", 1).Return(false, errors.New("Delete Education Dokter Failed")).Once()
@@ -807,7 +830,8 @@ func TestDeleteDoctorExperience(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 
 	t.Run("Server Error", func(t *testing.T) {
 		data.On("DeleteDoctorExperience", 1).Return(false, errors.New("Delete Experience Dokter Failed")).Once()
@@ -834,7 +858,8 @@ func TestDeleteDoctorWorkdays(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 
 	t.Run("Server Error", func(t *testing.T) {
 		data.On("DeleteDoctorWorkdays", 1).Return(false, errors.New("Delete Workdays Dokter Failed")).Once()
@@ -861,7 +886,8 @@ func TestDeleteDoctorRating(t *testing.T) {
 	data := mocks.NewDoctorDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	email := mockHelper.NewEmailInterface(t)
-	service := NewDoctor(data, cld, email)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
 
 	t.Run("Server Error", func(t *testing.T) {
 		data.On("DeleteDoctorRating", 1).Return(false, errors.New("Delete Rating Dokter Failed")).Once()
@@ -881,5 +907,39 @@ func TestDeleteDoctorRating(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, true, res)
 		data.AssertExpectations(t)
+	})
+}
+
+func TestGetMeetLink(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	mockMeet := []string{
+		"meet",
+	}
+
+	t.Run("Link Sudah Digunakan", func(t *testing.T) {
+		meet.On("GetMeetLink").Return(mockMeet).Once()
+		data.On("IsLinkUsed", mockMeet[0]).Return(true).Once()
+
+		res, err := service.GetMeetLink()
+
+		assert.Error(t, err)
+		assert.Equal(t, res, "")
+		assert.EqualError(t, err, "Semua link sudah digunakan")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		meet.On("GetMeetLink").Return(mockMeet).Once()
+		data.On("IsLinkUsed", mockMeet[0]).Return(false).Once()
+
+		res, err := service.GetMeetLink()
+
+		assert.Nil(t, err)
+		assert.Equal(t, res, mockMeet[0])
+		data.AssertExpectations(t)
+		meet.AssertExpectations(t)
 	})
 }

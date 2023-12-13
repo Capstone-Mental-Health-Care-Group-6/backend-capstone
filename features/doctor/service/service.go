@@ -2,6 +2,7 @@ package service
 
 import (
 	"FinalProject/features/doctor"
+	"FinalProject/helper"
 	"FinalProject/helper/email"
 	"FinalProject/utils/cloudinary"
 	"errors"
@@ -13,13 +14,15 @@ type DoctorService struct {
 	data  doctor.DoctorDataInterface
 	cld   cloudinary.CloudinaryInterface
 	email email.EmailInterface
+	meet  helper.MeetInterface
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface, meet helper.MeetInterface) doctor.DoctorServiceInterface {
 	return &DoctorService{
 		data:  data,
 		cld:   cloudinary,
 		email: email,
+		meet:  meet,
 	}
 }
 
@@ -170,6 +173,18 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 		return "", errors.New("Upload Ijazah Failed")
 	}
 	return uploadUrl, nil
+}
+
+func (psvc *DoctorService) GetMeetLink() (string, error) {
+	allMeetLinks := psvc.meet.GetMeetLink()
+
+	for _, meetLink := range allMeetLinks {
+		isLink := psvc.data.IsLinkUsed(meetLink)
+		if !isLink {
+			return meetLink, nil
+		}
+	}
+	return "", errors.New("Semua link sudah digunakan")
 }
 
 func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {
