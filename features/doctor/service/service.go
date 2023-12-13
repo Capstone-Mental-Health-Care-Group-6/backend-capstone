@@ -256,9 +256,24 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 func (psvc *DoctorService) GetMeetLink() (string, error) {
 
 	allMeetLinks := []string{
-		"meetlink1",
-		"meetlink2",
-		// Tambahkan link-link lainnya
+		"https://meet.google.com/uoc-ztpf-tqe",
+		"https://meet.google.com/hgn-qqrr-gud",
+		"https://meet.google.com/vxi-ytwh-iok",
+		"https://meet.google.com/aba-bszh-epg",
+		"https://meet.google.com/srg-bbas-quf",
+		"https://meet.google.com/cnh-hevt-pfg",
+		"https://meet.google.com/ijs-briv-zvj",
+		"https://meet.google.com/jco-xazh-ptd",
+		"https://meet.google.com/oej-toid-ipd",
+		"https://meet.google.com/dju-doak-tdj",
+		"https://meet.google.com/zep-heyr-hkw",
+		"https://meet.google.com/mpq-smjx-ags",
+		"https://meet.google.com/tno-gigx-mbb",
+		"https://meet.google.com/evs-ufwy-xvv",
+		"https://meet.google.com/mbu-xbcv-ubr",
+		"https://meet.google.com/xds-yubt-uzm",
+		"https://meet.google.com/raq-nrzg-kky",
+		"https://meet.google.com/kha-kugz-byu",
 	}
 
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))

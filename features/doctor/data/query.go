@@ -323,6 +323,7 @@ func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*docto
 }
 
 func (pdata *DoctorData) IsLinkUsed(meetLink string) bool {
-
-	return true
+	var count int64
+	pdata.db.Table("doctors").Where("doctor_meet_link = ?", meetLink).Count(&count)
+	return count > 0
 }
