@@ -155,7 +155,7 @@ func main() {
 	socket := websocket.NewServer()
 
 	counselingModel := dataCounseling.New(db)
-	counselingServices := serviceCounseling.New(counselingModel, cld)
+	counselingServices := serviceCounseling.New(counselingModel)
 	counselingController := handlerCounseling.New(counselingServices, jwtInterface)
 
 	counselingMethodModel := dataCounselingMethod.New(db)

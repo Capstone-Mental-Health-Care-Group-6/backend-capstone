@@ -192,7 +192,7 @@ type DoctorHandlerInterface interface {
 	GetDoctor() echo.HandlerFunc
 	GetDoctorByUserId() echo.HandlerFunc
 	CreateDoctor() echo.HandlerFunc
-	SearchDoctor() echo.HandlerFunc
+	// SearchDoctor() echo.HandlerFunc
 	UpdateDoctorDatapokok() echo.HandlerFunc
 	UpdateDoctorWorkdays() echo.HandlerFunc
 	UpdateDoctorEducation() echo.HandlerFunc
@@ -207,8 +207,8 @@ type DoctorHandlerInterface interface {
 }
 
 type DoctorServiceInterface interface {
-	GetDoctors() ([]DoctorAll, error)
-	SearchDoctor(name string) ([]DoctorAll, error)
+	GetDoctors(name string) ([]DoctorAll, error)
+	// SearchDoctor(name string) ([]DoctorAll, error)
 	GetDoctor(id int) (*DoctorAll, error)
 	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorExperience, error)
@@ -237,13 +237,13 @@ type DoctorServiceInterface interface {
 }
 
 type DoctorDataInterface interface {
-	GetAll() ([]DoctorAll, error)
+	GetAll(name string) ([]DoctorAll, error)
 	GetByID(id int) (*DoctorAll, error)
 	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetByIDEducation(id int) ([]DoctorEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorWorkdays, error)
 	GetByIDExperience(id int) ([]DoctorExperience, error)
-	SearchDoctor(name string) ([]DoctorAll, error)
+	// SearchDoctor(name string) ([]DoctorAll, error)
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkdays) (*DoctorWorkdays, error)
