@@ -33,6 +33,12 @@ type UserResetPass struct {
 	ExpiresAt time.Time
 }
 
+type UpdateProfile struct {
+	Name     string
+	Email    string
+	Password string
+}
+
 type UserHandlerInterface interface {
 	Register() echo.HandlerFunc
 	Login() echo.HandlerFunc
@@ -41,6 +47,8 @@ type UserHandlerInterface interface {
 	ForgetPasswordWeb() echo.HandlerFunc
 	ResetPassword() echo.HandlerFunc
 	ForgetPasswordVerify() echo.HandlerFunc
+	UpdateProfile() echo.HandlerFunc
+	RefreshToken() echo.HandlerFunc
 }
 
 type UserServiceInterface interface {
@@ -50,6 +58,7 @@ type UserServiceInterface interface {
 	ForgetPasswordWeb(email string) error
 	TokenResetVerify(code string) (*UserResetPass, error)
 	ResetPassword(code, email string, password string) error
+	UpdateProfile(id int, newData UpdateProfile) (bool, error)
 }
 
 type UserDataInterface interface {
@@ -60,4 +69,5 @@ type UserDataInterface interface {
 	DeleteCode(email string) error
 	GetByCode(code string) (*UserResetPass, error)
 	ResetPassword(code, email string, password string) error
+	UpdateProfile(id int, newData UpdateProfile) (bool, error)
 }

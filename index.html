@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSE Demo</title>
+  </head>
+  <body>
+    <h1>Chat Customer Service <br> Capstone EmpathiCare Cuy</h1>
+    <p>Koneksi nya gimana: <span class="status">Disconnected</span></p>
+    <form>
+        <select id="question" name="message">
+            <option value="" disabled selected>Pilih Pertanyaan</option>
+            <option value="bagaimana cara melakukan pendaftaran?">Bagaimana cara melakukan pendaftaran?</option>
+            <option value="apa langkah-langkah untuk login?">Apa langkah-langkah untuk login?</option>
+            <option value="apa yang harus dilakukan jika lupa password?">Apa yang harus dilakukan jika lupa password?</option>
+        </select>
+      <!-- <input type="text" name="message" /> -->
+      <button type="submit">Send</button>
+    </form>
+    <ul></ul>
+  </body>
+  <script>
+    const base_url = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
+    const sse = new EventSource('http://localhost:8000/chatbotcs')
+    const status = document.querySelector('.status')
+    const list = document.querySelector('ul')
+
+    sse.addEventListener('open', () => {
+      console.log('Connection opened')
+      status.textContent = 'Connected'
+    })
+
+    sse.addEventListener('error', () => {
+      console.log('Connection error')
+      status.textContent = 'Disconnected'
+    })
+
+    sse.addEventListener('message', ({ data }) => {
+      const li = document.createElement('li')
+
+      li.appendChild(document.createTextNode(data))
+
+      list.appendChild(li)
+    })
+
+    const form = document.querySelector('form')
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+
+      const formData = new FormData(form)
+      const message = formData.get('message')
+
+      const response = await fetch('http://localhost:8000/chatbotcs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: message,
+        }),
+      })
+
+      if (response.ok) {
+        return form.reset()
+      }
+
+      alert('Could not send message')
+    })
+  </script>
+</html>

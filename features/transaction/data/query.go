@@ -1,11 +1,14 @@
 package data
 
 import (
+	counselingsession "FinalProject/features/counseling_session/data"
 	"FinalProject/features/doctor/data"
 	"FinalProject/features/transaction"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/midtrans/midtrans-go/example"
 	"gorm.io/gorm"
 )
 
@@ -55,6 +58,12 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 			return false, err
 		}
 
+		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
+		if err := ad.db.Table("doctors_expertise_relation").Where("doctor_id = ?", transaction.DoctorID).First(&existingDataDoctorRelation).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
 		newDoctorBalance := existingDataDoctor.DoctorBalance + transaction.PriceResult
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
@@ -70,6 +79,22 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
+
+		var newData = new(counselingsession.CounselingSession)
+		newData.TransactionID = transaction.ID
+		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
+		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
+		newData.DoctorName = existingDataDoctor.DoctorName
+		newData.UserID = transaction.UserID
+		newData.Date = time.Now()
+		newData.Time = time.Now()
+		newData.Duration = transaction.DurationID
+		newData.Status = "pending"
+		// MASUKIN DATA
+
+		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
+			return false, err
+		}
 	}
 
 	return true, nil
@@ -77,7 +102,35 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 
 func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.TransactionInfo, error) {
 	var transactionInfos []transaction.TransactionInfo
-	var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Select("user_id, midtrans_id, payment_status, payment_type, price_result").Find(&transactionInfos)
+	// var qry = ad.db.Table("transactions").Where("midtrans_id = ?", id).Select("user_id, midtrans_id, payment_status, payment_type, price_result").Find(&transactionInfos)
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating as doctor_star_rating,
+        doctors_rating.doctor_review as doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		Where("transactions.midtrans_id = ?", id).
+		Where("transactions.deleted_at is null")
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	qry = qry.Scan(&transactionInfos)
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -101,7 +154,27 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 
 func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, error) {
 	var listTransactions []transaction.TransactionInfo
-	var qry = ad.db.Table("transactions")
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		Where("transactions.deleted_at is null")
 
 	if sort != "" {
 		qry = qry.Where("payment_type = ?", sort)
@@ -116,15 +189,78 @@ func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, e
 	return listTransactions, nil
 }
 
-func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transaction, error) {
-	var transactionInfo []transaction.Transaction
-	var qry = ad.db.Table("transactions").Where("user_id = ?", id)
+func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	var transactionInfo []transaction.TransactionInfo
+
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
+		Where("transactions.user_id = ?", id).
+		Where("transactions.deleted_at is null")
 
 	if sort != "" {
-		qry = qry.Where("payment_type = ?", sort)
+		qry = qry.Where("transactions.payment_type = ?", sort)
 	}
 
-	qry = qry.Find(&transactionInfo)
+	qry = qry.Scan(&transactionInfo)
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	return transactionInfo, nil
+}
+
+func (ad *TransactionData) GetByPatientID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	var transactionInfo []transaction.TransactionInfo
+
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
+		Where("transactions.patient_id = ?", id).
+		Where("transactions.deleted_at is null")
+
+	if sort != "" {
+		qry = qry.Where("transactions.payment_type = ?", sort)
+	}
+
+	qry = qry.Scan(&transactionInfo)
 
 	if qry.Error != nil {
 		return nil, qry.Error
@@ -154,8 +290,6 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.DurationID = newData.DurationID
 	dbData.CounselingID = newData.CounselingID
 	dbData.UserID = newData.UserID
-	dbData.MidtransID = newData.MidtransID
-
 	dbData.CounselingSession = newData.CounselingSession
 	dbData.CounselingType = newData.CounselingType
 
@@ -168,9 +302,26 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.PaymentStatus = newData.PaymentStatus
 	dbData.PaymentType = newData.PaymentType
 
+	if dbData.PaymentType == "manual" {
+		dbData.MidtransID = "M-" + example.Random()
+	} else {
+		dbData.MidtransID = newData.MidtransID
+	}
+
 	fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
 
 	if err := ad.db.Create(dbData).Error; err != nil {
+		return nil, err
+	}
+
+	var dbDataRating = new(data.DoctorRating)
+	dbDataRating.DoctorID = newData.DoctorID
+	dbDataRating.DoctorReview = ""
+	dbDataRating.TransactionID = newData.MidtransID
+	dbDataRating.DoctorStarRating = 0
+	dbDataRating.PatientID = newData.PatientID
+
+	if err := ad.db.Create(dbDataRating).Error; err != nil {
 		return nil, err
 	}
 
@@ -230,6 +381,12 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 			return false, err
 		}
 
+		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
+		if err := ad.db.Table("doctors_expertise_relation").Where("doctor_id = ?", existingData.DoctorID).First(&existingDataDoctorRelation).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
 		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
@@ -244,6 +401,22 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 
 		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 			return false, errors.New("Update Data Error, No Data Affected")
+		}
+
+		var newData = new(counselingsession.CounselingSession)
+		newData.TransactionID = existingData.ID
+		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
+		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
+		newData.DoctorName = existingDataDoctor.DoctorName
+		newData.UserID = existingData.UserID
+		newData.Date = time.Now()
+		newData.Time = time.Now()
+		newData.Duration = existingData.DurationID
+		newData.Status = "pending"
+		// MASUKIN DATA
+
+		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
+			return false, err
 		}
 	}
 

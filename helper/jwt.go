@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -19,6 +20,7 @@ type JWTInterface interface {
 	GetID(c echo.Context) (uint, error)
 	CheckRole(c echo.Context) interface{}
 	CheckID(c echo.Context) interface{}
+	RefreshJWT(accessToken string, refreshToken *jwt.Token) (map[string]any, error)
 }
 
 type JWT struct {
@@ -46,13 +48,13 @@ func (j *JWT) GenerateJWT(userID uint, role, status string) map[string]any {
 	return result
 }
 
-func (j *JWT) RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string]any {
+func (j *JWT) RefreshJWT(accessToken string, refreshToken *jwt.Token) (map[string]any, error) {
 	var result = map[string]any{}
 	expTime, err := refreshToken.Claims.GetExpirationTime()
 
 	if err != nil {
 		logrus.Error("Get Token Expiration Error, ", err.Error())
-		return nil
+		return nil, errors.New("Token Expiration Error")
 	}
 
 	if refreshToken.Valid && expTime.Time.Compare(time.Now()) > 0 {
@@ -63,7 +65,7 @@ func (j *JWT) RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string
 
 		if err != nil {
 			log.Error(err.Error())
-			return nil
+			return nil, errors.New(err.Error())
 		}
 
 		newClaim = newToken.Claims.(jwt.MapClaims)
@@ -79,9 +81,9 @@ func (j *JWT) RefreshJWT(accessToken string, refreshToken *jwt.Token) map[string
 		result["access_token"] = newToken.Raw
 		result["refresh_token"] = newSignedRefreshToken
 
-		return result
+		return result, nil
 	}
-	return nil
+	return nil, errors.New("Refresh Token Not Valid && Expired")
 }
 
 func (j *JWT) GenerateToken(id uint, role, status string) string {

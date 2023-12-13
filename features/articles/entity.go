@@ -1,16 +1,21 @@
 package articles
 
-import "github.com/labstack/echo/v4"
+import (
+	"mime/multipart"
+
+	"github.com/labstack/echo/v4"
+)
 
 type Article struct {
-	ID         uint   `json:"id"`
-	CategoryID uint   `json:"category_id"`
-	UserID     uint   `json:"user_id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	Thumbnail  string `json:"thumbnail"`
-	Status     string `json:"status"`
-	Slug       string `json:"slug"`
+	ID            uint           `json:"id"`
+	CategoryID    uint           `json:"category_id"`
+	UserID        uint           `json:"user_id"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ThumbnailUrl  string         `json:"thumbnail_url"`
+	ThumbnailFile multipart.File `json:"thumbnail"`
+	Status        string         `json:"status"`
+	Slug          string         `json:"slug"`
 }
 
 type ArticleInfo struct {
@@ -25,10 +30,21 @@ type ArticleInfo struct {
 }
 
 type UpdateArticle struct {
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Thumbnail string `json:"thumbnail"`
-	Slug      string `json:"slug"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	ThumbnailUrl  string         `json:"thumbnail_url"`
+	ThumbnailFile multipart.File `json:"thumbnail"`
+	Slug          string         `json:"slug"`
+}
+
+type ThumbnailDataModel struct {
+	ThumbnailPhoto multipart.File `json:"thumbnail"`
+}
+
+type ArticleDashboard struct {
+	TotalArticle        int `json:"total_article"`
+	TotalArticleBaru    int `json:"total_article_baru"`
+	TotalArticlePending int `json:"total_article_pending"`
 }
 
 type ArticleHandlerInterface interface {
@@ -36,21 +52,30 @@ type ArticleHandlerInterface interface {
 	GetArticle() echo.HandlerFunc
 	CreateArticle() echo.HandlerFunc
 	UpdateArticle() echo.HandlerFunc
-	DeleteArticle() echo.HandlerFunc
+	ArticleDashboard() echo.HandlerFunc
+	DenyArticle() echo.HandlerFunc
+	ApproveArticle() echo.HandlerFunc
+	GetArticlesByDoctorID() echo.HandlerFunc
 }
 
 type ArticleServiceInterface interface {
-	GetArticles() ([]ArticleInfo, error)
+	GetArticles(name, kategori string, timePublication, limit int) ([]ArticleInfo, error)
 	GetArticle(id int) ([]ArticleInfo, error)
 	CreateArticle(newData Article) (*Article, error)
 	UpdateArticle(newData UpdateArticle, id int) (bool, error)
-	DeleteArticle(id int) (bool, error)
+	ArticleDashboard() (ArticleDashboard, error)
+	DenyArticle(id int) (bool, error)
+	ApproveArticle(id int) (bool, error)
+	GetArticleByDoctor(id int) ([]ArticleInfo, error)
 }
 
 type ArticleDataInterface interface {
-	GetAll() ([]ArticleInfo, error)
+	GetAll(name, kategori string, timePublication, limit int) ([]ArticleInfo, error)
 	GetByID(id int) ([]ArticleInfo, error)
 	Insert(newData Article) (*Article, error)
 	Update(newData UpdateArticle, id int) (bool, error)
-	Delete(id int) (bool, error)
+	ArticleDashboard() (ArticleDashboard, error)
+	Deny(id int) (bool, error)
+	Approve(id int) (bool, error)
+	GetByIDDoctor(id int) ([]ArticleInfo, error)
 }

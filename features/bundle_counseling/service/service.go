@@ -21,7 +21,7 @@ func New(data bundlecounseling.BundleCounselingDataInterface, cld cloudinary.Clo
 func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCounselingInfo, error) {
 	result, err := s.d.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get All Process Failed")
 	}
 	return result, nil
 }
@@ -45,7 +45,7 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 
 	result, err := s.d.Create(newData)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Create Process Failed")
 	}
 
 	return result, nil
@@ -54,7 +54,7 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCounseling, error) {
 	result, err := s.d.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get By ID Process Failed")
 	}
 
 	return result, nil
@@ -82,7 +82,7 @@ func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.Bu
 
 	result, err := s.d.Update(id, newData)
 	if err != nil {
-		return false, err
+		return false, errors.New("Update Process Failed")
 	}
 
 	return result, nil
@@ -91,7 +91,7 @@ func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.Bu
 func (s *BundleCounselingService) DeleteBundle(id int) (bool, error) {
 	result, err := s.d.Delete(id)
 	if err != nil {
-		return false, err
+		return false, errors.New("Delete Process Failed")
 	}
 
 	return result, nil

@@ -30,7 +30,7 @@ func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
-		if role != "Admin" {
+		if role != "Admin" && role != "Patient" && role != "Doctor" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 

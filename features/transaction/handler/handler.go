@@ -57,6 +57,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
 	}
 }
@@ -174,6 +175,10 @@ func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
+		if len(result) == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
+		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
@@ -210,6 +215,50 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
 		}
 
+		if len(result) == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (th *TransactionHandler) GetTransactionByPatientID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		sortByPaymentType := c.QueryParam("payment_type")
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			logrus.Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+		}
+
+		if sortByPaymentType != "" {
+
+			result, err := th.s.GetTransactionByPatientID(id, sortByPaymentType)
+
+			if err != nil {
+				logrus.Info("Handler : Get All Process Error : ", err.Error())
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			}
+
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+
+		}
+
+		blank := ""
+
+		result, err := th.s.GetTransactionByPatientID(id, blank)
+
+		if err != nil {
+			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+		}
+
+		if len(result) == 0 {
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
+		}
+
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
 	}
 }
@@ -217,11 +266,6 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var paramID = c.Param("id")
-		// id, err := strconv.Atoi(paramID)
-		// if err != nil {
-		// 	logrus.Info("Handler : Param ID Error : ", err.Error())
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
-		// }
 
 		result, err := th.s.GetByIDMidtrans(paramID)
 
@@ -237,11 +281,6 @@ func (th *TransactionHandler) GetTransactionByMidtransID() echo.HandlerFunc {
 func (th *TransactionHandler) UpdateTransaction() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var paramID = c.Param("id")
-		// id, err := strconv.Atoi(paramID)
-		// if err != nil {
-		// 	c.Logger().Info("Handler : Param ID Error : ", err.Error())
-		// 	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
-		// }
 
 		var input = new(UpdateRequest)
 		if err := c.Bind(&input); err != nil {
