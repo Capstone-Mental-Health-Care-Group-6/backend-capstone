@@ -42,6 +42,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi", th.GetTransactions(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/transaksi/:id", th.DeleteTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi/patient/:id", th.GetTransactionByPatientID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/transaksi/:id", th.UpdateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }

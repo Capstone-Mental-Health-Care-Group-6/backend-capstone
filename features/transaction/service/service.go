@@ -37,7 +37,15 @@ func (as *TransactionService) GetTransactions(sort string) ([]transaction.Transa
 func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.TransactionInfo, error) {
 	result, err := as.d.GetByID(id, sort)
 	if err != nil {
-		return nil, errors.New("Get By ID Process Failed")
+		return nil, errors.New("Get By User ID Process Failed")
+	}
+	return result, nil
+}
+
+func (as *TransactionService) GetTransactionByPatientID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	result, err := as.d.GetByPatientID(id, sort)
+	if err != nil {
+		return nil, errors.New("Get By Patient ID Process Failed")
 	}
 	return result, nil
 }

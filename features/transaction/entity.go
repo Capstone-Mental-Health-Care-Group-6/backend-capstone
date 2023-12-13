@@ -100,6 +100,7 @@ type UpdateTransaction struct {
 type TransactionHandlerInterface interface {
 	GetTransactions() echo.HandlerFunc
 	GetTransaction() echo.HandlerFunc
+	GetTransactionByPatientID() echo.HandlerFunc
 	GetTransactionByMidtransID() echo.HandlerFunc
 	CreateTransaction() echo.HandlerFunc
 	NotifTransaction() echo.HandlerFunc
@@ -111,6 +112,7 @@ type TransactionServiceInterface interface {
 	GetTransactions(sort string) ([]TransactionInfo, error)
 	// GetTransactionsSort(sort string) ([]TransactionInfo, error)
 	GetTransaction(id int, sort string) ([]TransactionInfo, error)
+	GetTransactionByPatientID(id int, sort string) ([]TransactionInfo, error)
 	CreateTransaction(newData Transaction) (*Transaction, map[string]interface{}, error)
 	CreateManualTransaction(newData Transaction) (*Transaction, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
@@ -124,6 +126,7 @@ type TransactionDataInterface interface {
 	GetAll(sort string) ([]TransactionInfo, error)
 	// GetAllSort(sort string) ([]TransactionInfo, error)
 	GetByID(id int, sort string) ([]TransactionInfo, error)
+	GetByPatientID(id int, sort string) ([]TransactionInfo, error)
 	GetByIDMidtrans(id string) ([]TransactionInfo, error)
 	Insert(newData Transaction) (*Transaction, error)
 	Update(newData UpdateTransactionManual, id int) (bool, error)

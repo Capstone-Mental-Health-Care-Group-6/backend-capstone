@@ -228,6 +228,46 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 	return transactionInfo, nil
 }
 
+func (ad *TransactionData) GetByPatientID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	var transactionInfo []transaction.TransactionInfo
+
+	var qry = ad.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating,
+        doctors_rating.doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
+		Where("transactions.patient_id = ?", id).
+		Where("transactions.deleted_at is null")
+
+	if sort != "" {
+		qry = qry.Where("transactions.payment_type = ?", sort)
+	}
+
+	qry = qry.Scan(&transactionInfo)
+
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	return transactionInfo, nil
+}
+
 func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction.Transaction, error) {
 	if newData.DoctorID == 0 {
 		return nil, errors.New("Doctor ID not found")
