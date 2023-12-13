@@ -189,3 +189,55 @@ func TestDeleteBundle(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 }
+
+func TestGetAllBundleFilter(t *testing.T) {
+	data := mocks.NewBundleCounselingDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	service := New(data, cld)
+	bundle := []bundlecounseling.BundleCounselingInfo{}
+
+	t.Run("Error Harga Metode", func(t *testing.T) {
+		data.On("HargaMetode", 1).Return(uint(1), errors.New("Get Harga Metode Failed")).Once()
+
+		res, err := service.GetAllBundleFilter("INSTAN", 1, 1)
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Get Harga Metode Failed")
+	})
+
+	t.Run("Error Harga Durasi", func(t *testing.T) {
+		data.On("HargaMetode", 1).Return(uint(1), nil).Once()
+		data.On("HargaDurasi", 1).Return(uint(1), errors.New("Get Harga Durasi Failed")).Once()
+
+		res, err := service.GetAllBundleFilter("INSTAN", 1, 1)
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Get Harga Durasi Failed")
+	})
+
+	t.Run("Error Get All", func(t *testing.T) {
+		data.On("HargaMetode", 1).Return(uint(1), nil).Once()
+		data.On("HargaDurasi", 1).Return(uint(1), nil).Once()
+		data.On("GetAllFilter", "INSTAN").Return(nil, errors.New("Get All Filter Process Failed")).Once()
+
+		res, err := service.GetAllBundleFilter("INSTAN", 1, 1)
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Get All Filter Process Failed")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("HargaMetode", 1).Return(uint(1), nil).Once()
+		data.On("HargaDurasi", 1).Return(uint(1), nil).Once()
+		data.On("GetAllFilter", "INSTAN").Return(bundle, nil).Once()
+
+		res, err := service.GetAllBundleFilter("INSTAN", 1, 1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		data.AssertExpectations(t)
+	})
+}

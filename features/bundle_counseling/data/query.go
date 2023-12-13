@@ -32,6 +32,22 @@ func (bc *BundleCounselingData) GetAll() ([]bundlecounseling.BundleCounselingInf
 	return listBundleCounseling, nil
 }
 
+func (bc *BundleCounselingData) GetAllFilter(jenis string) ([]bundlecounseling.BundleCounselingInfo, error) {
+	var listBundleCounseling = []bundlecounseling.BundleCounselingInfo{}
+
+	var qry = bc.db.Table("bundle_counseling").
+		Select("bundle_counseling.*").
+		Where("bundle_counseling.deleted_at is null").
+		Where("bundle_counseling.type = ?", jenis).
+		Scan(&listBundleCounseling)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return listBundleCounseling, nil
+}
+
 func (bc *BundleCounselingData) Create(input bundlecounseling.BundleCounseling) (*bundlecounseling.BundleCounseling, error) {
 	// var newBundleCounseling = &bundlecounseling.BundleCounseling{
 	// 	Name:         input.Name,
@@ -104,4 +120,20 @@ func (bc *BundleCounselingData) Delete(id int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (bc *BundleCounselingData) HargaMetode(id int) (uint, error) {
+	var harga uint
+	if err := bc.db.Table("counseling_methods").Select("additional_price").Where("id = ?", id).Scan(&harga).Error; err != nil {
+		return 0, err
+	}
+	return harga, nil
+}
+
+func (bc *BundleCounselingData) HargaDurasi(id int) (uint, error) {
+	var harga uint
+	if err := bc.db.Table("counseling_durations").Select("additional_price").Where("id = ?", id).Scan(&harga).Error; err != nil {
+		return 0, err
+	}
+	return harga, nil
 }

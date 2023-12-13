@@ -26,6 +26,46 @@ func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCouns
 	return result, nil
 }
 
+func (s *BundleCounselingService) GetAllBundleFilter(jenis string, metode int, durasi int) ([]bundlecounseling.BundleCounselingInfo, error) {
+
+	var listBundleCounseling = []bundlecounseling.BundleCounselingInfo{}
+
+	if jenis == "INSTAN" {
+		metode = 1
+		durasi = 1
+	}
+
+	hargaMetode, err := s.d.HargaMetode(metode)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get Harga Metode Failed")
+	}
+
+	hargaDurasi, err := s.d.HargaDurasi(durasi)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get Harga Durasi Failed")
+	}
+
+	bundles, err := s.d.GetAllFilter(jenis)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get All Filter Process Failed")
+	}
+
+	for _, bundle := range bundles {
+		listBundleCounseling = append(listBundleCounseling, bundlecounseling.BundleCounselingInfo{
+			ID:           bundle.ID,
+			Name:         bundle.Name,
+			Sessions:     bundle.Sessions,
+			Type:         bundle.Type,
+			Price:        bundle.Price + hargaMetode + hargaDurasi,
+			Description:  bundle.Description,
+			ActivePriode: bundle.ActivePriode,
+			Avatar:       bundle.Avatar,
+		})
+	}
+
+	return listBundleCounseling, nil
+}
+
 func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (*bundlecounseling.BundleCounseling, error) {
 
 	uploadUrl, err := s.cld.UploadImageHelper(file.Avatar)

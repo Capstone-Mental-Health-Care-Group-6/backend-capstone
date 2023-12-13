@@ -89,6 +89,32 @@ func (_m *BundleCounselingServiceInterface) GetAllBundle() ([]bundlecounseling.B
 	return r0, r1
 }
 
+// GetAllBundleFilter provides a mock function with given fields: jenis, metode, durasi
+func (_m *BundleCounselingServiceInterface) GetAllBundleFilter(jenis string, metode int, durasi int) ([]bundlecounseling.BundleCounselingInfo, error) {
+	ret := _m.Called(jenis, metode, durasi)
+
+	var r0 []bundlecounseling.BundleCounselingInfo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, int, int) ([]bundlecounseling.BundleCounselingInfo, error)); ok {
+		return rf(jenis, metode, durasi)
+	}
+	if rf, ok := ret.Get(0).(func(string, int, int) []bundlecounseling.BundleCounselingInfo); ok {
+		r0 = rf(jenis, metode, durasi)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]bundlecounseling.BundleCounselingInfo)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, int, int) error); ok {
+		r1 = rf(jenis, metode, durasi)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetBundle provides a mock function with given fields: id
 func (_m *BundleCounselingServiceInterface) GetBundle(id int) (*bundlecounseling.BundleCounseling, error) {
 	ret := _m.Called(id)

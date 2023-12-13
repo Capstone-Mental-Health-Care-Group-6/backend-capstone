@@ -111,6 +111,7 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 
 func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/bundle", ph.GetAllBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/mobile/bundle", ph.GetAllBundleFilter())
 	e.GET("/bundle/:id", ph.GetBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
@@ -127,18 +128,18 @@ func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandler
 }
 
 func RouteCounselingMethod(e *echo.Echo, mh counselingmethod.CounselingMethodHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/methods", mh.GetCounselingMethods(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/methods/:id", mh.GetCounselingMethod(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/methods", mh.GetCounselingMethods())
+	e.GET("/counseling/methods/:id", mh.GetCounselingMethod())
 }
 
 func RouteCounselingDuration(e *echo.Echo, mh counselingdurations.CounselingDurationHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/durations", mh.GetCounselingDurations(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/durations/:id", mh.GetCounselingDuration(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/durations", mh.GetCounselingDurations())
+	e.GET("/counseling/durations/:id", mh.GetCounselingDuration())
 }
 
 func RouteCounselingTopic(e *echo.Echo, mh counselingtopics.CounselingTopicHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/topics", mh.GetCounselingTopics(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/topics/:id", mh.GetCounselingTopic(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/topics", mh.GetCounselingTopics())
+	e.GET("/counseling/topics/:id", mh.GetCounselingTopic())
 }
 
 func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {

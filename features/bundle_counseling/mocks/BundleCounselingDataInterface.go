@@ -89,6 +89,32 @@ func (_m *BundleCounselingDataInterface) GetAll() ([]bundlecounseling.BundleCoun
 	return r0, r1
 }
 
+// GetAllFilter provides a mock function with given fields: jenis
+func (_m *BundleCounselingDataInterface) GetAllFilter(jenis string) ([]bundlecounseling.BundleCounselingInfo, error) {
+	ret := _m.Called(jenis)
+
+	var r0 []bundlecounseling.BundleCounselingInfo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]bundlecounseling.BundleCounselingInfo, error)); ok {
+		return rf(jenis)
+	}
+	if rf, ok := ret.Get(0).(func(string) []bundlecounseling.BundleCounselingInfo); ok {
+		r0 = rf(jenis)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]bundlecounseling.BundleCounselingInfo)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(jenis)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetById provides a mock function with given fields: id
 func (_m *BundleCounselingDataInterface) GetById(id int) (*bundlecounseling.BundleCounseling, error) {
 	ret := _m.Called(id)
@@ -104,6 +130,54 @@ func (_m *BundleCounselingDataInterface) GetById(id int) (*bundlecounseling.Bund
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*bundlecounseling.BundleCounseling)
 		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// HargaDurasi provides a mock function with given fields: id
+func (_m *BundleCounselingDataInterface) HargaDurasi(id int) (uint, error) {
+	ret := _m.Called(id)
+
+	var r0 uint
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (uint, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) uint); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// HargaMetode provides a mock function with given fields: id
+func (_m *BundleCounselingDataInterface) HargaMetode(id int) (uint, error) {
+	ret := _m.Called(id)
+
+	var r0 uint
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (uint, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) uint); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(uint)
 	}
 
 	if rf, ok := ret.Get(1).(func(int) error); ok {
