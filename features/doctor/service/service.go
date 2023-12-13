@@ -2,12 +2,10 @@ package service
 
 import (
 	"FinalProject/features/doctor"
+	"FinalProject/helper"
 	"FinalProject/helper/email"
 	"FinalProject/utils/cloudinary"
 	"errors"
-	"fmt"
-	"math/rand"
-	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -16,13 +14,15 @@ type DoctorService struct {
 	data  doctor.DoctorDataInterface
 	cld   cloudinary.CloudinaryInterface
 	email email.EmailInterface
+	meet  helper.MeetInterface
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface, meet helper.MeetInterface) doctor.DoctorServiceInterface {
 	return &DoctorService{
 		data:  data,
 		cld:   cloudinary,
 		email: email,
+		meet:  meet,
 	}
 }
 
@@ -176,39 +176,15 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 }
 
 func (psvc *DoctorService) GetMeetLink() (string, error) {
-
-	allMeetLinks := []string{
-		"https://meet.google.com/uoc-ztpf-tqe",
-		"https://meet.google.com/hgn-qqrr-gud",
-		"https://meet.google.com/vxi-ytwh-iok",
-		"https://meet.google.com/aba-bszh-epg",
-		"https://meet.google.com/srg-bbas-quf",
-		"https://meet.google.com/cnh-hevt-pfg",
-		"https://meet.google.com/ijs-briv-zvj",
-		"https://meet.google.com/jco-xazh-ptd",
-		"https://meet.google.com/oej-toid-ipd",
-		"https://meet.google.com/dju-doak-tdj",
-		"https://meet.google.com/zep-heyr-hkw",
-		"https://meet.google.com/mpq-smjx-ags",
-		"https://meet.google.com/tno-gigx-mbb",
-		"https://meet.google.com/evs-ufwy-xvv",
-		"https://meet.google.com/mbu-xbcv-ubr",
-		"https://meet.google.com/xds-yubt-uzm",
-		"https://meet.google.com/raq-nrzg-kky",
-		"https://meet.google.com/kha-kugz-byu",
-	}
-
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
-	random.Shuffle(len(allMeetLinks), func(i, j int) {
-		allMeetLinks[i], allMeetLinks[j] = allMeetLinks[j], allMeetLinks[i]
-	})
+	allMeetLinks := psvc.meet.GetMeetLink()
 
 	for _, meetLink := range allMeetLinks {
-		if !psvc.data.IsLinkUsed(meetLink) {
+		isLink := psvc.data.IsLinkUsed(meetLink)
+		if !isLink {
 			return meetLink, nil
 		}
 	}
-	return "", fmt.Errorf("Semua link sudah digunakan")
+	return "", errors.New("Semua link sudah digunakan")
 }
 
 func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {
