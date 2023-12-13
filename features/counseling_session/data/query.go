@@ -64,6 +64,46 @@ func (bc *CounselingSessionData) GetById(id int) (*counselingsession.CounselingS
 	return result, nil
 }
 
+func (bc *CounselingSessionData) GetAllCounselingByUserID(userID int) ([]counselingsession.CounselingSession, error) {
+	var listCounselingSession = []counselingsession.CounselingSession{}
+
+	var qry = bc.db.Table("counseling_session").
+		Select("counseling_session.*").
+		Where("counseling_session.user_id = ?", userID).
+		Where("counseling_session.deleted_at is null").
+		Scan(&listCounselingSession)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return listCounselingSession, nil
+}
+
+// func (bc *CounselingSessionData) GetByUserId(id int) ([]counselingsession.CounselingSessionInfo, error) {
+// 	// var result = new(counselingsession.CounselingSession)
+// 	var counselingInfo []counselingsession.CounselingSessionInfo
+
+// 	// var qry = bc.db.Table("counseling_session").
+// 	// 	Select("counseling_session.*").
+// 	// 	Where("counseling_session.deleted_at is null").
+// 	// 	Where("counseling_session.id = ?", id).
+// 	// 	Scan(&result)
+
+// 		qry := bc.db.Table("counseling_session").
+// 		Select("counseling_session.*").
+// 		// Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+// 		Where("counseling_session.deleted_at IS NULL").
+// 		Where("counseling_session.id = ?", id).
+// 		Scan(&doctors)
+
+// 	if err := qry.Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return result, nil
+// }
+
 func (bc *CounselingSessionData) Update(id int, input counselingsession.CounselingSession) (bool, error) {
 	var newData = map[string]interface{}{
 		"transaction_id": input.TransactionID,

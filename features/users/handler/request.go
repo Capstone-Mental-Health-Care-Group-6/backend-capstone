@@ -26,3 +26,7 @@ type UpdateProfile struct {
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
+
+type RefreshInput struct {
+	Token string `json:"access_token" form:"access_token"`
+}

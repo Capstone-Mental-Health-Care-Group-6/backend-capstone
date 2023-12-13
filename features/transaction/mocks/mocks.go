@@ -13,6 +13,11 @@ type MockTransactionDataInterface struct {
 	mock.Mock
 }
 
+// GetByPatientID implements transaction.TransactionDataInterface.
+func (*MockTransactionDataInterface) GetByPatientID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	panic("unimplemented")
+}
+
 type MockMidtransServiceInterface struct {
 	mock.Mock
 }
@@ -22,9 +27,9 @@ func (m *MockTransactionDataInterface) GetAll(sort string) ([]transaction.Transa
 	return args.Get(0).([]transaction.TransactionInfo), args.Error(1)
 }
 
-func (m *MockTransactionDataInterface) GetByID(id int, sort string) ([]transaction.Transaction, error) {
+func (m *MockTransactionDataInterface) GetByID(id int, sort string) ([]transaction.TransactionInfo, error) {
 	args := m.Called(id)
-	return args.Get(0).([]transaction.Transaction), args.Error(1)
+	return args.Get(0).([]transaction.TransactionInfo), args.Error(1)
 }
 
 func (m *MockTransactionDataInterface) GetByIDMidtrans(id string) ([]transaction.TransactionInfo, error) {

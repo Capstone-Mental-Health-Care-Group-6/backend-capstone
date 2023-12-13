@@ -94,3 +94,11 @@ func (as *ArticleService) ArticleDashboard() (articles.ArticleDashboard, error) 
 
 	return res, nil
 }
+
+func (as *ArticleService) GetArticleByDoctor(id int) ([]articles.ArticleInfo, error) {
+	result, err := as.d.GetByIDDoctor(id)
+	if err != nil {
+		return nil, errors.New("Get By ID Doctor Process Failed")
+	}
+	return result, nil
+}

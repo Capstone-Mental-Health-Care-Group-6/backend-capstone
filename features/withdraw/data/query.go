@@ -34,6 +34,37 @@ func (ad *WithdrawData) GetAll() ([]withdraw.WithdrawInfo, error) {
 	return list, nil
 }
 
+func (ad *WithdrawData) GetAllDoctor(id uint) ([]withdraw.WithdrawInfo, error) {
+	var list = []withdraw.WithdrawInfo{}
+	var qry = ad.db.Table("withdraws").
+		Select("withdraws.id, doctors.doctor_name as doctor_name, users.name as confirm_name, withdraws.balance_before, withdraws.balance_after, withdraws.balance_req, withdraws.payment_method, withdraws.payment_number, withdraws.payment_name, withdraws.date_confirmed, withdraws.status").
+		Joins("LEFT JOIN doctors on doctors.id = withdraws.doctor_id").
+		Joins("LEFT JOIN users on users.id = withdraws.confirm_by_id").
+		Where("withdraws.deleted_at is null").
+		Where("withdraws.doctor_id = ?", id).Scan(&list)
+
+	if err := qry.Error; err != nil {
+		logrus.Info("DB error : ", err.Error())
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func (ad *WithdrawData) GetUserDoctor(id uint) (uint, error) {
+	var doctorID uint
+	var qry = ad.db.Table("users").
+		Select("doctors.id as doctor_id").
+		Joins("LEFT JOIN doctors on doctors.user_id = users.id").
+		Where("users.id = ?", id).Scan(&doctorID)
+
+	if err := qry.Error; err != nil {
+		return 0, err
+	}
+
+	return doctorID, nil
+}
+
 func (ad *WithdrawData) Insert(newData withdraw.Withdraw) (*withdraw.Withdraw, error) {
 	var data = new(Withdraw)
 	data.DoctorID = newData.DoctorID

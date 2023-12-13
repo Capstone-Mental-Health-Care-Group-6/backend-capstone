@@ -110,6 +110,7 @@ func TestUpdateArticleCategory(t *testing.T) {
 	}
 
 	t.Run("Success Update", func(t *testing.T) {
+		slug.On("GenerateSlug", article_categories.Name).Return(article_categories.Slug).Once()
 		data.On("Update", article_categories, 1).Return(true, nil).Once()
 
 		result, err := service.UpdateArticleCategory(article_categories, 1)
@@ -122,6 +123,7 @@ func TestUpdateArticleCategory(t *testing.T) {
 	})
 
 	t.Run("Server Error", func(t *testing.T) {
+		slug.On("GenerateSlug", article_categories.Name).Return(article_categories.Slug).Once()
 		data.On("Update", article_categories, 1).Return(false, errors.New("Update Process Failed")).Once()
 
 		result, err := service.UpdateArticleCategory(article_categories, 1)

@@ -9,7 +9,10 @@ import (
 	"FinalProject/features/chatbot"
 	"FinalProject/features/chatbotcs"
 	. "FinalProject/features/chats"
+	counselingdurations "FinalProject/features/counseling_durations"
+	counselingmethod "FinalProject/features/counseling_methods"
 	counselingsession "FinalProject/features/counseling_session"
+	counselingtopics "FinalProject/features/counseling_topics"
 	"FinalProject/features/doctor"
 	"FinalProject/features/patients"
 	transaction "FinalProject/features/transaction"
@@ -28,6 +31,7 @@ func RouteUser(e *echo.Echo, uh users.UserHandlerInterface, cfg configs.Programm
 	e.POST("/forget-password", uh.ForgetPasswordWeb())
 	e.POST("/forget-password/verify", uh.ForgetPasswordVerify())
 	e.POST("/reset-password", uh.ResetPassword())
+	e.POST("/refresh-token", uh.RefreshToken(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/admin/update", uh.UpdateProfile(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
@@ -38,6 +42,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 	e.GET("/transaksi", th.GetTransactions(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/transaksi/:id", th.DeleteTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/transaksi/check/:id", th.GetTransactionByMidtransID(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/transaksi/patient/:id", th.GetTransactionByPatientID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/transaksi/:id", th.UpdateTransaction(), echojwt.JWT([]byte(cfg.Secret)))
 	// e.POST("/transaksi/manual", th.CreateManualTransaction())
 }
@@ -45,6 +50,7 @@ func RouteTransaction(e *echo.Echo, th transaction.TransactionHandlerInterface, 
 func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/articles", ah.GetArticles())
 	e.GET("/articles/:id", ah.GetArticle())
+	e.GET("/doctor/articles", ah.GetArticlesByDoctorID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/articles", ah.CreateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id", ah.UpdateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id/deny", ah.DenyArticle(), echojwt.JWT([]byte(cfg.Secret)))
@@ -63,31 +69,32 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/dashboard/:id", ph.DoctorDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/patientlist/:id", ph.DoctorDashboardPatient(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/user/:id", ph.GetDoctorByUserId(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/workday", ph.InsertWorkday(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/experience", ph.InsertExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/doctor/insert/education", ph.InsertEducation(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/insert/:type", ph.InsertDataDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.PUT("/doctor/datapokok/:id", ph.UpdateDoctorDatapokok(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/workday/:id", ph.UpdateDoctorWorkdays(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/education/:id", ph.UpdateDoctorEducation(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/experience/:id", ph.UpdateDoctorExperience(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/doctor/rating/:patient/:id", ph.UpdateDoctorRating(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.DELETE("/doctor/:id", ph.DeleteDoctor(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/workday/:id", ph.DeleteWorkday(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/experience/:id", ph.DeleteExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/doctor/education/:id", ph.DeleteEducation(), echojwt.JWT([]byte(cfg.Secret)))
+	e.DELETE("/doctor/:type/:id", ph.DeleteDoctorData(), echojwt.JWT([]byte(cfg.Secret)))
+	// e.DELETE("/doctor/experience/:id", ph.DeleteExperience(), echojwt.JWT([]byte(cfg.Secret)))
+	// e.DELETE("/doctor/education/:id", ph.DeleteEducation(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/withdraw", wh.GetAllWithdrawDokter(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+
 }
 
 func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -112,10 +119,26 @@ func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterf
 
 func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/counseling", ph.GetAllCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/user/:id", ph.GetCounselingByUserID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/counseling/:id", ph.GetCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/counseling/:id", ph.DeleteCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteCounselingMethod(e *echo.Echo, mh counselingmethod.CounselingMethodHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/counseling/methods", mh.GetCounselingMethods(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/methods/:id", mh.GetCounselingMethod(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteCounselingDuration(e *echo.Echo, mh counselingdurations.CounselingDurationHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/counseling/durations", mh.GetCounselingDurations(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/durations/:id", mh.GetCounselingDuration(), echojwt.JWT([]byte(cfg.Secret)))
+}
+
+func RouteCounselingTopic(e *echo.Echo, mh counselingtopics.CounselingTopicHandlerInterface, cfg configs.ProgrammingConfig) {
+	e.GET("/counseling/topics", mh.GetCounselingTopics(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/topics/:id", mh.GetCounselingTopic(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {

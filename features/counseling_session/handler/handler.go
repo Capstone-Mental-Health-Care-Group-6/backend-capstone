@@ -114,7 +114,38 @@ func (h *CounselingSessionHandler) GetCounseling() echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, helper.FormatResponse("Success", "Data not found"))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get bundle", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get counseling data", result))
+	}
+}
+
+func (h *CounselingSessionHandler) GetCounselingByUserID() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// role := h.jwt.CheckRole(c)
+
+		// if role != "Admin" {
+		// 	return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		// }
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Info("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+		}
+
+		result, err := h.s.GetAllCounselingByUserID(id)
+
+		if err != nil {
+			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get counseling data", nil))
+		}
+
+		if len(result) == 0 {
+			return c.JSON(http.StatusNotFound, helper.FormatResponse("Success", "Data not found"))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get counseling data", result))
 	}
 }
 

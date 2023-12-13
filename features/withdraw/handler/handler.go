@@ -40,6 +40,30 @@ func (wh *WithdrawHandler) GetAllWithdraw() echo.HandlerFunc {
 	}
 }
 
+func (wh *WithdrawHandler) GetAllWithdrawDokter() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := wh.jwt.CheckRole(c)
+
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only doctor can access this page", nil))
+		}
+
+		id, _ := wh.jwt.GetID(c)
+
+		idDoctor, err := wh.s.GetUserDoctor(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+		res, err := wh.s.GetAllWithdrawDokter(idDoctor)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success get balance", res))
+	}
+}
+
 func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var req = new(InputRequest)
@@ -59,8 +83,13 @@ func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Token is not valid", nil))
 		}
 
+		idDoctor, err := wh.s.GetUserDoctor(idJwt)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+		}
+
 		var serviceInput = new(withdraw.Withdraw)
-		serviceInput.DoctorID = idJwt
+		serviceInput.DoctorID = idDoctor
 		serviceInput.BalanceReq = req.BalanceReq
 		serviceInput.PaymentMethod = req.PaymentMethod
 		serviceInput.PaymentNumber = req.PaymentNumber
