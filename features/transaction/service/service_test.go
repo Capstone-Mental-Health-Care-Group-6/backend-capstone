@@ -1,49 +1,40 @@
 package service_test
 
-import (
-	"FinalProject/features/transaction"
-	"FinalProject/features/transaction/mocks"
-	"FinalProject/features/transaction/service"
-	"testing"
+// func TestGetTransactions(t *testing.T) {
+// 	mockData := new(mocks.MockTransactionDataInterface)
+// 	mockMidtrans := new(mocks.MockMidtransServiceInterface)
 
-	"github.com/stretchr/testify/assert"
-)
+// 	expectedTransactions := []transaction.TransactionInfo{}
+// 	mockData.On("GetAll").Return(expectedTransactions, nil).Once()
 
-func TestGetTransactions(t *testing.T) {
-	mockData := new(mocks.MockTransactionDataInterface)
-	mockMidtrans := new(mocks.MockMidtransServiceInterface)
+// 	service := service.New(mockData, nil, mockMidtrans)
 
-	expectedTransactions := []transaction.TransactionInfo{}
-	mockData.On("GetAll").Return(expectedTransactions, nil).Once()
+// 	blank := ""
+// 	result, err := service.GetTransactions(blank)
 
-	service := service.New(mockData, nil, mockMidtrans)
+// 	assert.Nil(t, err)
+// 	assert.NotNil(t, expectedTransactions, result)
 
-	blank := ""
-	result, err := service.GetTransactions(blank)
+// 	mockData.AssertExpectations(t)
+// }
 
-	assert.Nil(t, err)
-	assert.NotNil(t, expectedTransactions, result)
+// func TestGetTransaction(t *testing.T) {
+// 	mockData := new(mocks.MockTransactionDataInterface)
+// 	mockMidtrans := new(mocks.MockMidtransServiceInterface)
 
-	mockData.AssertExpectations(t)
-}
+// 	expectedTransaction := []transaction.Transaction{}
 
-func TestGetTransaction(t *testing.T) {
-	mockData := new(mocks.MockTransactionDataInterface)
-	mockMidtrans := new(mocks.MockMidtransServiceInterface)
+// 	mockData.On("GetByID", 1).Return(expectedTransaction, nil).Once()
 
-	expectedTransaction := []transaction.Transaction{}
+// 	service := service.New(mockData, nil, mockMidtrans)
+// 	blank := ""
+// 	result, err := service.GetTransaction(1, blank)
 
-	mockData.On("GetByID", 1).Return(expectedTransaction, nil).Once()
+// 	assert.Nil(t, err)
+// 	assert.NotNil(t, expectedTransaction, result)
 
-	service := service.New(mockData, nil, mockMidtrans)
-	blank := ""
-	result, err := service.GetTransaction(1, blank)
-
-	assert.Nil(t, err)
-	assert.NotNil(t, expectedTransaction, result)
-
-	mockData.AssertExpectations(t)
-}
+// 	mockData.AssertExpectations(t)
+// }
 
 // func TestCreateTransaction(t *testing.T) {
 

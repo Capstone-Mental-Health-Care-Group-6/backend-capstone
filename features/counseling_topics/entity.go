@@ -14,6 +14,7 @@ type CounselingTopic struct {
 }
 
 type CounselingTopicInfo struct {
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 }
 
