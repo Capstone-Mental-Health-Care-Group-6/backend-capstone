@@ -10,6 +10,7 @@ import (
 type EmailInterface interface {
 	SendEmail(to, subject, body string) error
 	HTMLBody(role, name string) (string, string, string)
+	HtmlBodyRegistDoctor(name string) (string, string)
 }
 
 type email struct {
@@ -212,6 +213,77 @@ func (e *email) htmlBodyPatient(name, code string) (string, string) {
 		</body>
 		</html>
 		`
+
+	return header, htmlBody
+}
+
+func (e *email) HtmlBodyRegistDoctor(name string) (string, string) {
+	header := "Selamat " + name + ", pengajuan konselor Anda sudah kami terima!"
+	htmlBody := `<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Pengajuan Konselor</title>
+	</head>
+	<body style="margin: 0; padding: 0; box-sizing: border-box;">
+		<table align="center" cellpadding="0" cellspacing="0" width="95%">
+		<tr>
+			<td align="center">
+			<table align="center" cellpadding="0" cellspacing="0" width="600" style="border-spacing: 2px 5px;" bgcolor="#fff">
+				<tr>
+				<td style="padding: 5px 5px 5px 5px;">
+					<a href="#" target="_blank">
+					<img src="https://i.ibb.co/kgMjHSV/Logo.png" alt="Logo" style="width:200px; border:0; margin:0;"/>
+					</a>
+				</td>
+				</tr>
+				<tr>
+				<td bgcolor="#fff">
+					<table cellpadding="0" cellspacing="0" width="100%%">
+					<tr>
+						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 18px; font-weight: 900">
+						Halo, ` + name + `
+						</td>
+					</tr>
+					</table>
+				</td>
+				</tr>
+				<tr>
+				<td bgcolor="#fff">
+					<table cellpadding="0" cellspacing="0" width="100%%">
+					<tr>
+						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
+						Selamat! Kami dengan senang hati ingin memberitahu Anda bahwa pengajuan Anda sebagai Konselor di EmpathiCare telah berhasil diterima. Kami sangat berterima kasih atas ketertarikan Anda untuk bergabung dengan kami.
+			<p></p>
+						</td>
+					</tr>
+					<tr>
+						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
+						Terima kasih atas kontribusi Anda dalam meningkatkan pelayanan kesehatan kami.
+			 <p></p>
+						</td>
+					</tr>
+		  <tr>
+						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
+						Salam Sehat,
+						</td>
+					</tr>
+		   <tr>
+						<td style="font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
+						Team EmpathiCare
+						</td>
+					</tr>
+					</table>
+				</td>
+				</tr>
+			</table>
+			</td>
+		</tr>
+		</table>
+	</body>
+	</html>`
 
 	return header, htmlBody
 }

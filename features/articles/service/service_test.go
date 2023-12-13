@@ -259,3 +259,33 @@ func TestDashboardArticle(t *testing.T) {
 		assert.NotNil(t, result)
 	})
 }
+
+func TestGetArticleByDoctor(t *testing.T) {
+	data := mocks.NewArticleDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	slug := mockHelper.NewSlugInterface(t)
+	service := New(data, slug, cld)
+	article := []articles.ArticleInfo{}
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("GetByIDDoctor", 1).Return(article, nil).Once()
+
+		result, err := service.GetArticleByDoctor(1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, result)
+		data.AssertExpectations(t)
+		cld.AssertExpectations(t)
+		slug.AssertExpectations(t)
+	})
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetByIDDoctor", 1).Return(nil, errors.New("Get By ID Doctor Process Failed")).Once()
+
+		result, err := service.GetArticleByDoctor(1)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Get By ID Doctor Process Failed")
+		assert.Nil(t, result)
+	})
+}

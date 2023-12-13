@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-
-	"github.com/midtrans/midtrans-go/example"
 )
 
 type TransactionService struct {
@@ -20,6 +18,7 @@ type TransactionService struct {
 
 func New(data transaction.TransactionDataInterface, cloudinary cloudinary.CloudinaryInterface, mid midtrans.MidtransService) transaction.TransactionServiceInterface {
 	return &TransactionService{
+		d:   data,
 		cld: cloudinary,
 		mt:  mid,
 	}
@@ -33,18 +32,18 @@ func (as *TransactionService) GetTransactions(sort string) ([]transaction.Transa
 	return result, nil
 }
 
-// func (as *TransactionService) GetTransactionsSort(sort string) ([]transaction.TransactionInfo, error) {
-// 	result, err := as.d.GetAllSort(sort)
-// 	if err != nil {
-// 		return nil, errors.New("Get All Transactions with Sort Failed")
-// 	}
-// 	return result, nil
-// }
-
-func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.Transaction, error) {
+func (as *TransactionService) GetTransaction(id int, sort string) ([]transaction.TransactionInfo, error) {
 	result, err := as.d.GetByID(id, sort)
 	if err != nil {
-		return nil, errors.New("Get By ID Process Failed")
+		return nil, errors.New("Get By User ID Process Failed")
+	}
+	return result, nil
+}
+
+func (as *TransactionService) GetTransactionByPatientID(id int, sort string) ([]transaction.TransactionInfo, error) {
+	result, err := as.d.GetByPatientID(id, sort)
+	if err != nil {
+		return nil, errors.New("Get By Patient ID Process Failed")
 	}
 	return result, nil
 }
@@ -73,24 +72,26 @@ func (as *TransactionService) CreateTransaction(newData transaction.Transaction)
 
 	fmt.Println("Ini new data: ", newData)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.New("Insert Process Failed")
 	}
 	return result, response, nil
 }
 
 func (as *TransactionService) CreateManualTransaction(newData transaction.Transaction) (*transaction.Transaction, error) {
 
-	newData.MidtransID = "M-" + example.Random()
-
 	result, err := as.d.Insert(newData)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Insert Process Failed")
 	}
 	return result, nil
 }
 
 func (as *TransactionService) UpdateTransaction(notificationPayload map[string]interface{}, newData transaction.UpdateTransaction) (bool, error) {
 	paymentStatus, orderId, err := as.mt.TransactionStatus(notificationPayload)
+	if err != nil {
+		return false, errors.New("Transaction Status Failed")
+	}
+
 	newData.PaymentStatus = uint(paymentStatus)
 	result, err := as.d.GetAndUpdate(newData, orderId)
 
@@ -106,7 +107,7 @@ func (as *TransactionService) UpdateTransactionManual(newData transaction.Update
 		result, err := as.d.UpdateWithTrxID(newData, id)
 
 		if err != nil {
-			return false, err
+			return false, errors.New("Update Process Failed")
 		}
 		return result, nil
 

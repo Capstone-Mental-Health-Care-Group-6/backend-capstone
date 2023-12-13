@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,7 +30,7 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		var input = new(RegisterInput)
 		if err := c.Bind(&input); err != nil {
 			c.Logger().Info("Handler: Bind input error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		isValid, errors := helper.ValidateForm(input)
@@ -56,13 +57,14 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
 	}
 }
+
 func (uh *UserHandler) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input = new(LoginInput)
 
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind input error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		result, err := uh.s.Login(input.Email, input.Password)
@@ -70,9 +72,9 @@ func (uh *UserHandler) Login() echo.HandlerFunc {
 		if err != nil {
 			c.Logger().Error("Handler: Login process error: ", err.Error())
 			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusNotFound, helper.FormatResponse("Data Not Found", nil))
 			}
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Login Process Error", nil))
 		}
 
 		var response = new(LoginResponse)
@@ -227,5 +229,26 @@ func (uh *UserHandler) UpdateProfile() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+	}
+}
+
+func (uh *UserHandler) RefreshToken() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var input = new(RefreshInput)
+		if err := c.Bind(input); err != nil {
+			c.Logger().Error("Handler : Bind Refresh Token Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
+		}
+
+		var currentToken = c.Get("user").(*jwt.Token)
+		// fmt.Println(currentToken)
+
+		result, err := uh.jwt.RefreshJWT(input.Token, currentToken)
+		if err != nil {
+			c.Logger().Error("Handler : Refresh JWT Process Failed : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Refresh JWT Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Refresh Token", result))
 	}
 }
