@@ -21,9 +21,49 @@ func New(data bundlecounseling.BundleCounselingDataInterface, cld cloudinary.Clo
 func (s *BundleCounselingService) GetAllBundle() ([]bundlecounseling.BundleCounselingInfo, error) {
 	result, err := s.d.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get All Process Failed")
 	}
 	return result, nil
+}
+
+func (s *BundleCounselingService) GetAllBundleFilter(jenis string, metode int, durasi int) ([]bundlecounseling.BundleCounselingInfo, error) {
+
+	var listBundleCounseling = []bundlecounseling.BundleCounselingInfo{}
+
+	if jenis == "INSTAN" {
+		metode = 1
+		durasi = 1
+	}
+
+	hargaMetode, err := s.d.HargaMetode(metode)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get Harga Metode Failed")
+	}
+
+	hargaDurasi, err := s.d.HargaDurasi(durasi)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get Harga Durasi Failed")
+	}
+
+	bundles, err := s.d.GetAllFilter(jenis)
+	if err != nil {
+		return listBundleCounseling, errors.New("Get All Filter Process Failed")
+	}
+
+	for _, bundle := range bundles {
+		listBundleCounseling = append(listBundleCounseling, bundlecounseling.BundleCounselingInfo{
+			ID:           bundle.ID,
+			Name:         bundle.Name,
+			Sessions:     bundle.Sessions,
+			Type:         bundle.Type,
+			Price:        bundle.Price + hargaMetode + hargaDurasi,
+			Description:  bundle.Description,
+			ActivePriode: bundle.ActivePriode,
+			Avatar:       bundle.Avatar,
+		})
+	}
+
+	return listBundleCounseling, nil
 }
 
 func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCounseling, file bundlecounseling.BundleCounselingFile) (*bundlecounseling.BundleCounseling, error) {
@@ -45,7 +85,7 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 
 	result, err := s.d.Create(newData)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Create Process Failed")
 	}
 
 	return result, nil
@@ -54,7 +94,7 @@ func (s *BundleCounselingService) CreateBundle(input bundlecounseling.BundleCoun
 func (s *BundleCounselingService) GetBundle(id int) (*bundlecounseling.BundleCounseling, error) {
 	result, err := s.d.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get By ID Process Failed")
 	}
 
 	return result, nil
@@ -82,7 +122,7 @@ func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.Bu
 
 	result, err := s.d.Update(id, newData)
 	if err != nil {
-		return false, err
+		return false, errors.New("Update Process Failed")
 	}
 
 	return result, nil
@@ -91,7 +131,7 @@ func (s *BundleCounselingService) UpdateBundle(id int, input bundlecounseling.Bu
 func (s *BundleCounselingService) DeleteBundle(id int) (bool, error) {
 	result, err := s.d.Delete(id)
 	if err != nil {
-		return false, err
+		return false, errors.New("Delete Process Failed")
 	}
 
 	return result, nil

@@ -280,12 +280,12 @@ func TestGetArticleByDoctor(t *testing.T) {
 	})
 
 	t.Run("Server Error", func(t *testing.T) {
-		data.On("GetByIDDoctor", 1).Return(nil, errors.New("Get By ID Process Failed")).Once()
+		data.On("GetByIDDoctor", 1).Return(nil, errors.New("Get By ID Doctor Process Failed")).Once()
 
 		result, err := service.GetArticleByDoctor(1)
 
 		assert.Error(t, err)
-		assert.EqualError(t, err, "Get By ID Process Failed")
+		assert.EqualError(t, err, "Get By ID Doctor Process Failed")
 		assert.Nil(t, result)
 	})
 }

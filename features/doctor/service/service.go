@@ -6,7 +6,6 @@ import (
 	"FinalProject/helper/email"
 	"FinalProject/utils/cloudinary"
 	"errors"
-	"math/rand"
 
 	"github.com/sirupsen/logrus"
 )
@@ -14,32 +13,23 @@ import (
 type DoctorService struct {
 	data  doctor.DoctorDataInterface
 	cld   cloudinary.CloudinaryInterface
-	jwt   helper.JWTInterface
 	email email.EmailInterface
+	meet  helper.MeetInterface
 }
 
-func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface) doctor.DoctorServiceInterface {
+func NewDoctor(data doctor.DoctorDataInterface, cloudinary cloudinary.CloudinaryInterface, email email.EmailInterface, meet helper.MeetInterface) doctor.DoctorServiceInterface {
 	return &DoctorService{
 		data:  data,
 		cld:   cloudinary,
 		email: email,
+		meet:  meet,
 	}
 }
 
-func generateRandomCode(length int) string {
-	const charset = "0123456789"
-	code := make([]byte, length)
-	for i := range code {
-		code[i] = charset[rand.Intn(len(charset))]
-	}
-
-	return string(code)
-}
-
-func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorAll, error) {
-	result, err := psvc.data.GetAll()
+func (psvc *DoctorService) GetDoctors(name string) ([]doctor.DoctorAll, error) {
+	result, err := psvc.data.GetAll(name)
 	if err != nil {
-		return nil, errors.New("get All Process Failed")
+		return nil, errors.New("Get All Process Failed")
 	}
 	return result, nil
 }
@@ -47,7 +37,7 @@ func (psvc *DoctorService) GetDoctors() ([]doctor.DoctorAll, error) {
 func (psvc *DoctorService) GetDoctor(id int) (*doctor.DoctorAll, error) {
 	result, err := psvc.data.GetByID(id)
 	if err != nil {
-		return nil, errors.New("get By ID Process Failed")
+		return nil, errors.New("Get By ID Doctor Process Failed")
 	}
 	return result, nil
 }
@@ -55,15 +45,7 @@ func (psvc *DoctorService) GetDoctor(id int) (*doctor.DoctorAll, error) {
 func (psvc *DoctorService) GetDoctorByUserId(userID int) (*doctor.DoctorAll, error) {
 	result, err := psvc.data.GetDoctorByUserId(userID)
 	if err != nil {
-		return nil, errors.New("get By User ID Process Failed")
-	}
-	return result, nil
-}
-
-func (psvc *DoctorService) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
-	result, err := psvc.data.SearchDoctor(name)
-	if err != nil {
-		return nil, errors.New("get By ID Process Failed")
+		return nil, errors.New("Get Doctor By User ID Process Failed")
 	}
 	return result, nil
 }
@@ -71,7 +53,7 @@ func (psvc *DoctorService) SearchDoctor(name string) ([]doctor.DoctorAll, error)
 func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorWorkdays, error) {
 	result, err := psvc.data.GetByIDWorkadays(id)
 	if err != nil {
-		return nil, errors.New("get By ID Process Failed")
+		return nil, errors.New("Get By ID Workadays Process Failed")
 	}
 	return result, nil
 }
@@ -79,7 +61,7 @@ func (psvc *DoctorService) GetDoctorWorkadays(id int) ([]doctor.DoctorWorkdays, 
 func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorEducation, error) {
 	result, err := psvc.data.GetByIDEducation(id)
 	if err != nil {
-		return nil, errors.New("get By ID Process Failed")
+		return nil, errors.New("Get By ID Education Process Failed")
 	}
 	return result, nil
 }
@@ -87,7 +69,7 @@ func (psvc *DoctorService) GetDoctorEducation(id int) ([]doctor.DoctorEducation,
 func (psvc *DoctorService) GetDoctorExperience(id int) ([]doctor.DoctorExperience, error) {
 	result, err := psvc.data.GetByIDExperience(id)
 	if err != nil {
-		return nil, errors.New("get By ID Process Failed")
+		return nil, errors.New("Get By ID Experience Process Failed")
 	}
 	return result, nil
 }
@@ -95,94 +77,28 @@ func (psvc *DoctorService) GetDoctorExperience(id int) ([]doctor.DoctorExperienc
 func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, error) {
 	result, err := psvc.data.Insert(newData)
 	if err != nil {
-		return nil, errors.New("insert Process Failed")
+		return nil, errors.New("Insert Doctor Process Failed")
 	}
 
 	email, err := psvc.data.FindEmail(result.UserID)
+	if err != nil {
+		return nil, errors.New("Find Email Process Failed")
+	}
 
-	// emailUser, err := us.d.GetByEmail(email)
+	header, htmlBody := psvc.email.HtmlBodyRegistDoctor(result.DoctorName)
 
-	// email := emailUser
-
-	header := "Selamat " + result.DoctorName + ", pengajuan konselor Anda sudah kami terima!"
-	htmlBody := `<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Pengajuan Konselor</title>
-	</head>
-	<body style="margin: 0; padding: 0; box-sizing: border-box;">
-		<table align="center" cellpadding="0" cellspacing="0" width="95%">
-		<tr>
-			<td align="center">
-			<table align="center" cellpadding="0" cellspacing="0" width="600" style="border-spacing: 2px 5px;" bgcolor="#fff">
-				<tr>
-				<td style="padding: 5px 5px 5px 5px;">
-					<a href="#" target="_blank">
-					<img src="https://i.ibb.co/kgMjHSV/Logo.png" alt="Logo" style="width:200px; border:0; margin:0;"/>
-					</a>
-				</td>
-				</tr>
-				<tr>
-				<td bgcolor="#fff">
-					<table cellpadding="0" cellspacing="0" width="100%%">
-					<tr>
-						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 18px; font-weight: 900">
-						Halo, ` + result.DoctorName + `
-						</td>
-					</tr>
-					</table>
-				</td>
-				</tr>
-				<tr>
-				<td bgcolor="#fff">
-					<table cellpadding="0" cellspacing="0" width="100%%">
-					<tr>
-						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
-						Selamat! Kami dengan senang hati ingin memberitahu Anda bahwa pengajuan Anda sebagai Konselor di EmpathiCare telah berhasil diterima. Kami sangat berterima kasih atas ketertarikan Anda untuk bergabung dengan kami.
-			<p></p>
-						</td>
-					</tr>
-					<tr>
-						<td style="padding: 0; font-family: Nunito, sans-serif; font-size: 16px;">
-						Terima kasih atas kontribusi Anda dalam meningkatkan pelayanan kesehatan kami.
-			 <p></p>
-						</td>
-					</tr>
-		  <tr>
-						<td style="padding: 10px 0 10px 0; font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
-						Salam Sehat,
-						</td>
-					</tr>
-		   <tr>
-						<td style="font-family: Nunito, sans-serif; font-size: 16px; font-weight: 900">
-						Team EmpathiCare
-						</td>
-					</tr>
-					</table>
-				</td>
-				</tr>
-			</table>
-			</td>
-		</tr>
-		</table>
-	</body>
-	</html>`
-
-	ress := psvc.email.SendEmail(*email, header, htmlBody)
+	err = psvc.email.SendEmail(*email, header, htmlBody)
 
 	logrus.Info("Info send email ==[]==", nil)
 	logrus.Info("Email:", email, &email, *email)
 	logrus.Info("UserID:", result.UserID)
 	logrus.Info("Header: ", header)
 	logrus.Info("HTML Body: ", htmlBody)
-	logrus.Info("Result Pengiriman Email: ", ress)
+	logrus.Info("Result Pengiriman Email: ", err)
 	logrus.Info("Info send email ==[]==", nil)
 
-	if ress != nil {
-		return nil, ress
+	if err != nil {
+		return nil, errors.New("Send Email Error")
 	}
 	return result, nil
 }
@@ -190,7 +106,7 @@ func (psvc *DoctorService) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, 
 func (psvc *DoctorService) CreateDoctorExpertise(newData doctor.DoctorExpertiseRelation) (*doctor.DoctorExpertiseRelation, error) {
 	resultExpertise, err := psvc.data.InsertExpertise(newData)
 	if err != nil {
-		return nil, errors.New("insert Process Failed")
+		return nil, errors.New("Insert Doctor Expertise Process Failed")
 	}
 	return resultExpertise, nil
 }
@@ -198,7 +114,7 @@ func (psvc *DoctorService) CreateDoctorExpertise(newData doctor.DoctorExpertiseR
 func (psvc *DoctorService) CreateDoctorWorkadays(newData doctor.DoctorWorkdays) (*doctor.DoctorWorkdays, error) {
 	resultWorkadays, err := psvc.data.InsertWorkadays(newData)
 	if err != nil {
-		return nil, errors.New("insert Process Failed")
+		return nil, errors.New("Insert Doctor Workadays Process Failed")
 	}
 	return resultWorkadays, nil
 }
@@ -206,7 +122,7 @@ func (psvc *DoctorService) CreateDoctorWorkadays(newData doctor.DoctorWorkdays) 
 func (psvc *DoctorService) CreateDoctorEducation(newData doctor.DoctorEducation) (*doctor.DoctorEducation, error) {
 	resultEducation, err := psvc.data.InsertEducation(newData)
 	if err != nil {
-		return nil, errors.New("insert Process Failed")
+		return nil, errors.New("Insert Doctor Education Process Failed")
 	}
 	return resultEducation, nil
 }
@@ -214,7 +130,7 @@ func (psvc *DoctorService) CreateDoctorEducation(newData doctor.DoctorEducation)
 func (psvc *DoctorService) CreateDoctorExperience(newData doctor.DoctorExperience) (*doctor.DoctorExperience, error) {
 	resultExperience, err := psvc.data.InsertExperience(newData)
 	if err != nil {
-		return nil, errors.New("insert Process Failed")
+		return nil, errors.New("Insert Doctor Experience Process Failed")
 	}
 	return resultExperience, nil
 }
@@ -259,6 +175,18 @@ func (psvc *DoctorService) DoctorIjazahUpload(newData doctor.DoctorIjazahDataMod
 	return uploadUrl, nil
 }
 
+func (psvc *DoctorService) GetMeetLink() (string, error) {
+	allMeetLinks := psvc.meet.GetMeetLink()
+
+	for _, meetLink := range allMeetLinks {
+		isLink := psvc.data.IsLinkUsed(meetLink)
+		if !isLink {
+			return meetLink, nil
+		}
+	}
+	return "", errors.New("Semua link sudah digunakan")
+}
+
 func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {
 	result, err := psvc.data.UpdateDoctorDatapokok(id, newData)
 	if err != nil {
@@ -270,7 +198,7 @@ func (psvc *DoctorService) UpdateDoctorDatapokok(id int, newData doctor.DoctorDa
 func (psvc *DoctorService) UpdateDoctorEducation(id int, doctorID int, newData doctor.DoctorEducation) (bool, error) {
 	result, err := psvc.data.UpdateDoctorEducation(id, doctorID, newData)
 	if err != nil {
-		return false, errors.New("Update Datapokok Dokter Failed")
+		return false, errors.New("Update Education Dokter Failed")
 	}
 	return result, nil
 }
@@ -337,4 +265,24 @@ func (psvc *DoctorService) DeleteDoctorRating(doctorID int) (bool, error) {
 		return false, errors.New("Delete Rating Dokter Failed")
 	}
 	return result, nil
+}
+
+func (psvc *DoctorService) DoctorDashboard(id int) (doctor.DoctorDashboard, error) {
+	res, err := psvc.data.DoctorDashboard(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}
+
+func (psvc *DoctorService) DoctorDashboardPatient(id int) ([]doctor.DoctorDashboardPatient, error) {
+	res, err := psvc.data.DoctorDashboardPatient(id)
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
 }

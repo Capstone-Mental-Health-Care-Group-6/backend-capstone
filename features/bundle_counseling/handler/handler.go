@@ -219,3 +219,37 @@ func (h *BundleCounselingHandler) DeleteBundle() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete bundle", result))
 	}
 }
+
+func (h *BundleCounselingHandler) GetAllBundleFilter() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		jenisPaket := c.QueryParam("type")
+
+		if jenisPaket == "" {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Type param is required", nil))
+		}
+
+		metodeID := c.QueryParam("metode")
+		metodeIDInt, _ := strconv.Atoi(metodeID)
+
+		if metodeID == "" {
+			metodeIDInt = 1
+		}
+
+		durasiID := c.QueryParam("durasi")
+		durasiIDInt, _ := strconv.Atoi(durasiID)
+
+		if durasiID == "" {
+			durasiIDInt = 1
+		}
+
+		result, err := h.s.GetAllBundleFilter(jenisPaket, metodeIDInt, durasiIDInt)
+
+		if err != nil {
+			c.Logger().Info("Handler : Get All Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to get all bundle", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success to get all bundle", result))
+	}
+}

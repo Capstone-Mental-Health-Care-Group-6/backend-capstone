@@ -36,6 +36,7 @@ type WithdrawInfo struct {
 
 type WithdrawHandlerInterface interface {
 	GetAllWithdraw() echo.HandlerFunc
+	GetAllWithdrawDokter() echo.HandlerFunc
 	CreateWithdraw() echo.HandlerFunc
 	GetWithdraw() echo.HandlerFunc
 	UpdateStatus() echo.HandlerFunc
@@ -43,6 +44,8 @@ type WithdrawHandlerInterface interface {
 
 type WithdrawServiceInterface interface {
 	GetAllWithdraw() ([]WithdrawInfo, error)
+	GetAllWithdrawDokter(id uint) ([]WithdrawInfo, error)
+	GetUserDoctor(id uint) (uint, error)
 	CreateWithdraw(newData Withdraw) (*Withdraw, error)
 	GetBalance(idDoctor uint) (uint, error)
 	GetByID(id int) (*WithdrawInfo, error)
@@ -51,6 +54,8 @@ type WithdrawServiceInterface interface {
 
 type WithdrawDataInterface interface {
 	GetAll() ([]WithdrawInfo, error)
+	GetAllDoctor(id uint) ([]WithdrawInfo, error)
+	GetUserDoctor(id uint) (uint, error)
 	Insert(newData Withdraw) (*Withdraw, error)
 	GetBalance(idDoctor uint) (uint, error)
 	LessBalance(idDoctor uint, balance uint) (bool, error)

@@ -69,8 +69,9 @@ func RouteArticleCategory(e *echo.Echo, ach articlecategories.ArticleCategoryHan
 func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/doctor", ph.GetDoctors(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/:id", ph.GetDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/dashboard/:id", ph.DoctorDashboard(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/patientlist/:id", ph.DoctorDashboardPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/doctor/user/:id", ph.GetDoctorByUserId(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/doctor/search", ph.SearchDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.POST("/doctor/register", ph.CreateDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/doctor/insert/:type", ph.InsertDataDoctor(), echojwt.JWT([]byte(cfg.Secret)))
@@ -89,9 +90,11 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/withdraw", wh.GetAllWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/doctor/withdraw", wh.GetAllWithdrawDokter(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/withdraw", wh.CreateWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/withdraw/:id", wh.GetWithdraw(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/withdraw/:id/status", wh.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
+
 }
 
 func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
@@ -108,6 +111,7 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 
 func RouteBundle(e *echo.Echo, ph bundlecounseling.BundleCounselingHandlerInterface, cfg configs.ProgrammingConfig) {
 	e.GET("/bundle", ph.GetAllBundle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/mobile/bundle", ph.GetAllBundleFilter())
 	e.GET("/bundle/:id", ph.GetBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/bundle", ph.CreateBundle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/bundle/:id", ph.UpdateBundle(), echojwt.JWT([]byte(cfg.Secret)))
@@ -124,18 +128,18 @@ func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandler
 }
 
 func RouteCounselingMethod(e *echo.Echo, mh counselingmethod.CounselingMethodHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/methods", mh.GetCounselingMethods(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/methods/:id", mh.GetCounselingMethod(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/methods", mh.GetCounselingMethods())
+	e.GET("/counseling/methods/:id", mh.GetCounselingMethod())
 }
 
 func RouteCounselingDuration(e *echo.Echo, mh counselingdurations.CounselingDurationHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/durations", mh.GetCounselingDurations(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/durations/:id", mh.GetCounselingDuration(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/durations", mh.GetCounselingDurations())
+	e.GET("/counseling/durations/:id", mh.GetCounselingDuration())
 }
 
 func RouteCounselingTopic(e *echo.Echo, mh counselingtopics.CounselingTopicHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/counseling/topics", mh.GetCounselingTopics(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/counseling/topics/:id", mh.GetCounselingTopic(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/counseling/topics", mh.GetCounselingTopics())
+	e.GET("/counseling/topics/:id", mh.GetCounselingTopic())
 }
 
 func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {

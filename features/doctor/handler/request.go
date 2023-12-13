@@ -100,3 +100,10 @@ type DoctorRating struct {
 	DoctorStarRating uint   `json:"doctor_star_rating"`
 	DoctorReview     string `json:"doctor_review"`
 }
+
+type ManagePatient struct {
+	DoctorID     uint   `json:"doctor_id"`
+	PatientID    uint   `json:"patient_id"`
+	Alasan       string `json:"alasan"`
+	DetailAlasan string `json:"detail_alasan"`
+}
