@@ -445,6 +445,20 @@ func (_m *DoctorDataInterface) InsertWorkadays(newData doctor.DoctorWorkdays) (*
 	return r0, r1
 }
 
+// IsLinkUsed provides a mock function with given fields: meetLink
+func (_m *DoctorDataInterface) IsLinkUsed(meetLink string) bool {
+	ret := _m.Called(meetLink)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(meetLink)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // UpdateDoctorDatapokok provides a mock function with given fields: id, newData
 func (_m *DoctorDataInterface) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {
 	ret := _m.Called(id, newData)
