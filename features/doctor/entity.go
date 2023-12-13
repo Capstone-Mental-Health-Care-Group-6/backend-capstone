@@ -192,7 +192,7 @@ type DoctorHandlerInterface interface {
 	GetDoctor() echo.HandlerFunc
 	GetDoctorByUserId() echo.HandlerFunc
 	CreateDoctor() echo.HandlerFunc
-	SearchDoctor() echo.HandlerFunc
+	// SearchDoctor() echo.HandlerFunc
 	UpdateDoctorDatapokok() echo.HandlerFunc
 	UpdateDoctorWorkdays() echo.HandlerFunc
 	UpdateDoctorEducation() echo.HandlerFunc
@@ -207,8 +207,8 @@ type DoctorHandlerInterface interface {
 }
 
 type DoctorServiceInterface interface {
-	GetDoctors() ([]DoctorAll, error)
-	SearchDoctor(name string) ([]DoctorAll, error)
+	GetDoctors(name string) ([]DoctorAll, error)
+	// SearchDoctor(name string) ([]DoctorAll, error)
 	GetDoctor(id int) (*DoctorAll, error)
 	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorExperience, error)
@@ -224,6 +224,7 @@ type DoctorServiceInterface interface {
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+	GetMeetLink() (string, error)
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
@@ -237,19 +238,20 @@ type DoctorServiceInterface interface {
 }
 
 type DoctorDataInterface interface {
-	GetAll() ([]DoctorAll, error)
+	GetAll(name string) ([]DoctorAll, error)
 	GetByID(id int) (*DoctorAll, error)
 	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetByIDEducation(id int) ([]DoctorEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorWorkdays, error)
 	GetByIDExperience(id int) ([]DoctorExperience, error)
-	SearchDoctor(name string) ([]DoctorAll, error)
+	// SearchDoctor(name string) ([]DoctorAll, error)
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkdays) (*DoctorWorkdays, error)
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
 	FindEmail(userID uint) (*string, error)
+	IsLinkUsed(meetLink string) bool
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)

@@ -40,6 +40,30 @@ func (_m *EmailInterface) HTMLBody(role string, name string) (string, string, st
 	return r0, r1, r2
 }
 
+// HtmlBodyRegistDoctor provides a mock function with given fields: name
+func (_m *EmailInterface) HtmlBodyRegistDoctor(name string) (string, string) {
+	ret := _m.Called(name)
+
+	var r0 string
+	var r1 string
+	if rf, ok := ret.Get(0).(func(string) (string, string)); ok {
+		return rf(name)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(name)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) string); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	return r0, r1
+}
+
 // SendEmail provides a mock function with given fields: to, subject, body
 func (_m *EmailInterface) SendEmail(to string, subject string, body string) error {
 	ret := _m.Called(to, subject, body)

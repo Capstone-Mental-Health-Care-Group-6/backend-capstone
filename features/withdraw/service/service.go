@@ -18,7 +18,7 @@ func New(data withdraw.WithdrawDataInterface) withdraw.WithdrawServiceInterface 
 func (s *WithdrawService) GetAllWithdraw() ([]withdraw.WithdrawInfo, error) {
 	result, err := s.wd.GetAll()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get All Process Failed")
 	}
 
 	return result, nil
@@ -27,7 +27,7 @@ func (s *WithdrawService) GetAllWithdraw() ([]withdraw.WithdrawInfo, error) {
 func (s *WithdrawService) GetAllWithdrawDokter(id uint) ([]withdraw.WithdrawInfo, error) {
 	result, err := s.wd.GetAllDoctor(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get All Withdraw Doctor Failed")
 	}
 
 	return result, nil
@@ -44,16 +44,16 @@ func (s *WithdrawService) GetUserDoctor(id uint) (uint, error) {
 func (s *WithdrawService) CreateWithdraw(newData withdraw.Withdraw) (*withdraw.Withdraw, error) {
 	result, err := s.wd.Insert(newData)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Insert Process Failed")
 	}
 
 	isTrue, err := s.wd.LessBalance(newData.DoctorID, newData.BalanceReq)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Less Balance Process Failed")
 	}
 
 	if !isTrue {
-		return nil, err
+		return nil, errors.New("Less Balance")
 	}
 
 	return result, nil
@@ -62,7 +62,7 @@ func (s *WithdrawService) CreateWithdraw(newData withdraw.Withdraw) (*withdraw.W
 func (s *WithdrawService) GetByID(id int) (*withdraw.WithdrawInfo, error) {
 	result, err := s.wd.GetByID(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("Get By ID Process Failed")
 	}
 
 	return result, nil
@@ -71,16 +71,16 @@ func (s *WithdrawService) GetByID(id int) (*withdraw.WithdrawInfo, error) {
 func (s *WithdrawService) UpdateStatus(id int, newData withdraw.Withdraw) (bool, error) {
 	cekData, err := s.wd.GetByID(id)
 	if err != nil {
-		return false, err
+		return false, errors.New("Get By ID Process Failed")
 	}
 
 	if cekData.ID == 0 {
-		return false, errors.New("data not found")
+		return false, errors.New("Data Not Found")
 	}
 
 	result, err := s.wd.UpdateStatus(id, newData)
 	if err != nil {
-		return false, err
+		return false, errors.New("Update Status Process Failed")
 	}
 
 	return result, nil

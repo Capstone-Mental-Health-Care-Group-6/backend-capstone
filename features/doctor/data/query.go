@@ -77,16 +77,19 @@ func (pdata *DoctorData) FindEmail(userID uint) (*string, error) {
 
 // GET ALL AND BY ID QUERY \\
 
-func (pdata *DoctorData) GetAll() ([]doctor.DoctorAll, error) {
+func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 	var doctors []doctor.DoctorAll
 
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
 		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
-		Where("doctors.deleted_at IS NULL").
-		Scan(&doctors)
+		Where("doctors.deleted_at IS NULL")
 
-	if err := qry.Error; err != nil {
+	if name != "" {
+		qry.Where("doctors.doctor_name LIKE ?", "%"+name+"%")
+	}
+
+	if err := qry.Scan(&doctors).Error; err != nil {
 		return nil, err
 	}
 
@@ -329,6 +332,11 @@ func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*docto
 	return &newData, nil
 }
 
+func (pdata *DoctorData) IsLinkUsed(meetLink string) bool {
+	var count int64
+	pdata.db.Table("doctors").Where("doctor_meet_link = ?", meetLink).Count(&count)
+	return count > 0
+}
 // UPDATE QUERY \\
 
 func (pdata *DoctorData) UpdateDoctorDatapokok(id int, newData doctor.DoctorDatapokokUpdate) (bool, error) {

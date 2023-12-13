@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/midtrans/midtrans-go/example"
 	"gorm.io/gorm"
 )
 
@@ -289,8 +290,6 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.DurationID = newData.DurationID
 	dbData.CounselingID = newData.CounselingID
 	dbData.UserID = newData.UserID
-	dbData.MidtransID = newData.MidtransID
-
 	dbData.CounselingSession = newData.CounselingSession
 	dbData.CounselingType = newData.CounselingType
 
@@ -302,6 +301,12 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 
 	dbData.PaymentStatus = newData.PaymentStatus
 	dbData.PaymentType = newData.PaymentType
+
+	if dbData.PaymentType == "manual" {
+		dbData.MidtransID = "M-" + example.Random()
+	} else {
+		dbData.MidtransID = newData.MidtransID
+	}
 
 	fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
 
