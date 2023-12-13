@@ -36,6 +36,32 @@ func TestGetAllWithdraw(t *testing.T) {
 	})
 }
 
+func TestGetAllWithdrawDokter(t *testing.T) {
+	data := mocks.NewWithdrawDataInterface(t)
+	service := New(data)
+	wd := []withdraw.WithdrawInfo{}
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetAllDoctor", uint(1)).Return(nil, errors.New("Get All Withdraw Doctor Failed")).Once()
+
+		res, err := service.GetAllWithdrawDokter(uint(1))
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		assert.EqualError(t, err, "Get All Withdraw Doctor Failed")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("GetAllDoctor", uint(1)).Return(wd, nil).Once()
+
+		res, err := service.GetAllWithdrawDokter(uint(1))
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		data.AssertExpectations(t)
+	})
+}
+
 func TestCreateWithdraw(t *testing.T) {
 	data := mocks.NewWithdrawDataInterface(t)
 	service := New(data)
@@ -112,6 +138,22 @@ func TestGetBalance(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
 		assert.Equal(t, res, uint(20000))
+		data.AssertExpectations(t)
+	})
+}
+
+func TestGetUserDoctor(t *testing.T) {
+	data := mocks.NewWithdrawDataInterface(t)
+	service := New(data)
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("GetUserDoctor", uint(1)).Return(uint(1), nil).Once()
+
+		res, err := service.GetUserDoctor(uint(1))
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		assert.Equal(t, res, uint(1))
 		data.AssertExpectations(t)
 	})
 }

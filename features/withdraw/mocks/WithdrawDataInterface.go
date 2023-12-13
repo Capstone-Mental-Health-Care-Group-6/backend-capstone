@@ -39,6 +39,32 @@ func (_m *WithdrawDataInterface) GetAll() ([]withdraw.WithdrawInfo, error) {
 	return r0, r1
 }
 
+// GetAllDoctor provides a mock function with given fields: id
+func (_m *WithdrawDataInterface) GetAllDoctor(id uint) ([]withdraw.WithdrawInfo, error) {
+	ret := _m.Called(id)
+
+	var r0 []withdraw.WithdrawInfo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) ([]withdraw.WithdrawInfo, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uint) []withdraw.WithdrawInfo); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]withdraw.WithdrawInfo)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetBalance provides a mock function with given fields: idDoctor
 func (_m *WithdrawDataInterface) GetBalance(idDoctor uint) (uint, error) {
 	ret := _m.Called(idDoctor)
@@ -81,6 +107,30 @@ func (_m *WithdrawDataInterface) GetByID(id int) (*withdraw.WithdrawInfo, error)
 	}
 
 	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUserDoctor provides a mock function with given fields: id
+func (_m *WithdrawDataInterface) GetUserDoctor(id uint) (uint, error) {
+	ret := _m.Called(id)
+
+	var r0 uint
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) (uint, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uint) uint); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
 		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
