@@ -100,6 +100,7 @@ func main() {
 	var slug = slug.New()
 	var email = email.New(*config)
 	var openai = openai.InitOpenAI(*config)
+	var meet = helper.NewMeet()
 	db, err := database.InitDB(*config)
 	if err != nil {
 		e.Logger.Fatal("cannot run database, ", err.Error())
@@ -142,7 +143,7 @@ func main() {
 	patientController := handlerPatient.NewHandlerPatient(patientServices, jwtInterface)
 
 	doctorModel := dataDoctor.NewDoctor(db)
-	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, email)
+	doctorServices := serviceDoctor.NewDoctor(doctorModel, cld, email, meet)
 	doctorController := handlerDoctor.NewHandlerDoctor(doctorServices, jwtInterface)
 
 	withdrawModel := dataWithdraw.New(db)
