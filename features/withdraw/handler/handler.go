@@ -66,6 +66,12 @@ func (wh *WithdrawHandler) GetAllWithdrawDokter() echo.HandlerFunc {
 
 func (wh *WithdrawHandler) CreateWithdraw() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := wh.jwt.CheckRole(c)
+
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only doctor can access this page", nil))
+		}
+
 		var req = new(InputRequest)
 
 		if err := c.Bind(req); err != nil {

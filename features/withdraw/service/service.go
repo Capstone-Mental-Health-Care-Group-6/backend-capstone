@@ -34,11 +34,19 @@ func (s *WithdrawService) GetAllWithdrawDokter(id uint) ([]withdraw.WithdrawInfo
 }
 
 func (s *WithdrawService) GetBalance(idDoctor uint) (uint, error) {
-	return s.wd.GetBalance(idDoctor)
+	balance, err := s.wd.GetBalance(idDoctor)
+	if err != nil {
+		return 0, errors.New("Get Balance Error")
+	}
+	return balance, nil
 }
 
 func (s *WithdrawService) GetUserDoctor(id uint) (uint, error) {
-	return s.wd.GetUserDoctor(id)
+	id, err := s.wd.GetUserDoctor(id)
+	if err != nil {
+		return 0, errors.New("Get User Doctor Error")
+	}
+	return id, nil
 }
 
 func (s *WithdrawService) CreateWithdraw(newData withdraw.Withdraw) (*withdraw.Withdraw, error) {
