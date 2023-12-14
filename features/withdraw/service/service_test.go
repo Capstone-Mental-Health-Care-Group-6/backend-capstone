@@ -140,6 +140,16 @@ func TestGetBalance(t *testing.T) {
 		assert.Equal(t, res, uint(20000))
 		data.AssertExpectations(t)
 	})
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetBalance", uint(1)).Return(uint(0), errors.New("Get Balance Error")).Once()
+
+		res, err := service.GetBalance(uint(1))
+
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res)
+		assert.EqualError(t, err, "Get Balance Error")
+	})
 }
 
 func TestGetUserDoctor(t *testing.T) {
@@ -155,6 +165,16 @@ func TestGetUserDoctor(t *testing.T) {
 		assert.NotNil(t, res)
 		assert.Equal(t, res, uint(1))
 		data.AssertExpectations(t)
+	})
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetUserDoctor", uint(1)).Return(uint(0), errors.New("Get User Doctor Error")).Once()
+
+		res, err := service.GetUserDoctor(uint(1))
+
+		assert.NotNil(t, err)
+		assert.Equal(t, uint(0), res)
+		assert.EqualError(t, err, "Get User Doctor Error")
 	})
 }
 
