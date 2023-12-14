@@ -1,7 +1,7 @@
 package data
 
 import (
-	counselingsession "FinalProject/features/counseling_session/data"
+	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor/data"
 	"FinalProject/features/transaction"
 	"errors"
@@ -388,6 +388,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		}
 
 		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
+
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
 		qryToDoctor := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).Updates(data.Doctor{
@@ -408,7 +409,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
 		newData.DoctorName = existingDataDoctor.DoctorName
-		newData.UserID = existingData.UserID
+		newData.UserID = existingData.PatientID
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = existingData.DurationID
@@ -470,6 +471,7 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 		}
 
 		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
+
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
 
 		qryToDoctor := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).Updates(data.Doctor{

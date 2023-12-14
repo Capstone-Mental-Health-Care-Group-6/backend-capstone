@@ -83,8 +83,6 @@ import (
 	"FinalProject/utils/openai"
 	"FinalProject/utils/websocket"
 
-	// "fmt"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

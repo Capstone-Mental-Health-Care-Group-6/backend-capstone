@@ -48,11 +48,16 @@ func (pdata *DoctorData) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
 		if err != nil {
 			return nil, err
 		}
+		rating, err := pdata.GetByIDRating(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
 
 		// Assign the retrieved data to the corresponding fields in the Doctor struct
 		doctors[i].DoctorExperience = experience
 		doctors[i].DoctorEducation = education
 		doctors[i].DoctorWorkdays = workday
+		doctors[i].DoctorRating = rating
 	}
 
 	return doctors, nil
@@ -107,6 +112,10 @@ func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 		if err != nil {
 			return nil, err
 		}
+		rating, err := pdata.GetByIDRating(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
 
 		fmt.Println("Data", doctor.ID)
 
@@ -114,6 +123,7 @@ func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 		doctors[i].DoctorExperience = experience
 		doctors[i].DoctorEducation = education
 		doctors[i].DoctorWorkdays = workday
+		doctors[i].DoctorRating = rating
 	}
 
 	return doctors, nil
@@ -146,11 +156,16 @@ func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 	if err != nil {
 		return nil, err
 	}
+	rating, err := pdata.GetByIDRating(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
 
 	// Assign the retrieved data to the corresponding fields in the Doctor struct
 	doctor.DoctorExperience = experience
 	doctor.DoctorEducation = education
 	doctor.DoctorWorkdays = workday
+	doctor.DoctorRating = rating
 
 	return &doctor, nil
 }
@@ -183,10 +198,16 @@ func (pdata *DoctorData) GetDoctorByUserId(userId int) (*doctor.DoctorAll, error
 		return nil, err
 	}
 
+	rating, err := pdata.GetByIDRating(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
+
 	// Assign the retrieved data to the corresponding fields in the Doctor struct
 	doctor.DoctorExperience = experience
 	doctor.DoctorEducation = education
 	doctor.DoctorWorkdays = workday
+	doctor.DoctorRating = rating
 
 	return &doctor, nil
 }
@@ -230,6 +251,20 @@ func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorWorkdays, erro
 	}
 
 	return doctorInfoWorkday, nil
+}
+
+func (pdata *DoctorData) GetByIDRating(id int) ([]doctor.DoctorRating, error) {
+	var doctorInfoRating []doctor.DoctorRating
+
+	qry := pdata.db.Table("doctors_rating").
+		Select("doctors_rating.*").Where("doctors_rating.doctor_id = ?", id).Where("doctors_rating.deleted_at IS NULL").
+		Scan(&doctorInfoRating)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return doctorInfoRating, nil
 }
 
 // CREATE DATA QUERY \\

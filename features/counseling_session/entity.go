@@ -20,43 +20,10 @@ type CounselingSession struct {
 	Status          string    `json:"status"`
 	CreatedAt       time.Time `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt       time.Time `json:"updated_at" gorm:"column:updated_at"`
-}
 
-type CounselingSessionInfo struct {
-	ID              uint              `json:"id"`
-	TransactionID   uint              `json:"transaction_id"`
-	TransactionInfo []TransactionInfo `json:"transaction_info"`
-	Date            time.Time         `json:"date"`
-	Time            time.Time         `json:"time"`
-	Duration        uint              `json:"duration"`
-	Status          string            `json:"status"`
-}
-
-type TransactionInfo struct {
-	TopicName     string `json:"topic_name"`
-	PatientName   string `json:"patient_name"`
-	PatientAvatar string `json:"patient_avatar"`
-	DoctorName    string `json:"doctor_name"`
-	MethodName    string `json:"method_name"`
-	DurationName  string `json:"duration_name"`
-	CounselingID  uint   `json:"counseling_id"`
-
-	UserID     uint   `json:"user_id"`
-	MidtransID string `json:"transaction_id"`
-
-	CounselingType string `json:"counseling_type"`
-
-	PriceMethod     uint `json:"price_method"`
-	PriceDuration   uint `json:"price_duration"`
-	PriceCounseling uint `json:"price_counseling"`
-	PriceResult     uint `json:"price_result"`
-
-	PaymentProof  string    `json:"payment_proof"`
-	PaymentStatus uint      `json:"payment_status"`
-	PaymentType   string    `json:"payment_type"`
-	CreatedAt     time.Time `json:"created_at" gorm:"column:created_at"`
-	UpdatedAt     time.Time `json:"updated_at" gorm:"column:updated_at"`
-	// Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
+	CounselingType   string `json:"counseling_type"`
+	CounselingMethod string `json:"counseling_method"`
+	CounselingTopic  string `json:"counseling_topic"`
 }
 
 type CounselingSessionHandlerInterface interface {
