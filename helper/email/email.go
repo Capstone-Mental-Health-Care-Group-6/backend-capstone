@@ -69,7 +69,7 @@ func (e *email) HTMLBody(role, name string) (string, string, string) {
 }
 
 func (e *email) htmlBodyDoctor(name, code string) (string, string) {
-	url := e.config.BaseURLFE + "/reset-password?token_reset_password=" + code
+	url := e.config.BaseURLFE + "/reset-password/" + code
 	header := "Hi " + name + ", Kami sudah mengirim link verifikasi untuk merubah kata sandi"
 	htmlBody := `
 		<!DOCTYPE html>
