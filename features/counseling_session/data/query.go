@@ -4,6 +4,8 @@ import (
 	counselingsession "FinalProject/features/counseling_session"
 	"errors"
 
+	transaction "FinalProject/features/transaction"
+
 	"gorm.io/gorm"
 )
 
@@ -25,8 +27,44 @@ func (bc *CounselingSessionData) GetAll() ([]counselingsession.CounselingSession
 		Where("counseling_session.deleted_at is null").
 		Scan(&listCounselingSession)
 
-	if err := qry.Error; err != nil {
-		return nil, err
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	for i, result := range listCounselingSession {
+		existingData := transaction.TransactionInfo{}
+
+		var qryTransaction = bc.db.Table("transactions").Select(`
+	        transactions.*,
+	        counseling_topics.name as topic_name,
+	        patient_accounts.name as patient_name,
+	        patient_accounts.avatar as patient_avatar,
+	        doctors.doctor_name as doctor_name,
+	        counseling_methods.name as method_name,
+	        counseling_durations.name as duration_name,
+	        transactions.created_at,
+	        transactions.updated_at,
+	        doctors_rating.id as doctor_rating_id,
+	        doctors_rating.doctor_star_rating as doctor_star_rating,
+	        doctors_rating.doctor_review as doctor_review
+	    `).
+			Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+			Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+			Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+			Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+			Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+			Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+			Where("transactions.id = ?", result.TransactionID).
+			Where("transactions.deleted_at is null").
+			Scan(&existingData)
+
+		if qryTransaction.Error != nil {
+			return nil, qryTransaction.Error
+		}
+
+		listCounselingSession[i].CounselingType = existingData.CounselingType
+		listCounselingSession[i].CounselingMethod = existingData.MethodName
+		listCounselingSession[i].CounselingTopic = existingData.TopicName
 	}
 
 	return listCounselingSession, nil
@@ -60,6 +98,40 @@ func (bc *CounselingSessionData) GetById(id int) (*counselingsession.CounselingS
 		Where("counseling_session.id = ?", id).
 		Scan(&result)
 
+	existingData := transaction.TransactionInfo{}
+
+	var qryTransaction = bc.db.Table("transactions").Select(`
+        transactions.*,
+        counseling_topics.name as topic_name,
+        patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        counseling_methods.name as method_name,
+        counseling_durations.name as duration_name,
+        transactions.created_at,
+        transactions.updated_at,
+        doctors_rating.id as doctor_rating_id,
+        doctors_rating.doctor_star_rating as doctor_star_rating,
+        doctors_rating.doctor_review as doctor_review
+    `).
+		Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+		Where("transactions.id = ?", result.TransactionID).
+		Where("transactions.deleted_at is null").
+		Scan(&existingData)
+
+	if qryTransaction.Error != nil {
+		return nil, qry.Error
+	}
+
+	result.CounselingType = existingData.CounselingType
+	result.CounselingMethod = existingData.MethodName
+	result.CounselingTopic = existingData.TopicName
+
 	if err := qry.Error; err != nil {
 		return nil, err
 	}
@@ -76,8 +148,44 @@ func (bc *CounselingSessionData) GetAllCounselingByUserID(userID int) ([]counsel
 		Where("counseling_session.deleted_at is null").
 		Scan(&listCounselingSession)
 
-	if err := qry.Error; err != nil {
-		return nil, err
+	if qry.Error != nil {
+		return nil, qry.Error
+	}
+
+	for i, result := range listCounselingSession {
+		existingData := transaction.TransactionInfo{}
+
+		var qryTransaction = bc.db.Table("transactions").Select(`
+	        transactions.*,
+	        counseling_topics.name as topic_name,
+	        patient_accounts.name as patient_name,
+	        patient_accounts.avatar as patient_avatar,
+	        doctors.doctor_name as doctor_name,
+	        counseling_methods.name as method_name,
+	        counseling_durations.name as duration_name,
+	        transactions.created_at,
+	        transactions.updated_at,
+	        doctors_rating.id as doctor_rating_id,
+	        doctors_rating.doctor_star_rating as doctor_star_rating,
+	        doctors_rating.doctor_review as doctor_review
+	    `).
+			Joins("LEFT JOIN counseling_topics ON counseling_topics.id = transactions.topic_id").
+			Joins("LEFT JOIN patient_accounts ON patient_accounts.id = transactions.patient_id").
+			Joins("LEFT JOIN doctors ON doctors.id = transactions.doctor_id").
+			Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
+			Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
+			Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
+			Where("transactions.id = ?", result.TransactionID).
+			Where("transactions.deleted_at is null").
+			Scan(&existingData)
+
+		if qryTransaction.Error != nil {
+			return nil, qryTransaction.Error
+		}
+
+		listCounselingSession[i].CounselingType = existingData.CounselingType
+		listCounselingSession[i].CounselingMethod = existingData.MethodName
+		listCounselingSession[i].CounselingTopic = existingData.TopicName
 	}
 
 	return listCounselingSession, nil

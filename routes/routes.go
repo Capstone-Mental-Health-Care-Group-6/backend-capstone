@@ -84,8 +84,11 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 
 	e.DELETE("/doctor/:id", ph.DeleteDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/doctor/:type/:id", ph.DeleteDoctorData(), echojwt.JWT([]byte(cfg.Secret)))
-	// e.DELETE("/doctor/experience/:id", ph.DeleteExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	// e.DELETE("/doctor/education/:id", ph.DeleteEducation(), echojwt.JWT([]byte(cfg.Secret)))
+
+	// ROUTE UNTUK ADMIN
+	e.GET("/doctor/dashboard", ph.DoctorDashboardAdmin(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/:user_id/approve", ph.ApproveDoctor(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/doctor/:user_id/deny", ph.DenyDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg configs.ProgrammingConfig) {

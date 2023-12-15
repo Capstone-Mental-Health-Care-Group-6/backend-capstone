@@ -3,7 +3,9 @@ package data
 import (
 	"FinalProject/features/doctor"
 	"FinalProject/features/users"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -48,11 +50,16 @@ func (pdata *DoctorData) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
 		if err != nil {
 			return nil, err
 		}
+		rating, err := pdata.GetByIDRating(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
 
 		// Assign the retrieved data to the corresponding fields in the Doctor struct
 		doctors[i].DoctorExperience = experience
 		doctors[i].DoctorEducation = education
 		doctors[i].DoctorWorkdays = workday
+		doctors[i].DoctorRating = rating
 	}
 
 	return doctors, nil
@@ -107,6 +114,10 @@ func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 		if err != nil {
 			return nil, err
 		}
+		rating, err := pdata.GetByIDRating(int(doctor.ID))
+		if err != nil {
+			return nil, err
+		}
 
 		fmt.Println("Data", doctor.ID)
 
@@ -114,6 +125,7 @@ func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 		doctors[i].DoctorExperience = experience
 		doctors[i].DoctorEducation = education
 		doctors[i].DoctorWorkdays = workday
+		doctors[i].DoctorRating = rating
 	}
 
 	return doctors, nil
@@ -146,11 +158,16 @@ func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 	if err != nil {
 		return nil, err
 	}
+	rating, err := pdata.GetByIDRating(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
 
 	// Assign the retrieved data to the corresponding fields in the Doctor struct
 	doctor.DoctorExperience = experience
 	doctor.DoctorEducation = education
 	doctor.DoctorWorkdays = workday
+	doctor.DoctorRating = rating
 
 	return &doctor, nil
 }
@@ -183,10 +200,16 @@ func (pdata *DoctorData) GetDoctorByUserId(userId int) (*doctor.DoctorAll, error
 		return nil, err
 	}
 
+	rating, err := pdata.GetByIDRating(int(doctor.ID))
+	if err != nil {
+		return nil, err
+	}
+
 	// Assign the retrieved data to the corresponding fields in the Doctor struct
 	doctor.DoctorExperience = experience
 	doctor.DoctorEducation = education
 	doctor.DoctorWorkdays = workday
+	doctor.DoctorRating = rating
 
 	return &doctor, nil
 }
@@ -230,6 +253,20 @@ func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorWorkdays, erro
 	}
 
 	return doctorInfoWorkday, nil
+}
+
+func (pdata *DoctorData) GetByIDRating(id int) ([]doctor.DoctorRating, error) {
+	var doctorInfoRating []doctor.DoctorRating
+
+	qry := pdata.db.Table("doctors_rating").
+		Select("doctors_rating.*").Where("doctors_rating.doctor_id = ?", id).Where("doctors_rating.deleted_at IS NULL").
+		Scan(&doctorInfoRating)
+
+	if err := qry.Error; err != nil {
+		return nil, err
+	}
+
+	return doctorInfoRating, nil
 }
 
 // CREATE DATA QUERY \\
@@ -295,6 +332,8 @@ func (pdata *DoctorData) InsertWorkadays(newData doctor.DoctorWorkdays) (*doctor
 		return nil, err
 	}
 
+	newData.ID = dbData.ID
+
 	return &newData, nil
 }
 
@@ -307,11 +346,12 @@ func (pdata *DoctorData) InsertExperience(newData doctor.DoctorExperience) (*doc
 	dbData.DoctorCompanyAddress = newData.DoctorCompany
 	dbData.DoctorStartDate = newData.DoctorStartDate
 	dbData.DoctorEndDate = newData.DoctorEndDate
-	// dbData.DoctorIsNow = newData.DoctorIsNow
 
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
 	}
+
+	newData.ID = dbData.ID
 
 	return &newData, nil
 }
@@ -328,6 +368,8 @@ func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*docto
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
 	}
+
+	newData.ID = dbData.ID
 
 	return &newData, nil
 }
@@ -591,6 +633,69 @@ func (pdata *DoctorData) DeleteDoctor(doctorID int) (bool, error) {
 
 	if err := pdata.db.Table("doctors_rating").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
 		return false, err
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DoctorDashboardAdmin() (doctor.DoctorDashboardAdmin, error) {
+	var dashboardArticle doctor.DoctorDashboardAdmin
+
+	tDokter, tDokterBaru, tDokterPending, tDokterActive := pdata.getTotalDoctor()
+
+	dashboardArticle.TotalDoctor = tDokter
+	dashboardArticle.TotalDoctorActive = tDokterActive
+	dashboardArticle.TotalDoctorBaru = tDokterBaru
+	dashboardArticle.TotalDoctorPending = tDokterPending
+
+	return dashboardArticle, nil
+}
+
+func (pdata *DoctorData) getTotalDoctor() (int, int, int, int) {
+	var totalDokter int64
+	var totalDokterBaru int64
+	var totalDokterPending int64
+	var totalDokterAktif int64
+
+	var now = time.Now()
+	var before = now.AddDate(0, 0, -30)
+
+	var _ = pdata.db.Table("doctors").Count(&totalDokter)
+	var _ = pdata.db.Table("doctors").Where("created_at BETWEEN ? and ?", before, now).Where("doctor_status = ?", "Confirmed").Count(&totalDokterBaru)
+	var _ = pdata.db.Table("doctors").Where("doctor_status = ?", "Request").Count(&totalDokterPending)
+	var _ = pdata.db.Table("doctors").Where("doctor_status = ?", "Confirmed").Count(&totalDokterAktif)
+
+	totalDokterInt := int(totalDokter)
+	totalDokterBaruInt := int(totalDokterBaru)
+	totalDokterPendingInt := int(totalDokterPending)
+	totalDokterAktifInt := int(totalDokterAktif)
+
+	return totalDokterInt, totalDokterBaruInt, totalDokterPendingInt, totalDokterAktifInt
+}
+
+func (pdata *DoctorData) DenyDoctor(id int) (bool, error) {
+	var qry = pdata.db.Table("doctors").Where("id = ?", id).Updates(Doctor{DoctorStatus: "Reject"})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) ApproveDoctor(id int) (bool, error) {
+	var qry = pdata.db.Table("doctors").Where("id = ?", id).Updates(Doctor{DoctorStatus: "Confirmed"})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
 	return true, nil

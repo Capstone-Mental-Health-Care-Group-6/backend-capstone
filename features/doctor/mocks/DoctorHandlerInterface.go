@@ -12,6 +12,22 @@ type DoctorHandlerInterface struct {
 	mock.Mock
 }
 
+// ApproveDoctor provides a mock function with given fields:
+func (_m *DoctorHandlerInterface) ApproveDoctor() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
 // CreateDoctor provides a mock function with given fields:
 func (_m *DoctorHandlerInterface) CreateDoctor() echo.HandlerFunc {
 	ret := _m.Called()
@@ -60,8 +76,40 @@ func (_m *DoctorHandlerInterface) DeleteDoctorData() echo.HandlerFunc {
 	return r0
 }
 
+// DenyDoctor provides a mock function with given fields:
+func (_m *DoctorHandlerInterface) DenyDoctor() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
 // DoctorDashboard provides a mock function with given fields:
 func (_m *DoctorHandlerInterface) DoctorDashboard() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// DoctorDashboardAdmin provides a mock function with given fields:
+func (_m *DoctorHandlerInterface) DoctorDashboardAdmin() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
