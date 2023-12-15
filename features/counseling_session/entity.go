@@ -50,8 +50,8 @@ type CounselingSessionServiceInterface interface {
 	GetAllCounselingByUserID(userID int) ([]CounselingSession, error)
 	UpdateCounseling(id int, input CounselingSession) (bool, error)
 	DeleteCounseling(id int) (bool, error)
-	ApprovePatient(id int) (bool, error)
-	RejectPatient(id int, newData StatusUpdate) (bool, error)
+	ApprovePatient(id, doctorID int) (bool, error)
+	RejectPatient(id, doctorID int, newData StatusUpdate) (bool, error)
 }
 
 type CounselingSessionDataInterface interface {
@@ -63,4 +63,5 @@ type CounselingSessionDataInterface interface {
 	Delete(id int) (bool, error)
 	ApprovePatient(id int) (bool, error)
 	RejectPatient(id int, newData StatusUpdate) (bool, error)
+	CheckPatient(id, doctorID int) error
 }

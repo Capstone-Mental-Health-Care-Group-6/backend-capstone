@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -237,6 +238,9 @@ func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 
+		doctor_id, _ := h.jwt.GetID(c)
+		doctorID := int(doctor_id)
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -244,9 +248,12 @@ func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Param ID", nil))
 		}
 
-		result, err := h.s.ApprovePatient(id)
+		result, err := h.s.ApprovePatient(id, doctorID)
 
 		if err != nil {
+			if strings.Contains(err.Error(), "Data Not Found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Dokter Tidak Memiliki Berhak Untuk Counseling Session Ini", nil))
+			}
 			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
 		}
@@ -264,6 +271,9 @@ func (h *CounselingSessionHandler) RejectPatient() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
 
+		doctor_id, _ := h.jwt.GetID(c)
+		doctorID := int(doctor_id)
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
@@ -280,9 +290,12 @@ func (h *CounselingSessionHandler) RejectPatient() echo.HandlerFunc {
 		var serviceUpdate = new(counselingsession.StatusUpdate)
 		serviceUpdate.Alasan = input.Alasan
 
-		result, err := h.s.RejectPatient(id, *serviceUpdate)
+		result, err := h.s.RejectPatient(id, doctorID, *serviceUpdate)
 
 		if err != nil {
+			if strings.Contains(err.Error(), "Data Not Found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Dokter Tidak Memiliki Berhak Untuk Counseling Session Ini", nil))
+			}
 			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
 		}
