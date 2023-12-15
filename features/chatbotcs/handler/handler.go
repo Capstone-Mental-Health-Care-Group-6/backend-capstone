@@ -33,7 +33,7 @@ func (ch *ChatbotCsHandler) ChatBotCs() echo.HandlerFunc {
 		defer ch.srv.LeaveGroup(ip)
 
 		welcome := chatbotcs.ChatbotCs{
-			Message: "Hello , Halo! Selamat datang di EmpathiCare. Saya Salsa, Asistent Virtual EmpathiCare 😊. Silakan pilih opsi menu yang Sahabat inginkan",
+			Message: "Selamat datang di Aplikasi Kesehatan Mental kami! Saya akan dengan senang hati membantu Anda memahami fitur-fitur yang tersedia. Berikut beberapa hal yang dapat Anda lakukan:",
 			Type:    "bot",
 		}
 
