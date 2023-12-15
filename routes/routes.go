@@ -125,6 +125,7 @@ func RouteCounseling(e *echo.Echo, ph counselingsession.CounselingSessionHandler
 	e.POST("/counseling", ph.CreateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/counseling/:id", ph.UpdateCounseling(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/counseling/:id", ph.DeleteCounseling(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/counseling/manage/:id", ph.ManagePatient(), echojwt.JWT([]byte(cfg.Secret)))
 }
 
 func RouteCounselingMethod(e *echo.Echo, mh counselingmethod.CounselingMethodHandlerInterface, cfg configs.ProgrammingConfig) {

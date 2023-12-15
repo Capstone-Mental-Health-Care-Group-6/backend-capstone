@@ -18,6 +18,8 @@ type CounselingSession struct {
 	Time            time.Time `json:"time"`
 	Duration        uint      `json:"duration"`
 	Status          string    `json:"status"`
+	Alasan          string    `json:"alasan"`
+	DetailAlasan    string    `json:"detail_alasan"`
 	CreatedAt       time.Time `json:"created_at" gorm:"column:created_at"`
 	UpdatedAt       time.Time `json:"updated_at" gorm:"column:updated_at"`
 }
@@ -59,6 +61,12 @@ type TransactionInfo struct {
 	// Ratings       []DoctorRating `json:"ratings gorm:"foreignkey:DoctorID"`
 }
 
+type StatusUpdate struct {
+	Status       string
+	Alasan       string
+	DetailAlasan string
+}
+
 type CounselingSessionHandlerInterface interface {
 	GetAllCounseling() echo.HandlerFunc
 	CreateCounseling() echo.HandlerFunc
@@ -66,6 +74,7 @@ type CounselingSessionHandlerInterface interface {
 	GetCounselingByUserID() echo.HandlerFunc
 	UpdateCounseling() echo.HandlerFunc
 	DeleteCounseling() echo.HandlerFunc
+	ManagePatient() echo.HandlerFunc
 }
 
 type CounselingSessionServiceInterface interface {
@@ -75,6 +84,7 @@ type CounselingSessionServiceInterface interface {
 	GetAllCounselingByUserID(userID int) ([]CounselingSession, error)
 	UpdateCounseling(id int, input CounselingSession) (bool, error)
 	DeleteCounseling(id int) (bool, error)
+	ManagePatient(id int, newData StatusUpdate) (bool, error)
 }
 
 type CounselingSessionDataInterface interface {
@@ -84,4 +94,5 @@ type CounselingSessionDataInterface interface {
 	GetById(id int) (*CounselingSession, error)
 	Update(id int, newData CounselingSession) (bool, error)
 	Delete(id int) (bool, error)
+	ManagePatient(id int, newData StatusUpdate) (bool, error)
 }

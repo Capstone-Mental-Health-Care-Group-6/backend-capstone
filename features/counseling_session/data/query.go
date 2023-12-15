@@ -39,6 +39,8 @@ func (bc *CounselingSessionData) Create(input counselingsession.CounselingSessio
 	newData.Time = input.Time
 	newData.Duration = input.Duration
 	newData.Status = input.Status
+	newData.Alasan = input.Alasan
+	newData.DetailAlasan = input.DetailAlasan
 	// MASUKIN DATA
 
 	if err := bc.db.Table("counseling_session").Create(newData).Error; err != nil {
@@ -127,6 +129,24 @@ func (bc *CounselingSessionData) Delete(id int) (bool, error) {
 
 	if err := bc.db.Table("counseling_session").Where("id = ?", id).Delete(&deleteData).Error; err != nil {
 		return false, err
+	}
+
+	return true, nil
+}
+
+func (bc *CounselingSessionData) ManagePatient(id int, newData counselingsession.StatusUpdate) (bool, error) {
+	var qry = bc.db.Table("counseling_session").Where("id = ?", id).Updates(CounselingSession{
+		Status:       newData.Status,
+		Alasan:       newData.Alasan,
+		DetailAlasan: newData.DetailAlasan,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, nil
 	}
 
 	return true, nil
