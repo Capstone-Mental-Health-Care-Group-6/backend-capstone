@@ -14,10 +14,11 @@ type ChatbotCsData struct {
 func New(questions map[string]string) chatbotcs.ChatbotCsDataInterface {
 	return &ChatbotCsData{
 		Questions: map[string]string{
-			"bagaimana cara melakukan pendaftaran?":          "Untuk mendaftar, kunjungi halaman pendaftaran dan isi formulir dengan informasi yang diperlukan.",
-			"apa langkah-langkah untuk login?":               "Langkah-langkah login melibatkan memasukkan email dan password yang sudah terdaftar.",
-			"bagaimana cara mengubah kata sandi?":            "Anda dapat mengubah kata sandi di halaman pengaturan akun setelah berhasil login.",
-			"apa yang harus dilakukan jika lupa kata sandi?": "Klik 'Lupa Kata Sandi' pada halaman login dan ikuti petunjuk untuk mereset kata sandi.",
+			"Bagaimana Cara Mengubah Biodata Diri?":    "Buka aplikasi. Masuk ke akun Anda. Cari 'Profil' atau pada  menu. Klik opsi 'Edit Profil'. Isi data baru dan simpan perubahan. Apakah informasi yang saya berikan sudah jelas?.",
+			"Apa Fitur yang Tersedia?":                 "Kami memiliki beberapa fitur yang tersedia seperti Artikel, Buat Janji, Chatbot dan Konseling. Namun, kami memiliki fitur unggulan yaitu konseling dengan dokter spesialis yang tersedia.",
+			"Panduan Untuk Buat Janji Dengan Konselor": "Klik menu 'Buat Janji'. Pilih konselor yang ingin Anda panggil. Pilih tanggal dan waktu. Klik tombol 'Buat Janji'.",
+			"Panduan Untuk Chatbot":                    "Klik menu 'Chatbot'. Pilih pertanyaan yang ingin Anda tanyakan. AI akan membalas pertanyaan Anda.",
+			"Panduan Untuk Konseling":                  "Klik menu 'Konseling'. Pastikan Anda Sudah membuat Janji Dengan Dokter, Pilih Dokter yang ingin Anda konsultasi. Anda akan berkomunikasi melalui chat dan video call.",
 		},
 	}
 }
