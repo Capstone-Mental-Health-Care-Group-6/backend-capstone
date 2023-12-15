@@ -35,6 +35,7 @@ type TransactionInfo struct {
 	TopicName      string `json:"topic_name"`
 	PatientName    string `json:"patient_name"`
 	PatientAvatar  string `json:"patient_avatar"`
+	DoctorAvatar   string `json:"doctor_avatar"`
 	DoctorName     string `json:"doctor_name"`
 	MethodName     string `json:"method_name"`
 	DurationName   string `json:"duration_name"`
