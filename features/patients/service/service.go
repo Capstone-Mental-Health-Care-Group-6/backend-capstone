@@ -122,11 +122,21 @@ func (psvc *PatientService) UpdateStatus(id int, newData patients.UpdateStatus) 
 	return result, nil
 }
 
-func (psvc *PatientService) Delete(id int) (bool, error) {
-	result, err := psvc.data.Delete(id)
+func (psvc *PatientService) InactivateAccount(id int) (bool, error) {
+	result, err := psvc.data.InactivateAccount(id)
 
 	if err != nil {
-		return false, errors.New("Delete Process Failed")
+		return false, errors.New("Inactivate Account Process Failed")
+	}
+
+	return result, nil
+}
+
+func (psvc *PatientService) ActivateAccount(id int) (bool, error) {
+	result, err := psvc.data.ActivateAccount(id)
+
+	if err != nil {
+		return false, errors.New("Activate Account Process Failed")
 	}
 
 	return result, nil

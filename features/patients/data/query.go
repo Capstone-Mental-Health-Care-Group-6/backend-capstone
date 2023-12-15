@@ -3,6 +3,7 @@ package data
 import (
 	//"net/url"
 	"FinalProject/features/patients"
+	"errors"
 	"time"
 
 	//mysql "FinalProject/utils/database/migration/mysql"
@@ -126,7 +127,7 @@ func (pdata *PatientData) Update(id int, newData patients.UpdateProfile) (bool, 
 	}
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
-		return false, nil
+		return false, errors.New("Update Data Error, No Rows Affected")
 	}
 
 	return true, nil
@@ -142,7 +143,7 @@ func (pdata *PatientData) UpdatePassword(id int, newData patients.UpdatePassword
 	}
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
-		return false, nil
+		return false, errors.New("Update Data Error, No Rows Affected")
 	}
 
 	return true, nil
@@ -193,16 +194,35 @@ func (pdata *PatientData) UpdateStatus(id int, newData patients.UpdateStatus) (b
 	}
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
-		return false, nil
+		return false, errors.New("Update Data Error, No Rows Affected")
 	}
 
 	return true, nil
 }
 
-func (pdata *PatientData) Delete(id int) (bool, error) {
+func (pdata *PatientData) InactivateAccount(id int) (bool, error) {
+	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{Status: "Inactive"})
 
-	if err := pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{Status: "Inactive"}).Error; err != nil {
+	if err := qry.Error; err != nil {
 		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Rows Affected")
+	}
+
+	return true, nil
+}
+
+func (pdata *PatientData) ActivateAccount(id int) (bool, error) {
+	var qry = pdata.db.Table("patient_accounts").Where("id = ?", id).Updates(PatientAccount{Status: "Active"})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Rows Affected")
 	}
 
 	return true, nil

@@ -41,10 +41,10 @@ func (mdl *PatientHandler) GetPatients() echo.HandlerFunc {
 		}
 
 		if len(result) == 0 {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Success", "Data is Empty"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Data is Empty", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Data", result))
 	}
 }
 
@@ -54,7 +54,7 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 
 		if err := c.Bind(input); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		//formHeaderPhoto, err := c.FormFile("avatar")
@@ -96,7 +96,7 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Input Process Error", nil))
 		}
 
 		var response = new(PatientResponse)
@@ -109,7 +109,7 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 		response.Role = result.Role
 		response.Status = result.Status
 
-		return c.JSON(http.StatusCreated, helper.FormatResponse("Success", response))
+		return c.JSON(http.StatusCreated, helper.FormatResponse("Success Created Data", response))
 	}
 }
 
@@ -120,7 +120,7 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 		var input = new(UpdateProfile)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		formHeaderPhoto, err := c.FormFile("avatar")
@@ -130,12 +130,12 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 
 		formPhoto, err := formHeaderPhoto.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Server Error Cannot Open Photo", nil))
 		}
 
 		uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Upload Photo Error", nil))
 		}
 
 		var serviceUpdate = new(patients.UpdateProfile)
@@ -149,11 +149,11 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 		result, err := mdl.svc.UpdatePatient(userIdInt, *serviceUpdate)
 
 		if err != nil {
-			c.Logger().Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Info("Handler : Update Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Process Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Data", result))
 	}
 }
 
@@ -163,7 +163,7 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind input error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Input User", nil))
 		}
 
 		result, err := mdl.svc.LoginPatient(input.Email, input.Password)
@@ -171,9 +171,9 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 		if err != nil {
 			c.Logger().Error("Handler: Login process error: ", err.Error())
 			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusNotFound, helper.FormatResponse("Data Not Found", nil))
 			}
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Login Patient Error", nil))
 		}
 
 		var response = new(PatientLoginResponse)
@@ -181,7 +181,7 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 		response.Email = result.Email
 		response.Token = result.Access
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", response))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Login", response))
 	}
 }
 
@@ -192,7 +192,7 @@ func (mdl *PatientHandler) UpdatePassword() echo.HandlerFunc {
 		var input = new(UpdatePassword)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		var serviceUpdate = new(patients.UpdatePassword)
@@ -201,11 +201,11 @@ func (mdl *PatientHandler) UpdatePassword() echo.HandlerFunc {
 		result, err := mdl.svc.UpdatePassword(userIdInt, *serviceUpdate)
 
 		if err != nil {
-			c.Logger().Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Info("Handler : Update Password Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Password Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Password", result))
 	}
 }
 
@@ -216,17 +216,17 @@ func (mdl *PatientHandler) GetPatient() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		result, err := mdl.svc.GetPatient(id)
 
 		if err != nil {
 			c.Logger().Info("Handler : Get By ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Get By ID Process Error", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Data", result))
 	}
 }
 
@@ -241,7 +241,7 @@ func (mdl *PatientHandler) PatientDashboard() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Callback process error: ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Dashboard Patient Error", nil))
 		}
 
 		var response = new(DashboardResponse)
@@ -250,7 +250,7 @@ func (mdl *PatientHandler) PatientDashboard() echo.HandlerFunc {
 		response.TotalUserActive = res.TotalUserActive
 		response.TotalUserInactive = res.TotalUserInactive
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success get patient", response))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Patient", response))
 	}
 }
 
@@ -261,18 +261,19 @@ func (mdl *PatientHandler) UpdateStatus() echo.HandlerFunc {
 		if role != "Admin" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
 		var req UpdateStatus
 
 		if err := c.Bind(&req); err != nil {
 			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Request", nil))
 		}
 
 		var serviceUpdate = new(patients.UpdateStatus)
@@ -281,26 +282,54 @@ func (mdl *PatientHandler) UpdateStatus() echo.HandlerFunc {
 		result, err := mdl.svc.UpdateStatus(id, *serviceUpdate)
 
 		if err != nil {
-			c.Logger().Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Status", result))
 	}
 }
 
-func (mdl *PatientHandler) Delete() echo.HandlerFunc {
+func (mdl *PatientHandler) InactivateAccount() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+		if role != "Patient" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
 		id := mdl.jwt.CheckID(c)
 		userIdInt := int(id.(float64))
 
-		result, err := mdl.svc.Delete(userIdInt)
+		result, err := mdl.svc.InactivateAccount(userIdInt)
 
 		if err != nil {
-			c.Logger().Info("Handler : Delete Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to delete bundle", nil))
+			c.Logger().Info("Handler : Inactivate Account Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Inactivate Account Process Failed", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete account", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Inactivate Account", result))
+	}
+}
+
+func (mdl *PatientHandler) ActivateAccount() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		fmt.Println(role)
+		if role != "Patient" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		id := mdl.jwt.CheckID(c)
+		userIdInt := int(id.(float64))
+
+		result, err := mdl.svc.ActivateAccount(userIdInt)
+
+		if err != nil {
+			c.Logger().Info("Handler : Activate Account Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Activate Account Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Activate Account", result))
 	}
 }

@@ -13,8 +13,8 @@ type PatientDataInterface struct {
 	mock.Mock
 }
 
-// Delete provides a mock function with given fields: id
-func (_m *PatientDataInterface) Delete(id int) (bool, error) {
+// ActivateAccount provides a mock function with given fields: id
+func (_m *PatientDataInterface) ActivateAccount(id int) (bool, error) {
 	ret := _m.Called(id)
 
 	var r0 bool
@@ -76,6 +76,30 @@ func (_m *PatientDataInterface) GetByID(id int) (patients.Patientdetail, error) 
 		r0 = rf(id)
 	} else {
 		r0 = ret.Get(0).(patients.Patientdetail)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// InactivateAccount provides a mock function with given fields: id
+func (_m *PatientDataInterface) InactivateAccount(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
 	}
 
 	if rf, ok := ret.Get(1).(func(int) error); ok {

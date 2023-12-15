@@ -12,8 +12,8 @@ type PatientHandlerInterface struct {
 	mock.Mock
 }
 
-// CreatePatient provides a mock function with given fields:
-func (_m *PatientHandlerInterface) CreatePatient() echo.HandlerFunc {
+// ActivateAccount provides a mock function with given fields:
+func (_m *PatientHandlerInterface) ActivateAccount() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
@@ -28,8 +28,8 @@ func (_m *PatientHandlerInterface) CreatePatient() echo.HandlerFunc {
 	return r0
 }
 
-// Delete provides a mock function with given fields:
-func (_m *PatientHandlerInterface) Delete() echo.HandlerFunc {
+// CreatePatient provides a mock function with given fields:
+func (_m *PatientHandlerInterface) CreatePatient() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
@@ -62,6 +62,22 @@ func (_m *PatientHandlerInterface) GetPatient() echo.HandlerFunc {
 
 // GetPatients provides a mock function with given fields:
 func (_m *PatientHandlerInterface) GetPatients() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// InactivateAccount provides a mock function with given fields:
+func (_m *PatientHandlerInterface) InactivateAccount() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
