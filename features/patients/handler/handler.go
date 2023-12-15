@@ -53,7 +53,7 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 		var input = new(PatientRequest)
 
 		if err := c.Bind(input); err != nil {
-			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
+			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
