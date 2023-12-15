@@ -182,3 +182,56 @@ func TestDeleteCounseling(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 }
+
+func TestApprovePatient(t *testing.T) {
+	data := mocks.NewCounselingSessionDataInterface(t)
+	service := New(data)
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("ApprovePatient", 1).Return(false, errors.New("Approve Patient Process Failed")).Once()
+
+		res, err := service.ApprovePatient(1)
+
+		assert.Error(t, err)
+		assert.Equal(t, res, false)
+		assert.EqualError(t, err, "Approve Patient Process Failed")
+	})
+
+	t.Run("Success Approve", func(t *testing.T) {
+		data.On("ApprovePatient", 1).Return(true, nil).Once()
+
+		res, err := service.ApprovePatient(1)
+
+		assert.Nil(t, err)
+		assert.Equal(t, res, true)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestRejectPatient(t *testing.T) {
+	data := mocks.NewCounselingSessionDataInterface(t)
+	service := New(data)
+	status := counselingsession.StatusUpdate{
+		Alasan: "overbook",
+	}
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("RejectPatient", 1, status).Return(false, errors.New("Reject Patient Process Failed")).Once()
+
+		res, err := service.RejectPatient(1, status)
+
+		assert.Error(t, err)
+		assert.Equal(t, res, false)
+		assert.EqualError(t, err, "Reject Patient Process Failed")
+	})
+
+	t.Run("Success Reject", func(t *testing.T) {
+		data.On("RejectPatient", 1, status).Return(true, nil).Once()
+
+		res, err := service.RejectPatient(1, status)
+
+		assert.Nil(t, err)
+		assert.Equal(t, res, true)
+		data.AssertExpectations(t)
+	})
+}
