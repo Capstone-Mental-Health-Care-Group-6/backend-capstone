@@ -275,3 +275,17 @@ func (bc *CounselingSessionData) RejectPatient(id int, newData counselingsession
 
 	return true, nil
 }
+
+func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
+	var listCounselingSession = []counselingsession.CounselingSession{}
+	var qry = bc.db.Table("counseling_session").Where("id = ? AND user_id = ?", id, doctorID).Scan(&listCounselingSession)
+
+	var count int64
+	qry.Count(&count)
+
+	if count > 0 {
+		return nil
+	}
+
+	return errors.New("Data Not Found")
+}

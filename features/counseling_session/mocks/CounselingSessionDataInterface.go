@@ -37,6 +37,20 @@ func (_m *CounselingSessionDataInterface) ApprovePatient(id int) (bool, error) {
 	return r0, r1
 }
 
+// CheckPatient provides a mock function with given fields: id, doctorID
+func (_m *CounselingSessionDataInterface) CheckPatient(id int, doctorID int) error {
+	ret := _m.Called(id, doctorID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, int) error); ok {
+		r0 = rf(id, doctorID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Create provides a mock function with given fields: input
 func (_m *CounselingSessionDataInterface) Create(input CounselingSession.CounselingSession) (*CounselingSession.CounselingSession, error) {
 	ret := _m.Called(input)

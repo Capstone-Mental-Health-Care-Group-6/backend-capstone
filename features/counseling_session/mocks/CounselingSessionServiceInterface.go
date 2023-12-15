@@ -13,23 +13,23 @@ type CounselingSessionServiceInterface struct {
 	mock.Mock
 }
 
-// ApprovePatient provides a mock function with given fields: id
-func (_m *CounselingSessionServiceInterface) ApprovePatient(id int) (bool, error) {
-	ret := _m.Called(id)
+// ApprovePatient provides a mock function with given fields: id, doctorID
+func (_m *CounselingSessionServiceInterface) ApprovePatient(id int, doctorID int) (bool, error) {
+	ret := _m.Called(id, doctorID)
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(int, int) (bool, error)); ok {
+		return rf(id, doctorID)
 	}
-	if rf, ok := ret.Get(0).(func(int) bool); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(int, int) bool); ok {
+		r0 = rf(id, doctorID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(int) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(int, int) error); ok {
+		r1 = rf(id, doctorID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -165,23 +165,23 @@ func (_m *CounselingSessionServiceInterface) GetCounseling(id int) (*CounselingS
 	return r0, r1
 }
 
-// RejectPatient provides a mock function with given fields: id, newData
-func (_m *CounselingSessionServiceInterface) RejectPatient(id int, newData CounselingSession.StatusUpdate) (bool, error) {
-	ret := _m.Called(id, newData)
+// RejectPatient provides a mock function with given fields: id, doctorID, newData
+func (_m *CounselingSessionServiceInterface) RejectPatient(id int, doctorID int, newData CounselingSession.StatusUpdate) (bool, error) {
+	ret := _m.Called(id, doctorID, newData)
 
 	var r0 bool
 	var r1 error
-	if rf, ok := ret.Get(0).(func(int, CounselingSession.StatusUpdate) (bool, error)); ok {
-		return rf(id, newData)
+	if rf, ok := ret.Get(0).(func(int, int, CounselingSession.StatusUpdate) (bool, error)); ok {
+		return rf(id, doctorID, newData)
 	}
-	if rf, ok := ret.Get(0).(func(int, CounselingSession.StatusUpdate) bool); ok {
-		r0 = rf(id, newData)
+	if rf, ok := ret.Get(0).(func(int, int, CounselingSession.StatusUpdate) bool); ok {
+		r0 = rf(id, doctorID, newData)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(int, CounselingSession.StatusUpdate) error); ok {
-		r1 = rf(id, newData)
+	if rf, ok := ret.Get(1).(func(int, int, CounselingSession.StatusUpdate) error); ok {
+		r1 = rf(id, doctorID, newData)
 	} else {
 		r1 = ret.Error(1)
 	}
