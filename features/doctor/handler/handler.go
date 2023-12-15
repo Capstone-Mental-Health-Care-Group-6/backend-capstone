@@ -214,7 +214,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		serviceInput.DoctorIjazah = uploadUrlIjazah
 
 		serviceInput.DoctorBalance = 0
-		serviceInput.DoctorStatus = "request"
+		serviceInput.DoctorStatus = "Request"
 		//INPUT REQUEST
 
 		result, err := mdl.svc.CreateDoctor(*serviceInput)
@@ -963,5 +963,81 @@ func (mdl *DoctorHandler) DoctorDashboardPatient() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", res))
+	}
+}
+
+func (mdl *DoctorHandler) DoctorDashboardAdmin() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		res, err := mdl.svc.DoctorDashboardAdmin()
+
+		if err != nil {
+			c.Logger().Error("Handler: Doctor Dashboard Process Error: ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Doctor Dashboard Process Error", nil))
+		}
+
+		var response = new(DashboardAdminResponse)
+		response.TotalDoctor = res.TotalDoctor
+		response.TotalDoctorActive = res.TotalDoctorActive
+		response.TotalDoctorBaru = res.TotalDoctorBaru
+		response.TotalDoctorPending = res.TotalDoctorPending
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Get Doctor Dashboard", response))
+	}
+}
+
+func (mdl *DoctorHandler) DenyDoctor() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+		var paramID = c.Param("user_id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
+		}
+
+		_, err = mdl.svc.DenyDoctor(id)
+
+		if err != nil {
+			c.Logger().Error("Handler : Deny Doctor Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Deny Doctor Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Denny Doctor", nil))
+	}
+}
+
+func (mdl *DoctorHandler) ApproveDoctor() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := mdl.jwt.CheckRole(c)
+
+		if role != "Admin" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Only admin can access this page", nil))
+		}
+		var paramID = c.Param("user_id")
+		id, err := strconv.Atoi(paramID)
+
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
+		}
+
+		_, err = mdl.svc.ApproveDoctor(id)
+
+		if err != nil {
+			c.Logger().Error("Handler : Approve Doctor Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Approve Doctor Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Approve Doctor", nil))
 	}
 }

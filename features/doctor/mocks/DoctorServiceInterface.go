@@ -13,6 +13,30 @@ type DoctorServiceInterface struct {
 	mock.Mock
 }
 
+// ApproveDoctor provides a mock function with given fields: idDoctor
+func (_m *DoctorServiceInterface) ApproveDoctor(idDoctor int) (bool, error) {
+	ret := _m.Called(idDoctor)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(idDoctor)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(idDoctor)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(idDoctor)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateDoctor provides a mock function with given fields: newData
 func (_m *DoctorServiceInterface) CreateDoctor(newData doctor.Doctor) (*doctor.Doctor, error) {
 	ret := _m.Called(newData)
@@ -263,6 +287,30 @@ func (_m *DoctorServiceInterface) DeleteDoctorWorkdays(doctorID int) (bool, erro
 	return r0, r1
 }
 
+// DenyDoctor provides a mock function with given fields: idDoctor
+func (_m *DoctorServiceInterface) DenyDoctor(idDoctor int) (bool, error) {
+	ret := _m.Called(idDoctor)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(idDoctor)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(idDoctor)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(idDoctor)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DoctorAvatarUpload provides a mock function with given fields: newData
 func (_m *DoctorServiceInterface) DoctorAvatarUpload(newData doctor.DoctorAvatarPhoto) (string, error) {
 	ret := _m.Called(newData)
@@ -328,6 +376,30 @@ func (_m *DoctorServiceInterface) DoctorDashboard(id int) (doctor.DoctorDashboar
 
 	if rf, ok := ret.Get(1).(func(int) error); ok {
 		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DoctorDashboardAdmin provides a mock function with given fields:
+func (_m *DoctorServiceInterface) DoctorDashboardAdmin() (doctor.DoctorDashboardAdmin, error) {
+	ret := _m.Called()
+
+	var r0 doctor.DoctorDashboardAdmin
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (doctor.DoctorDashboardAdmin, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() doctor.DoctorDashboardAdmin); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(doctor.DoctorDashboardAdmin)
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
 	} else {
 		r1 = ret.Error(1)
 	}

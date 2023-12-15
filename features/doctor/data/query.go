@@ -3,7 +3,9 @@ package data
 import (
 	"FinalProject/features/doctor"
 	"FinalProject/features/users"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -631,6 +633,69 @@ func (pdata *DoctorData) DeleteDoctor(doctorID int) (bool, error) {
 
 	if err := pdata.db.Table("doctors_rating").Where("id = ?", doctorID).Delete(deleteData).Error; err != nil {
 		return false, err
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) DoctorDashboardAdmin() (doctor.DoctorDashboardAdmin, error) {
+	var dashboardArticle doctor.DoctorDashboardAdmin
+
+	tDokter, tDokterBaru, tDokterPending, tDokterActive := pdata.getTotalDoctor()
+
+	dashboardArticle.TotalDoctor = tDokter
+	dashboardArticle.TotalDoctorActive = tDokterActive
+	dashboardArticle.TotalDoctorBaru = tDokterBaru
+	dashboardArticle.TotalDoctorPending = tDokterPending
+
+	return dashboardArticle, nil
+}
+
+func (pdata *DoctorData) getTotalDoctor() (int, int, int, int) {
+	var totalDokter int64
+	var totalDokterBaru int64
+	var totalDokterPending int64
+	var totalDokterAktif int64
+
+	var now = time.Now()
+	var before = now.AddDate(0, 0, -30)
+
+	var _ = pdata.db.Table("doctors").Count(&totalDokter)
+	var _ = pdata.db.Table("doctors").Where("created_at BETWEEN ? and ?", before, now).Where("doctor_status = ?", "Confirmed").Count(&totalDokterBaru)
+	var _ = pdata.db.Table("doctors").Where("doctor_status = ?", "Request").Count(&totalDokterPending)
+	var _ = pdata.db.Table("doctors").Where("doctor_status = ?", "Confirmed").Count(&totalDokterAktif)
+
+	totalDokterInt := int(totalDokter)
+	totalDokterBaruInt := int(totalDokterBaru)
+	totalDokterPendingInt := int(totalDokterPending)
+	totalDokterAktifInt := int(totalDokterAktif)
+
+	return totalDokterInt, totalDokterBaruInt, totalDokterPendingInt, totalDokterAktifInt
+}
+
+func (pdata *DoctorData) DenyDoctor(id int) (bool, error) {
+	var qry = pdata.db.Table("doctors").Where("id = ?", id).Updates(Doctor{DoctorStatus: "Reject"})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (pdata *DoctorData) ApproveDoctor(id int) (bool, error) {
+	var qry = pdata.db.Table("doctors").Where("id = ?", id).Updates(Doctor{DoctorStatus: "Confirmed"})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
 	return true, nil

@@ -28,7 +28,7 @@ type Doctor struct {
 	DoctorCV                string                    `gorm:"column:doctor_cv;type:varchar(255)"`
 	DoctorIjazah            string                    `gorm:"column:doctor_ijazah;type:varchar(255)"`
 	DoctorBalance           uint                      `gorm:"column:doctor_balance"`
-	DoctorStatus            string                    `gorm:"column:doctor_status;type:enum('request','confirmed')"`
+	DoctorStatus            string                    `gorm:"column:doctor_status;type:enum('Request','Confirmed','Reject')"`
 	DoctorExpertiseRelation []DoctorExpertiseRelation `gorm:"foreignKey:DoctorID"`
 	DoctorWorkadays         []DoctorWorkadays         `gorm:"foreignKey:DoctorID"`
 	DoctorExperience        []DoctorExperience        `gorm:"foreignKey:DoctorID"`
