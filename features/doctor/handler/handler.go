@@ -695,8 +695,8 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor rating id", nil))
 		}
 
-		var paramIDPatient = c.Param("patient")
-		patientID, err := strconv.Atoi(paramIDPatient)
+		getIDPatient, err := mdl.jwt.GetID(c)
+
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get patient id", nil))
@@ -720,7 +720,7 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 		serviceInput.DoctorReview = input.DoctorReview
 		serviceInput.DoctorStarRating = input.DoctorStarRating
 
-		result, err := mdl.svc.UpdateDoctorRating(id, patientID, *serviceInput)
+		result, err := mdl.svc.UpdateDoctorRating(id, int(getIDPatient), *serviceInput)
 
 		if err != nil {
 			c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())

@@ -80,7 +80,7 @@ func RouteDoctor(e *echo.Echo, ph doctor.DoctorHandlerInterface, cfg configs.Pro
 	e.PUT("/doctor/workday/:id", ph.UpdateDoctorWorkdays(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/education/:id", ph.UpdateDoctorEducation(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/doctor/experience/:id", ph.UpdateDoctorExperience(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/doctor/rating/:patient/:id", ph.UpdateDoctorRating(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/doctor/rating/:id", ph.UpdateDoctorRating(), echojwt.JWT([]byte(cfg.Secret)))
 
 	e.DELETE("/doctor/:id", ph.DeleteDoctor(), echojwt.JWT([]byte(cfg.Secret)))
 	e.DELETE("/doctor/:type/:id", ph.DeleteDoctorData(), echojwt.JWT([]byte(cfg.Secret)))
