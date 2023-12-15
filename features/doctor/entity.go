@@ -49,7 +49,7 @@ type DoctorAll struct {
 	DoctorDOB         string `json:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_number_phone"`
+	DoctorNumberPhone string `json:"doctor_number_phone" gorm:"column:doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender"`
 	DoctorAvatar      string `json:"doctor_avatar"`
 	DoctorDescription string `json:"doctor_description"`
