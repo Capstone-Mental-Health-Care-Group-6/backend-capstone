@@ -179,7 +179,20 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Ijazah", nil))
 		}
 
+		resultMeetlink, err := mdl.svc.GetMeetLink()
+
+		if err != nil {
+			c.Logger().Error("Handler: Get meet link error (Get meet link): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create meet link", nil))
+		}
+
 		var serviceInput = new(doctor.Doctor)
+
+		if resultMeetlink == "" {
+			serviceInput.DoctorMeetLink = "https://meet.google.com/(Create by yourself)"
+		} else {
+			serviceInput.DoctorMeetLink = resultMeetlink
+		}
 
 		serviceInput.UserID = getID
 		serviceInput.DoctorName = input.DoctorName
@@ -192,7 +205,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		serviceInput.DoctorGender = input.DoctorGender
 
 		serviceInput.DoctorAvatar = uploadUrlPhoto
-		serviceInput.DoctorMeetLink = input.DoctorMeetLink
+
 		serviceInput.DoctorSIPP = input.DoctorSIPP
 		serviceInput.DoctorSTR = input.DoctorSTR
 		serviceInput.DoctorSIPPFile = uploadUrlSIPP
