@@ -360,7 +360,7 @@ func TestUpdateStatus(t *testing.T) {
 	})
 }
 
-func TestDelete(t *testing.T) {
+func TestActivateAccount(t *testing.T) {
 	data := mocks.NewPatientDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	enkrip := mockHelper.NewHashInterface(t)
@@ -368,19 +368,47 @@ func TestDelete(t *testing.T) {
 	service := NewPatient(data, cld, jwt, enkrip)
 
 	t.Run("Server Error", func(t *testing.T) {
-		data.On("Delete", 1).Return(false, errors.New("Delete Process Failed")).Once()
+		data.On("ActivateAccount", 1).Return(false, errors.New("Activate Account Process Failed")).Once()
 
-		res, err := service.Delete(1)
+		res, err := service.ActivateAccount(1)
 
 		assert.Error(t, err)
 		assert.Equal(t, res, false)
-		assert.EqualError(t, err, "Delete Process Failed")
+		assert.EqualError(t, err, "Activate Account Process Failed")
 	})
 
-	t.Run("Success Delete", func(t *testing.T) {
-		data.On("Delete", 1).Return(true, nil).Once()
+	t.Run("Success ActivateAccount", func(t *testing.T) {
+		data.On("ActivateAccount", 1).Return(true, nil).Once()
 
-		res, err := service.Delete(1)
+		res, err := service.ActivateAccount(1)
+
+		assert.Nil(t, err)
+		assert.Equal(t, res, true)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestInactivateAccount(t *testing.T) {
+	data := mocks.NewPatientDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	enkrip := mockHelper.NewHashInterface(t)
+	jwt := mockHelper.NewJWTInterface(t)
+	service := NewPatient(data, cld, jwt, enkrip)
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("InactivateAccount", 1).Return(false, errors.New("Inactivate Account Process Failed")).Once()
+
+		res, err := service.InactivateAccount(1)
+
+		assert.Error(t, err)
+		assert.Equal(t, res, false)
+		assert.EqualError(t, err, "Inactivate Account Process Failed")
+	})
+
+	t.Run("Success InactivateAccount", func(t *testing.T) {
+		data.On("InactivateAccount", 1).Return(true, nil).Once()
+
+		res, err := service.InactivateAccount(1)
 
 		assert.Nil(t, err)
 		assert.Equal(t, res, true)
