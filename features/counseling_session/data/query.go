@@ -2,6 +2,7 @@ package data
 
 import (
 	counselingsession "FinalProject/features/counseling_session"
+	"errors"
 
 	transaction "FinalProject/features/transaction"
 
@@ -78,6 +79,8 @@ func (bc *CounselingSessionData) Create(input counselingsession.CounselingSessio
 	newData.Time = input.Time
 	newData.Duration = input.Duration
 	newData.Status = input.Status
+	newData.Alasan = input.Alasan
+	newData.DetailAlasan = input.DetailAlasan
 	// MASUKIN DATA
 
 	if err := bc.db.Table("counseling_session").Create(newData).Error; err != nil {
@@ -241,4 +244,51 @@ func (bc *CounselingSessionData) Delete(id int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (bc *CounselingSessionData) ApprovePatient(id int) (bool, error) {
+	var qry = bc.db.Table("counseling_session").Where("id = ?", id).Updates(CounselingSession{
+		Status: "not_finished",
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (bc *CounselingSessionData) RejectPatient(id int, newData counselingsession.StatusUpdate) (bool, error) {
+	var qry = bc.db.Table("counseling_session").Where("id = ?", id).Updates(CounselingSession{
+		Status: "rejected",
+		Alasan: newData.Alasan,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
+	var listCounselingSession = []counselingsession.CounselingSession{}
+	var qry = bc.db.Table("counseling_session").Where("id = ? AND user_id = ?", id, doctorID).Scan(&listCounselingSession)
+
+	var count int64
+	qry.Count(&count)
+
+	if count > 0 {
+		return nil
+	}
+
+	return errors.New("Data Not Found")
 }

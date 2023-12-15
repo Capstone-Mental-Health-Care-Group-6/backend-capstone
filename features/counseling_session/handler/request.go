@@ -16,3 +16,7 @@ type InputRequestUpdate struct {
 	Duration      uint      `json:"duration" form:"duration"`
 	Status        string    `json:"status" form:"status"`
 }
+
+type RequestStatusUpdate struct {
+	Alasan string `json:"alasan" form:"alasan"`
+}
