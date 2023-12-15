@@ -286,3 +286,47 @@ func (psvc *DoctorService) DoctorDashboardPatient(id int) ([]doctor.DoctorDashbo
 
 	return res, nil
 }
+
+func (psvc *DoctorService) DoctorDashboardAdmin() (doctor.DoctorDashboardAdmin, error) {
+	res, err := psvc.data.DoctorDashboardAdmin()
+
+	if err != nil {
+		return res, errors.New("Process Failed")
+	}
+
+	return res, nil
+}
+
+func (psvc *DoctorService) DenyDoctor(userID int) (bool, error) {
+	dataDoctor, err := psvc.data.GetDoctorByUserId(userID)
+	if err != nil {
+		return false, errors.New("Get Doctor By User ID Error")
+	}
+
+	doctorID := int(dataDoctor.ID)
+
+	result, err := psvc.data.DenyDoctor(doctorID)
+
+	if err != nil {
+		return false, errors.New("Deny Process Failed")
+	}
+
+	return result, nil
+}
+
+func (psvc *DoctorService) ApproveDoctor(userID int) (bool, error) {
+	dataDoctor, err := psvc.data.GetDoctorByUserId(userID)
+	if err != nil {
+		return false, errors.New("Get Doctor By User ID Error")
+	}
+
+	doctorID := int(dataDoctor.ID)
+
+	result, err := psvc.data.ApproveDoctor(doctorID)
+
+	if err != nil {
+		return false, errors.New("Approve Process Failed")
+	}
+
+	return result, nil
+}

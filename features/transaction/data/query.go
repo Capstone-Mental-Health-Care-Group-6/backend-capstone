@@ -86,6 +86,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
 		newData.DoctorName = existingDataDoctor.DoctorName
 		newData.UserID = transaction.UserID
+		newData.DoctorMeetLink = existingDataDoctor.DoctorMeetLink
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = transaction.DurationID
@@ -409,6 +410,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
 		newData.DoctorName = existingDataDoctor.DoctorName
+		newData.DoctorMeetLink = existingDataDoctor.DoctorMeetLink
 		newData.UserID = existingData.PatientID
 		newData.Date = time.Now()
 		newData.Time = time.Now()
@@ -470,6 +472,12 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 			return false, err
 		}
 
+		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
+		if err := ad.db.Table("doctors_expertise_relation").Where("doctor_id = ?", existingData.DoctorID).First(&existingDataDoctorRelation).Error; err != nil {
+			fmt.Printf("Error fetching doctor data: %v\n", err)
+			return false, err
+		}
+
 		newDoctorBalance := existingDataDoctor.DoctorBalance + existingData.PriceResult
 
 		fmt.Println("This is the new Update Balance: ", newDoctorBalance)
@@ -485,6 +493,23 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 
 		if dataCount := qryToDoctor.RowsAffected; dataCount < 1 {
 			return false, errors.New("Update Data Error, No Data Affected")
+		}
+
+		var newData = new(counselingsession.CounselingSession)
+		newData.TransactionID = existingData.ID
+		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
+		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
+		newData.DoctorName = existingDataDoctor.DoctorName
+		newData.DoctorMeetLink = existingDataDoctor.DoctorMeetLink
+		newData.UserID = existingData.PatientID
+		newData.Date = time.Now()
+		newData.Time = time.Now()
+		newData.Duration = existingData.DurationID
+		newData.Status = "pending"
+		// MASUKIN DATA
+
+		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
+			return false, err
 		}
 	}
 

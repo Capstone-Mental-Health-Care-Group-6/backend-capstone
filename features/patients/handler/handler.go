@@ -57,34 +57,39 @@ func (mdl *PatientHandler) CreatePatient() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
 		}
 
-		formHeaderPhoto, err := c.FormFile("avatar")
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
-		}
+		//formHeaderPhoto, err := c.FormFile("avatar")
+		//if err != nil {
+		//	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
+		//}
 
-		isValidFile, errorsFile := helper.ValidateFile(formHeaderPhoto, 5*1024*1024, "image/jpeg", "image/png")
-		if !isValidFile {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
-		}
+		//isValidFile, errorsFile := helper.ValidateFile(formHeaderPhoto, 5*1024*1024, "image/jpeg", "image/png")
+		//if !isValidFile {
+		//	return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errorsFile))
+		//}
 
-		formPhoto, err := formHeaderPhoto.Open()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed", nil))
-		}
+		//formPhoto, err := formHeaderPhoto.Open()
+		//if err != nil {
+		//	return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed", nil))
+		//}
 
-		uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed", nil))
-		}
+		//uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
+		//if err != nil {
+		//	return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed", nil))
+		//}
 
 		var serviceInput = new(patients.Patiententity)
+
+		isValid, errors := helper.ValidateForm(serviceInput)
+		if !isValid {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
+		}
 		serviceInput.Name = input.Name
 		serviceInput.Email = input.Email
 		serviceInput.Password = input.Password
 		serviceInput.DateOfBirth = input.DateOfBirth
 		serviceInput.Gender = input.Gender
 		serviceInput.Phone = input.Phone
-		serviceInput.Avatar = uploadUrlPhoto
+		serviceInput.Avatar = "https://res.cloudinary.com/du87kowmp/image/upload/v1702560428/Avatar/fc2dgtshfu2w9hlhgqed.png"
 		serviceInput.Role = "Patient"
 		serviceInput.Status = "Active"
 		result, err := mdl.svc.CreatePatient(*serviceInput)
