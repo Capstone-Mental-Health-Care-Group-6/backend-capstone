@@ -202,6 +202,13 @@ type DoctorDashboardPatient struct {
 	Layanan     string `json:"layanan"`
 }
 
+type DoctorDashboardAdmin struct {
+	TotalDoctor        int `json:"total_doctor"`
+	TotalDoctorBaru    int `json:"total_new_doctor"`
+	TotalDoctorActive  int `json:"total_active_doctor"`
+	TotalDoctorPending int `json:"total_pending_doctor"`
+}
+
 type DoctorManagePatient struct {
 	DoctorID     uint   `json:"doctor_id"`
 	PatientID    uint   `json:"patient_id"`
@@ -213,54 +220,67 @@ type DoctorHandlerInterface interface {
 	GetDoctors() echo.HandlerFunc
 	GetDoctor() echo.HandlerFunc
 	GetDoctorByUserId() echo.HandlerFunc
+
 	CreateDoctor() echo.HandlerFunc
-	// SearchDoctor() echo.HandlerFunc
+	InsertDataDoctor() echo.HandlerFunc
+
 	UpdateDoctorDatapokok() echo.HandlerFunc
 	UpdateDoctorWorkdays() echo.HandlerFunc
 	UpdateDoctorEducation() echo.HandlerFunc
 	UpdateDoctorExperience() echo.HandlerFunc
 	UpdateDoctorRating() echo.HandlerFunc
-	InsertDataDoctor() echo.HandlerFunc
+
 	DeleteDoctor() echo.HandlerFunc
+	DeleteDoctorData() echo.HandlerFunc
+
 	DoctorDashboard() echo.HandlerFunc
 	DoctorDashboardPatient() echo.HandlerFunc
-	DeleteDoctorData() echo.HandlerFunc
-	// DeleteWorkday() echo.HandlerFunc
-	// DeleteEducation() echo.HandlerFunc
-	// DeleteExperience() echo.HandlerFunc
+	DoctorDashboardAdmin() echo.HandlerFunc
+
+	ApproveDoctor() echo.HandlerFunc
+	DenyDoctor() echo.HandlerFunc
 }
 
 type DoctorServiceInterface interface {
 	GetDoctors(name string) ([]DoctorAll, error)
-	// SearchDoctor(name string) ([]DoctorAll, error)
 	GetDoctor(id int) (*DoctorAll, error)
 	GetDoctorByUserId(userID int) (*DoctorAll, error)
 	GetDoctorExperience(id int) ([]DoctorExperience, error)
 	GetDoctorEducation(id int) ([]DoctorEducation, error)
 	GetDoctorWorkadays(id int) ([]DoctorWorkdays, error)
+
 	CreateDoctorExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	CreateDoctorWorkadays(newData DoctorWorkdays) (*DoctorWorkdays, error)
 	CreateDoctorEducation(newData DoctorEducation) (*DoctorEducation, error)
 	CreateDoctorExperience(newData DoctorExperience) (*DoctorExperience, error)
 	CreateDoctor(newData Doctor) (*Doctor, error)
+
 	DoctorAvatarUpload(newData DoctorAvatarPhoto) (string, error)
 	DoctorSIPPUpload(newData DoctorSIPPFileDataModel) (string, error)
 	DoctorSTRUpload(newData DoctorSTRFileDataModel) (string, error)
 	DoctorCVUpload(newData DoctorCVDataModel) (string, error)
 	DoctorIjazahUpload(newData DoctorIjazahDataModel) (string, error)
+
 	GetMeetLink() (string, error)
+
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
-	DoctorDashboard(id int) (DoctorDashboard, error)
-	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorEducation) (bool, error)
 	UpdateDoctorRating(id int, patientID int, newData DoctorRating) (bool, error)
+
 	DeleteDoctor(doctorID int) (bool, error)
 	DeleteDoctorExperience(doctorID int) (bool, error)
 	DeleteDoctorWorkdays(doctorID int) (bool, error)
 	DeleteDoctorEducation(doctorID int) (bool, error)
 	DeleteDoctorRating(doctorID int) (bool, error)
+
+	DoctorDashboard(id int) (DoctorDashboard, error)
+	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
+	DoctorDashboardAdmin() (DoctorDashboardAdmin, error)
+
+	ApproveDoctor(idDoctor int) (bool, error)
+	DenyDoctor(idDoctor int) (bool, error)
 }
 
 type DoctorDataInterface interface {
@@ -270,26 +290,33 @@ type DoctorDataInterface interface {
 	GetByIDEducation(id int) ([]DoctorEducation, error)
 	GetByIDWorkadays(id int) ([]DoctorWorkdays, error)
 	GetByIDExperience(id int) ([]DoctorExperience, error)
-	// SearchDoctor(name string) ([]DoctorAll, error)
+
 	Insert(newData Doctor) (*Doctor, error)
 	InsertExpertise(newData DoctorExpertiseRelation) (*DoctorExpertiseRelation, error)
 	InsertWorkadays(newData DoctorWorkdays) (*DoctorWorkdays, error)
 	InsertEducation(newData DoctorEducation) (*DoctorEducation, error)
 	InsertExperience(newData DoctorExperience) (*DoctorExperience, error)
+
 	FindEmail(userID uint) (*string, error)
+
 	IsLinkUsed(meetLink string) bool
+
 	UpdateDoctorDatapokok(id int, newData DoctorDatapokokUpdate) (bool, error)
-	DoctorDashboard(id int) (DoctorDashboard, error)
-	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
-	// DoctorManagePatient(id int) (DoctorManagePatient, error)
 	UpdateDoctorExperience(id int, doctorID int, newData DoctorExperience) (bool, error)
 	UpdateDoctorWorkdays(id int, doctorID int, newData DoctorWorkdays) (bool, error)
 	UpdateDoctorEducation(id int, doctorID int, newData DoctorEducation) (bool, error)
 	UpdateDoctorRating(id int, pateintID int, newData DoctorRating) (bool, error)
+
 	DeleteDoctor(doctorID int) (bool, error)
-	// DeleteDoctorDatapokok(doctorID int) (bool, error)
 	DeleteDoctorExperience(doctorID int) (bool, error)
 	DeleteDoctorWorkdays(doctorID int) (bool, error)
 	DeleteDoctorEducation(doctorID int) (bool, error)
 	DeleteDoctorRating(doctorID int) (bool, error)
+
+	DoctorDashboard(id int) (DoctorDashboard, error)
+	DoctorDashboardPatient(id int) ([]DoctorDashboardPatient, error)
+	DoctorDashboardAdmin() (DoctorDashboardAdmin, error)
+
+	ApproveDoctor(idDoctor int) (bool, error)
+	DenyDoctor(idDoctor int) (bool, error)
 }
