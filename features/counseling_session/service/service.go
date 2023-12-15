@@ -84,3 +84,18 @@ func (s *CounselingSessionService) DeleteCounseling(id int) (bool, error) {
 
 	return result, nil
 }
+
+func (s *CounselingSessionService) ApprovePatient(id int) (bool, error) {
+	res, err := s.d.ApprovePatient(id)
+	if err != nil {
+		return false, errors.New("Approve Patient Process Failed")
+	}
+	return res, nil
+}
+func (s *CounselingSessionService) RejectPatient(id int, newData counselingsession.StatusUpdate) (bool, error) {
+	res, err := s.d.RejectPatient(id, newData)
+	if err != nil {
+		return false, errors.New("Reject Patient Process Failed")
+	}
+	return res, nil
+}

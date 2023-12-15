@@ -12,6 +12,22 @@ type CounselingSessionHandlerInterface struct {
 	mock.Mock
 }
 
+// ApprovePatient provides a mock function with given fields:
+func (_m *CounselingSessionHandlerInterface) ApprovePatient() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
 // CreateCounseling provides a mock function with given fields:
 func (_m *CounselingSessionHandlerInterface) CreateCounseling() echo.HandlerFunc {
 	ret := _m.Called()
@@ -78,6 +94,22 @@ func (_m *CounselingSessionHandlerInterface) GetCounseling() echo.HandlerFunc {
 
 // GetCounselingByUserID provides a mock function with given fields:
 func (_m *CounselingSessionHandlerInterface) GetCounselingByUserID() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// RejectPatient provides a mock function with given fields:
+func (_m *CounselingSessionHandlerInterface) RejectPatient() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc

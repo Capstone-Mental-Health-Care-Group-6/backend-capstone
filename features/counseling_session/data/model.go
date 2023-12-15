@@ -18,6 +18,7 @@ type CounselingSession struct {
 	Time            time.Time `gorm:"column:time"`
 	Duration        uint      `gorm:"column:duration"`
 	Status          string    `gorm:"column:status;type:enum('rejected','pending','not_finished','finished')"`
+	Alasan          string    `gorm:"column:alasan;type:enum('overbook','time_limit','doctor_have_another_activities','other')"`
 }
 
 func (CounselingSession) TableName() string {
