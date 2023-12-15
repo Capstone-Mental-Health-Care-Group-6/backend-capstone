@@ -75,7 +75,6 @@ type PatientHandlerInterface interface {
 	LoginPatient() echo.HandlerFunc
 	PatientDashboard() echo.HandlerFunc
 	InactivateAccount() echo.HandlerFunc
-	ActivateAccount() echo.HandlerFunc
 }
 
 type PatientServiceInterface interface {
@@ -89,7 +88,6 @@ type PatientServiceInterface interface {
 	PatientDashboard() (PatientDashboard, error)
 	UpdateStatus(id int, newData UpdateStatus) (bool, error)
 	InactivateAccount(id int) (bool, error)
-	ActivateAccount(id int) (bool, error)
 }
 
 type PatientDataInterface interface {
@@ -102,5 +100,4 @@ type PatientDataInterface interface {
 	PatientDashboard() (PatientDashboard, error)
 	UpdateStatus(id int, newData UpdateStatus) (bool, error)
 	InactivateAccount(id int) (bool, error)
-	ActivateAccount(id int) (bool, error)
 }

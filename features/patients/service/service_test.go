@@ -227,6 +227,36 @@ func TestLoginPatient(t *testing.T) {
 		assert.Nil(t, result)
 	})
 
+	t.Run("Password Incorrect", func(t *testing.T) {
+		userFail := patients.Patiententity{
+			Email:    "irvanhau",
+			Password: "vanhau123",
+		}
+
+		data.On("LoginPatient", userFail.Email, userFail.Password).Return(nil, errors.New("Incorrect Password")).Once()
+
+		result, err := service.LoginPatient(userFail.Email, userFail.Password)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Incorrect Password")
+		assert.Nil(t, result)
+	})
+
+	t.Run("Not Found", func(t *testing.T) {
+		userFail := patients.Patiententity{
+			Email:    "irvanhau",
+			Password: "vanhau123",
+		}
+
+		data.On("LoginPatient", userFail.Email, userFail.Password).Return(nil, errors.New("User Not Found / User Inactive")).Once()
+
+		result, err := service.LoginPatient(userFail.Email, userFail.Password)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "User Not Found / User Inactive")
+		assert.Nil(t, result)
+	})
+
 	t.Run("Generate JWT Error", func(t *testing.T) {
 		data.On("LoginPatient", "irvanhau@gmail.com", "password").Return(&patient, nil).Once()
 		jwt.On("GenerateJWT", uint(0), patient.Role, patient.Status).Return(nil).Once()
@@ -353,34 +383,6 @@ func TestUpdateStatus(t *testing.T) {
 		data.On("UpdateStatus", 1, patient).Return(true, nil).Once()
 
 		res, err := service.UpdateStatus(1, patient)
-
-		assert.Nil(t, err)
-		assert.Equal(t, res, true)
-		data.AssertExpectations(t)
-	})
-}
-
-func TestActivateAccount(t *testing.T) {
-	data := mocks.NewPatientDataInterface(t)
-	cld := mockUtil.NewCloudinaryInterface(t)
-	enkrip := mockHelper.NewHashInterface(t)
-	jwt := mockHelper.NewJWTInterface(t)
-	service := NewPatient(data, cld, jwt, enkrip)
-
-	t.Run("Server Error", func(t *testing.T) {
-		data.On("ActivateAccount", 1).Return(false, errors.New("Activate Account Process Failed")).Once()
-
-		res, err := service.ActivateAccount(1)
-
-		assert.Error(t, err)
-		assert.Equal(t, res, false)
-		assert.EqualError(t, err, "Activate Account Process Failed")
-	})
-
-	t.Run("Success ActivateAccount", func(t *testing.T) {
-		data.On("ActivateAccount", 1).Return(true, nil).Once()
-
-		res, err := service.ActivateAccount(1)
 
 		assert.Nil(t, err)
 		assert.Equal(t, res, true)

@@ -110,7 +110,6 @@ func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs
 	// PATIENT
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
-	e.POST("/patient/activate", ph.ActivateAccount(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/patient/inactivate", ph.InactivateAccount(), echojwt.JWT([]byte(cfg.Secret)))
 
 	// ADMIN

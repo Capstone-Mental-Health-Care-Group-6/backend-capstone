@@ -54,6 +54,9 @@ func (us *UserService) Login(email, password string) (*users.UserCredential, err
 		if strings.Contains(err.Error(), "Incorrect Password") {
 			return nil, errors.New("Incorrect Password")
 		}
+		if strings.Contains(err.Error(), "Not Found") {
+			return nil, errors.New("User Not Found / User Inactive")
+		}
 		return nil, errors.New("Process Failed")
 	}
 
