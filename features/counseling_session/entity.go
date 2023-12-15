@@ -62,9 +62,7 @@ type TransactionInfo struct {
 }
 
 type StatusUpdate struct {
-	Status       string
-	Alasan       string
-	DetailAlasan string
+	Alasan string `json:"alasan"`
 }
 
 type CounselingSessionHandlerInterface interface {
@@ -74,7 +72,8 @@ type CounselingSessionHandlerInterface interface {
 	GetCounselingByUserID() echo.HandlerFunc
 	UpdateCounseling() echo.HandlerFunc
 	DeleteCounseling() echo.HandlerFunc
-	ManagePatient() echo.HandlerFunc
+	RejectPatient() echo.HandlerFunc
+	ApprovePatient() echo.HandlerFunc
 }
 
 type CounselingSessionServiceInterface interface {
@@ -84,7 +83,8 @@ type CounselingSessionServiceInterface interface {
 	GetAllCounselingByUserID(userID int) ([]CounselingSession, error)
 	UpdateCounseling(id int, input CounselingSession) (bool, error)
 	DeleteCounseling(id int) (bool, error)
-	ManagePatient(id int, newData StatusUpdate) (bool, error)
+	ApprovePatient(id int) (bool, error)
+	RejectPatient(id int, newData StatusUpdate) (bool, error)
 }
 
 type CounselingSessionDataInterface interface {
@@ -94,5 +94,6 @@ type CounselingSessionDataInterface interface {
 	GetById(id int) (*CounselingSession, error)
 	Update(id int, newData CounselingSession) (bool, error)
 	Delete(id int) (bool, error)
-	ManagePatient(id int, newData StatusUpdate) (bool, error)
+	ApprovePatient(id int) (bool, error)
+	RejectPatient(id int, newData StatusUpdate) (bool, error)
 }

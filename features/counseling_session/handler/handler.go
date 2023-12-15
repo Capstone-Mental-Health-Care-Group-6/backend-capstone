@@ -228,39 +228,65 @@ func (h *CounselingSessionHandler) DeleteCounseling() echo.HandlerFunc {
 }
 
 // MASIH BUG BIND ID //
-func (h *CounselingSessionHandler) ManagePatient() echo.HandlerFunc {
+func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := h.jwt.CheckRole(c)
+
 		fmt.Println(role)
 		if role != "Doctor" {
 			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
 		}
+
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Param ID", nil))
 		}
 
-		var req = new(InputstatusUpdate)
+		result, err := h.s.ApprovePatient(id)
 
-		if err := c.Bind(req); err != nil {
+		if err != nil {
+			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Status", result))
+	}
+}
+
+func (h *CounselingSessionHandler) RejectPatient() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := h.jwt.CheckRole(c)
+
+		fmt.Println(role)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Param ID", nil))
+		}
+
+		var input = new(RequestStatusUpdate)
+		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
 		}
 
 		var serviceUpdate = new(counselingsession.StatusUpdate)
-		serviceUpdate.Status = req.Status
-		serviceUpdate.Alasan = req.Alasan
-		serviceUpdate.DetailAlasan = req.DetailAlasan
+		serviceUpdate.Alasan = input.Alasan
 
-		result, err := h.s.ManagePatient(id, *serviceUpdate)
+		result, err := h.s.RejectPatient(id, *serviceUpdate)
 
 		if err != nil {
-			c.Logger().Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Status", result))
 	}
 }

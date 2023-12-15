@@ -17,8 +17,6 @@ type InputRequestUpdate struct {
 	Status        string    `json:"status" form:"status"`
 }
 
-type InputstatusUpdate struct {
-	Status       string `json:"status" form:"status"`
-	Alasan       string `json:"alasan" form:"alasan"`
-	DetailAlasan string `json:"detail_alasan" form:"detail_alasan"`
+type RequestStatusUpdate struct {
+	Alasan string `json:"alasan" form:"alasan"`
 }

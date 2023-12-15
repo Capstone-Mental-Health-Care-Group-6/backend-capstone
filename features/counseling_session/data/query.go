@@ -2,6 +2,7 @@ package data
 
 import (
 	counselingsession "FinalProject/features/counseling_session"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -134,11 +135,9 @@ func (bc *CounselingSessionData) Delete(id int) (bool, error) {
 	return true, nil
 }
 
-func (bc *CounselingSessionData) ManagePatient(id int, newData counselingsession.StatusUpdate) (bool, error) {
+func (bc *CounselingSessionData) ApprovePatient(id int) (bool, error) {
 	var qry = bc.db.Table("counseling_session").Where("id = ?", id).Updates(CounselingSession{
-		Status:       newData.Status,
-		Alasan:       newData.Alasan,
-		DetailAlasan: newData.DetailAlasan,
+		Status: "not_finished",
 	})
 
 	if err := qry.Error; err != nil {
@@ -146,7 +145,24 @@ func (bc *CounselingSessionData) ManagePatient(id int, newData counselingsession
 	}
 
 	if dataCount := qry.RowsAffected; dataCount < 1 {
-		return false, nil
+		return false, errors.New("Update Data Error, No Data Affected")
+	}
+
+	return true, nil
+}
+
+func (bc *CounselingSessionData) RejectPatient(id int, newData counselingsession.StatusUpdate) (bool, error) {
+	var qry = bc.db.Table("counseling_session").Where("id = ?", id).Updates(CounselingSession{
+		Status: "rejected",
+		Alasan: newData.Alasan,
+	})
+
+	if err := qry.Error; err != nil {
+		return false, err
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		return false, errors.New("Update Data Error, No Data Affected")
 	}
 
 	return true, nil
