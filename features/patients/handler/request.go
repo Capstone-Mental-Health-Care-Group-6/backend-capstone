@@ -5,15 +5,15 @@ import (
 )
 
 type PatientRequest struct {
-	Name        string         `json:"name" form:"name" validate:"required"`
-	Email       string         `json:"email" form:"email" validate:"required"`
-	Password    string         `json:"password" form:"password" validate:"required"`
-	DateOfBirth string         `json:"date_of_birth" form:"date_of_birth" validate:"required"`
-	Gender      string         `json:"gender" form:"gender" validate:"required"`
-	Avatar      multipart.File `json:"avatar" form:"avatar" validate:"required"`
-	Phone       string         `json:"phone_number" form:"phone_number" validate:"required"`
-	Role        string         `json:"role" form:"role" validate:"required"`
-	Status      string         `json:"status" form:"status" validate:"required"`
+	Name        string `json:"name" form:"name" validate:"required"`
+	Email       string `json:"email" form:"email" validate:"email"`
+	Password    string `json:"password" form:"password" validate:"required"`
+	DateOfBirth string `json:"date_of_birth" form:"date_of_birth" validate:"required"`
+	Gender      string `json:"gender" form:"gender" validate:"required"`
+	Avatar      string `json:"avatar" form:"avatar" validate:"omitempty"`
+	Phone       string `json:"phone_number" form:"phone_number" validate:"required"`
+	Role        string `json:"role" form:"role" validate:"required"`
+	Status      string `json:"status" form:"status" validate:"required"`
 }
 
 type UpdateProfile struct {
