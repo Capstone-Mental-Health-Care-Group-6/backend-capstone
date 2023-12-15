@@ -16,7 +16,7 @@ type Doctor struct {
 	DoctorDOB         string `json:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_numberphone"`
+	DoctorNumberPhone string `json:"doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender"`
 	DoctorAvatar      string `json:"doctor_avatar"`
 	DoctorDescription string `json:"doctor_description"`
@@ -49,14 +49,14 @@ type DoctorAll struct {
 	DoctorDOB         string `json:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_numberphone"`
+	DoctorNumberPhone string `json:"doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender"`
 	DoctorAvatar      string `json:"doctor_avatar"`
 	DoctorDescription string `json:"doctor_description"`
 
 	DoctorMeetLink string `json:"doctor_meet_link"`
-	DoctorSIPP     string `json:"doctor_sipp"`
-	DoctorSIPPFile string `json:"doctor_sipp_file"`
+	DoctorSIPP     string `json:"doctor_sipp" gorm:"column:doctor_sipp"`
+	DoctorSIPPFile string `json:"doctor_sipp_file" gorm:"column:doctor_sipp_file"`
 	DoctorSTR      string `json:"doctor_str"`
 	DoctorSTRFile  string `json:"doctor_str_file"`
 	DoctorCV       string `json:"doctor_cv"`
@@ -79,7 +79,7 @@ type DoctorDatapokokUpdate struct {
 	DoctorDOB         string `json:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_numberphone"`
+	DoctorNumberPhone string `json:"doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender"`
 	DoctorAvatar      string `json:"doctor_avatar"`
 	DoctorDescription string `json:"doctor_description"`
@@ -94,7 +94,7 @@ type DoctorDatapokokUpdate struct {
 	DoctorBalance  uint   `json:"doctor_balance"`
 	DoctorStatus   string `json:"doctor_status"`
 	//FOR DOCTOR EXPERTISE
-	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id"`
+	DoctorExpertiseID uint `json:"expertise_id"`
 }
 
 // type DoctorInfoWorkday struct {

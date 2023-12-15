@@ -9,7 +9,7 @@ type DoctorRequest struct {
 	DoctorDOB         string `json:"doctor_dob" form:"doctor_dob"`
 	DoctorProvinsi    string `json:"doctor_provinsi" form:"doctor_provinsi"`
 	DoctorKota        string `json:"doctor_kota" form:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_numberphone" form:"doctor_numberphone"`
+	DoctorNumberPhone string `json:"doctor_number_phone" form:"doctor_number_phone"`
 	DoctorGender      string `json:"doctor_gender" form:"doctor_gender"`
 	DoctorAvatar      string `json:"doctor_avatar" form:"doctor_avatar"`
 	DoctorDescription string `json:"doctor_description" form:"doctor_description"`

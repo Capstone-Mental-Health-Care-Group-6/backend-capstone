@@ -160,6 +160,7 @@ func (ad *TransactionData) GetAll(sort string) ([]transaction.TransactionInfo, e
         counseling_topics.name as topic_name,
         patient_accounts.name as patient_name,
         patient_accounts.avatar as patient_avatar,
+        doctors.doctor_avatar as doctor_avatar,
         doctors.doctor_name as doctor_name,
         counseling_methods.name as method_name,
         counseling_durations.name as duration_name,
@@ -198,6 +199,7 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
         counseling_topics.name as topic_name,
         patient_accounts.name as patient_name,
         patient_accounts.avatar as patient_avatar,
+        doctors.doctor_avatar as doctor_avatar,
         doctors.doctor_name as doctor_name,
         counseling_methods.name as method_name,
         counseling_durations.name as duration_name,
@@ -238,6 +240,7 @@ func (ad *TransactionData) GetByPatientID(id int, sort string) ([]transaction.Tr
         counseling_topics.name as topic_name,
         patient_accounts.name as patient_name,
         patient_accounts.avatar as patient_avatar,
+        doctors.doctor_avatar as doctor_avatar,
         doctors.doctor_name as doctor_name,
         counseling_methods.name as method_name,
         counseling_durations.name as duration_name,
@@ -317,7 +320,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 
 	var dbDataRating = new(data.DoctorRating)
 	dbDataRating.DoctorID = newData.DoctorID
-	dbDataRating.DoctorReview = ""
+	dbDataRating.DoctorReview = "No review yet"
 	dbDataRating.TransactionID = newData.MidtransID
 	dbDataRating.DoctorStarRating = 0
 	dbDataRating.PatientID = newData.PatientID
