@@ -170,8 +170,8 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Login process error: ", err.Error())
-			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, helper.FormatResponse("Data Not Found", nil))
+			if strings.Contains(err.Error(), "Not Found") {
+				return c.JSON(http.StatusNotFound, helper.FormatResponse("User Not Found / User Inactive", nil))
 			}
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Login Patient Error", nil))
 		}
