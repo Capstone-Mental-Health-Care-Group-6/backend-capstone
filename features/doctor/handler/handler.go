@@ -179,7 +179,20 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Ijazah", nil))
 		}
 
+		resultMeetlink, err := mdl.svc.GetMeetLink()
+
+		if err != nil {
+			c.Logger().Error("Handler: Get meet link error (Get meet link): ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create meet link", nil))
+		}
+
 		var serviceInput = new(doctor.Doctor)
+
+		if resultMeetlink == "" {
+			serviceInput.DoctorMeetLink = "https://meet.google.com/(Create by yourself)"
+		} else {
+			serviceInput.DoctorMeetLink = resultMeetlink
+		}
 
 		serviceInput.UserID = getID
 		serviceInput.DoctorName = input.DoctorName
@@ -192,7 +205,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		serviceInput.DoctorGender = input.DoctorGender
 
 		serviceInput.DoctorAvatar = uploadUrlPhoto
-		serviceInput.DoctorMeetLink = input.DoctorMeetLink
+
 		serviceInput.DoctorSIPP = input.DoctorSIPP
 		serviceInput.DoctorSTR = input.DoctorSTR
 		serviceInput.DoctorSIPPFile = uploadUrlSIPP
@@ -603,7 +616,7 @@ func (mdl *DoctorHandler) UpdateDoctorEducation() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Update Process Error (UpdateDoctorEducation): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to update doctor education", nil))
 			}
 		}
 
@@ -679,14 +692,14 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor rating id", nil))
 		}
 
 		var paramIDPatient = c.Param("patient")
 		patientID, err := strconv.Atoi(paramIDPatient)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid Patient ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get patient id", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
@@ -699,7 +712,7 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 		var input = new(DoctorRating)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind doctor rating request", nil))
 		}
 
 		var serviceInput = new(doctor.DoctorRating)
@@ -711,7 +724,7 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to give review to doctor", nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -724,7 +737,7 @@ func (mdl *DoctorHandler) DeleteDoctor() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get id doctor", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
@@ -752,7 +765,7 @@ func (mdl *DoctorHandler) DeleteDoctorData() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get id doctor", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
@@ -808,7 +821,7 @@ func (mdl *DoctorHandler) DeleteDoctorData() echo.HandlerFunc {
 
 		}
 
-		return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail, type or id not found", nil))
+		return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail, path param type or path param id not found", nil))
 	}
 }
 
@@ -828,7 +841,7 @@ func (mdl *DoctorHandler) InsertDataDoctor() echo.HandlerFunc {
 			var input = new(DoctorWorkdays)
 			if err := c.Bind(input); err != nil {
 				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request doctor workadays", nil))
 			}
 
 			var serviceInput = new(doctor.DoctorWorkdays)
@@ -851,7 +864,7 @@ func (mdl *DoctorHandler) InsertDataDoctor() echo.HandlerFunc {
 			var input = new(DoctorEducation)
 			if err := c.Bind(input); err != nil {
 				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request doctor education", nil))
 			}
 
 			var serviceInput = new(doctor.DoctorEducation)
@@ -874,7 +887,7 @@ func (mdl *DoctorHandler) InsertDataDoctor() echo.HandlerFunc {
 			var input = new(DoctorExperience)
 			if err := c.Bind(input); err != nil {
 				c.Logger().Info("Handler: Bind Input Error: ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request doctor experience", nil))
 			}
 
 			var serviceInput = new(doctor.DoctorExperience)
@@ -904,13 +917,13 @@ func (mdl *DoctorHandler) DoctorDashboard() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := mdl.jwt.CheckRole(c)
 		if role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized permission", nil))
 		}
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get id doctor", nil))
 		}
 
 		res, err := mdl.svc.DoctorDashboard(id)
@@ -934,14 +947,14 @@ func (mdl *DoctorHandler) DoctorDashboardPatient() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := mdl.jwt.CheckRole(c)
 		if role != "Doctor" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized permission", nil))
 		}
 
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get id doctor", nil))
 		}
 		res, err := mdl.svc.DoctorDashboardPatient(id)
 		if err != nil {
@@ -957,7 +970,7 @@ func (mdl *DoctorHandler) DoctorDashboardAdmin() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := mdl.jwt.CheckRole(c)
 		if role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized permission", nil))
 		}
 
 		res, err := mdl.svc.DoctorDashboardAdmin()
