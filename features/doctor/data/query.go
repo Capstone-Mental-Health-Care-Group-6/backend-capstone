@@ -330,6 +330,8 @@ func (pdata *DoctorData) InsertWorkadays(newData doctor.DoctorWorkdays) (*doctor
 		return nil, err
 	}
 
+	newData.ID = dbData.ID
+
 	return &newData, nil
 }
 
@@ -342,11 +344,12 @@ func (pdata *DoctorData) InsertExperience(newData doctor.DoctorExperience) (*doc
 	dbData.DoctorCompanyAddress = newData.DoctorCompany
 	dbData.DoctorStartDate = newData.DoctorStartDate
 	dbData.DoctorEndDate = newData.DoctorEndDate
-	// dbData.DoctorIsNow = newData.DoctorIsNow
 
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
 	}
+
+	newData.ID = dbData.ID
 
 	return &newData, nil
 }
@@ -363,6 +366,8 @@ func (pdata *DoctorData) InsertEducation(newData doctor.DoctorEducation) (*docto
 	if err := pdata.db.Create(dbData).Error; err != nil {
 		return nil, err
 	}
+
+	newData.ID = dbData.ID
 
 	return &newData, nil
 }

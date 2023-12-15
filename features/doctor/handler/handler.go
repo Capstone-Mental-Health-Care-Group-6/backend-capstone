@@ -28,12 +28,12 @@ func (mdl *DoctorHandler) GetDoctors() echo.HandlerFunc {
 
 		result, err := mdl.svc.GetDoctors(name)
 		if err != nil {
-			c.Logger().Error("Handler : Get All Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			c.Logger().Error("Handler : Error to get doctor : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail, error to get doctors", nil))
 		}
 
 		if len(result) == 0 {
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Doctors data is Empty"))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -46,18 +46,18 @@ func (mdl *DoctorHandler) GetDoctor() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid doctor id", nil))
 		}
 
 		result, err := mdl.svc.GetDoctor(id)
 
 		if err != nil {
 			c.Logger().Error("Handler : Get By ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get doctor id", nil))
 		}
 
 		if result.ID == 0 {
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Doctor data is empty"))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -70,18 +70,18 @@ func (mdl *DoctorHandler) GetDoctorByUserId() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param User ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid User ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid user id"))
 		}
 
 		result, err := mdl.svc.GetDoctorByUserId(id)
 
 		if err != nil {
 			c.Logger().Error("Handler : Get By User ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to get user id", nil))
 		}
 
 		if result.ID == 0 {
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Data is Empty"))
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success", "Doctor data is empty"))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -94,7 +94,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 		getID, err := mdl.jwt.GetID(c)
 		fmt.Println(role)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, cant get ID from JWT", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail to get id from jwt", nil))
 		}
 
 		var input = new(DoctorRequest)
@@ -106,77 +106,77 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		formHeaderPhoto, err := c.FormFile("doctor_avatar")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Avatar", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload avatar", nil))
 		}
 
 		formHeaderSIPP, err := c.FormFile("doctor_sipp_file")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload SIPP", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload SIPP", nil))
 		}
 
 		formHeaderSTR, err := c.FormFile("doctor_str_file")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload STR", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload STR", nil))
 		}
 
 		formHeaderCV, err := c.FormFile("doctor_cv")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload CV", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload CV", nil))
 		}
 
 		formHeaderIjazah, err := c.FormFile("doctor_ijazah")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Ijazah", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload Ijazah", nil))
 		}
 
 		formPhoto, err := formHeaderPhoto.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderPhoto", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open avatar", nil))
 		}
 
 		formSIPP, err := formHeaderSIPP.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderSIPP", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open SIPP", nil))
 		}
 
 		formSTR, err := formHeaderSTR.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderSTR", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open STR", nil))
 		}
 
 		formCV, err := formHeaderCV.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderCV", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open CV", nil))
 		}
 
 		formIjazah, err := formHeaderIjazah.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderIjazah", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open Ijazah", nil))
 		}
 
 		uploadUrlPhoto, err := mdl.svc.DoctorAvatarUpload(doctor.DoctorAvatarPhoto{DoctorAvatar: formPhoto})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Avatar", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Avatar", nil))
 		}
 
 		uploadUrlSIPP, err := mdl.svc.DoctorSIPPUpload(doctor.DoctorSIPPFileDataModel{DoctorSIPPFile: formSIPP})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload SIPP", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload SIPP", nil))
 		}
 
 		uploadUrlSTR, err := mdl.svc.DoctorSTRUpload(doctor.DoctorSTRFileDataModel{DoctorSTRFile: formSTR})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload STR", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload STR", nil))
 		}
 
 		uploadUrlCV, err := mdl.svc.DoctorCVUpload(doctor.DoctorCVDataModel{DoctorCV: formCV})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload CV", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload CV", nil))
 		}
 
 		uploadUrlIjazah, err := mdl.svc.DoctorIjazahUpload(doctor.DoctorIjazahDataModel{DoctorIjazah: formIjazah})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Ijazah", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Ijazah", nil))
 		}
 
 		var serviceInput = new(doctor.Doctor)
@@ -208,7 +208,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Input Process Error (CreateDoctor): ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create data doctor", nil))
 		}
 
 		var serviceInputExpertise = new(doctor.DoctorExpertiseRelation)
@@ -219,25 +219,25 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Input Process Error (CreateDoctorExpertise): ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create data doctor expertise", nil))
 		}
 
 		if len(input.DoctorWorkdayID) != len(input.DoctorWorkStartTime) || len(input.DoctorWorkdayID) != len(input.DoctorWorkEndTime) {
 			c.Logger().Error("Handler: workday, start time, and end time must have the same array length!")
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Workday, Start and End time mismatch array length.", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("workday, start time, and end time must have the same array length", nil))
 		}
 
 		// Validate array lengths for DoctorEducation
 		if len(input.DoctorUniversity) != len(input.DoctorStudyProgram) || len(input.DoctorUniversity) != len(input.DoctorGraduateYear) {
 			c.Logger().Error("Handler: university, study program, and graduate year must have the same array length!")
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: University, Study Program, and Graduate Year mismatch array length.", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("university, study program, and graduate year must have the same array length", nil))
 		}
 
 		// Validate array lengths for DoctorExperience
 		if len(input.DoctorCompany) != len(input.DoctorTitle) ||
 			len(input.DoctorCompany) != len(input.DoctorStartDate) || len(input.DoctorCompany) != len(input.DoctorEndDate) {
 			c.Logger().Error("Handler: company, title, experience, start date, end date, and is now must have the same array length!")
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail: Company, Title, Experience, Start Date, End Date, and Is Now mismatch array length.", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("company, title, experience, start date, end date, and is now must have the same array length", nil))
 		}
 
 		// Create DoctorWorkadays objects
@@ -261,7 +261,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Input Process Error (CreateDoctorWorkadays): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create data doctor workdays", nil))
 			}
 		}
 
@@ -289,7 +289,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Input Process Error (CreateDoctorEducation): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create data doctor education", nil))
 			}
 		}
 
@@ -318,7 +318,7 @@ func (mdl *DoctorHandler) CreateDoctor() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Input Process Error (CreateDoctorExperience): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to create data doctor experience", nil))
 			}
 		}
 
@@ -359,95 +359,95 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor id", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
 
 		fmt.Println(role)
 		if role != "Doctor" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permission", nil))
 		}
 
 		var input = new(DoctorRequestDatapokok)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request", nil))
 		}
 
 		formHeaderPhoto, err := c.FormFile("doctor_avatar")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Avatar", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload Avatar", nil))
 		}
 
 		formHeaderSIPP, err := c.FormFile("doctor_sipp_file")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload SIPP", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload SIPP", nil))
 		}
 
 		formHeaderSTR, err := c.FormFile("doctor_str_file")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload STR", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload STR", nil))
 		}
 
 		formHeaderCV, err := c.FormFile("doctor_cv")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload CV", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload CV", nil))
 		}
 
 		formHeaderIjazah, err := c.FormFile("doctor_ijazah")
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload Ijazah", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Required to upload Ijazah", nil))
 		}
 
 		formPhoto, err := formHeaderPhoto.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderPhoto", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open Photo", nil))
 		}
 
 		formSIPP, err := formHeaderSIPP.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderSIPP", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open SIPP", nil))
 		}
 
 		formSTR, err := formHeaderSTR.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderSTR", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open STR", nil))
 		}
 
 		formCV, err := formHeaderCV.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderCV", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open CV", nil))
 		}
 
 		formIjazah, err := formHeaderIjazah.Open()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed FormHeaderIjazah", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to open Ijazah", nil))
 		}
 
 		uploadUrlPhoto, err := mdl.svc.DoctorAvatarUpload(doctor.DoctorAvatarPhoto{DoctorAvatar: formPhoto})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Avatar", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Avatar", nil))
 		}
 
 		uploadUrlSIPP, err := mdl.svc.DoctorSIPPUpload(doctor.DoctorSIPPFileDataModel{DoctorSIPPFile: formSIPP})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload SIPP", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload SIPP", nil))
 		}
 
 		uploadUrlSTR, err := mdl.svc.DoctorSTRUpload(doctor.DoctorSTRFileDataModel{DoctorSTRFile: formSTR})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload STR", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload STR", nil))
 		}
 
 		uploadUrlCV, err := mdl.svc.DoctorCVUpload(doctor.DoctorCVDataModel{DoctorCV: formCV})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload CV", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload CV", nil))
 		}
 
 		uploadUrlIjazah, err := mdl.svc.DoctorIjazahUpload(doctor.DoctorIjazahDataModel{DoctorIjazah: formIjazah})
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Ijazah", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to upload Ijazah", nil))
 		}
 
 		var serviceInput = new(doctor.DoctorDatapokokUpdate)
@@ -478,7 +478,7 @@ func (mdl *DoctorHandler) UpdateDoctorDatapokok() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to update doctor data", nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -491,21 +491,21 @@ func (mdl *DoctorHandler) UpdateDoctorExperience() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor id", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
 
 		if role != "Doctor" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		var input = new([]DoctorExperience)
 
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request", nil))
 		}
 
 		var result bool
@@ -541,7 +541,7 @@ func (mdl *DoctorHandler) UpdateDoctorExperience() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Update Process Error (UpdateDoctorExperience): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to update doctor experience", nil))
 			}
 		}
 
@@ -555,20 +555,20 @@ func (mdl *DoctorHandler) UpdateDoctorEducation() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor id", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
 
 		if role == "Patient" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		var input = new([]DoctorEducation)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request", nil))
 		}
 
 		var result bool
@@ -617,20 +617,20 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			c.Logger().Error("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", "Invalid ID"))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get doctor id", nil))
 		}
 
 		role := mdl.jwt.CheckRole(c)
 		fmt.Println(role)
 
 		if role == "Patient" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		var input = new([]DoctorWorkdays)
 		if err := c.Bind(input); err != nil {
 			c.Logger().Error("Handler: Bind Input Error: ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind input request", nil))
 		}
 
 		var result bool
@@ -665,7 +665,7 @@ func (mdl *DoctorHandler) UpdateDoctorWorkdays() echo.HandlerFunc {
 
 			if err != nil {
 				c.Logger().Error("Handler: Update Process Error (UpdateDoctor): ", err.Error())
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to update doctor workadays", nil))
 			}
 		}
 
@@ -693,7 +693,7 @@ func (mdl *DoctorHandler) UpdateDoctorRating() echo.HandlerFunc {
 		fmt.Println(role)
 
 		if role != "Patient" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		var input = new(DoctorRating)
@@ -731,7 +731,7 @@ func (mdl *DoctorHandler) DeleteDoctor() echo.HandlerFunc {
 		fmt.Println(role)
 
 		if role != "Doctor" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		result, err := mdl.svc.DeleteDoctor(id)
@@ -759,7 +759,7 @@ func (mdl *DoctorHandler) DeleteDoctorData() echo.HandlerFunc {
 		fmt.Println(role)
 
 		if role != "Doctor" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		if paramType == "workday" {
@@ -820,7 +820,7 @@ func (mdl *DoctorHandler) InsertDataDoctor() echo.HandlerFunc {
 		fmt.Println(role)
 
 		if role != "Doctor" && role != "Admin" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Fail, you don't have access.", nil))
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Insufficient permissions", nil))
 		}
 
 		if paramType == "workday" {
