@@ -13,6 +13,30 @@ type CounselingSessionServiceInterface struct {
 	mock.Mock
 }
 
+// ApprovePatient provides a mock function with given fields: id
+func (_m *CounselingSessionServiceInterface) ApprovePatient(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateCounseling provides a mock function with given fields: input
 func (_m *CounselingSessionServiceInterface) CreateCounseling(input CounselingSession.CounselingSession) (*CounselingSession.CounselingSession, error) {
 	ret := _m.Called(input)
@@ -134,6 +158,30 @@ func (_m *CounselingSessionServiceInterface) GetCounseling(id int) (*CounselingS
 
 	if rf, ok := ret.Get(1).(func(int) error); ok {
 		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RejectPatient provides a mock function with given fields: id, newData
+func (_m *CounselingSessionServiceInterface) RejectPatient(id int, newData CounselingSession.StatusUpdate) (bool, error) {
+	ret := _m.Called(id, newData)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int, CounselingSession.StatusUpdate) (bool, error)); ok {
+		return rf(id, newData)
+	}
+	if rf, ok := ret.Get(0).(func(int, CounselingSession.StatusUpdate) bool); ok {
+		r0 = rf(id, newData)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int, CounselingSession.StatusUpdate) error); ok {
+		r1 = rf(id, newData)
 	} else {
 		r1 = ret.Error(1)
 	}

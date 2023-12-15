@@ -3,6 +3,7 @@ package handler
 import (
 	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/helper"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -56,10 +57,10 @@ func (h *CounselingSessionHandler) CreateCounseling() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Format Request", nil))
 		}
 
-		isValid, errors := helper.ValidateForm(req)
-		if !isValid {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
-		}
+		//isValid, errors := helper.ValidateForm(req)
+		//if !isValid {
+		//	return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
+		//}
 
 		var serviceInput = new(counselingsession.CounselingSession)
 		serviceInput.TransactionID = req.TransactionID
@@ -67,6 +68,8 @@ func (h *CounselingSessionHandler) CreateCounseling() echo.HandlerFunc {
 		serviceInput.Time = req.Time
 		serviceInput.Duration = req.Duration
 		serviceInput.Status = "process"
+		serviceInput.Alasan = ""
+		serviceInput.DetailAlasan = ""
 
 		//CREATE COUNSELING HANDLER
 
@@ -82,6 +85,8 @@ func (h *CounselingSessionHandler) CreateCounseling() echo.HandlerFunc {
 		response.Time = result.Time
 		response.Duration = result.Duration
 		response.Status = result.Status
+		serviceInput.Alasan = ""
+		serviceInput.DetailAlasan = ""
 
 		return c.JSON(http.StatusCreated, helper.FormatResponse("Success to create counseling session", response))
 	}
@@ -219,5 +224,69 @@ func (h *CounselingSessionHandler) DeleteCounseling() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success to delete bundle", result))
+	}
+}
+
+// MASIH BUG BIND ID //
+func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := h.jwt.CheckRole(c)
+
+		fmt.Println(role)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Param ID", nil))
+		}
+
+		result, err := h.s.ApprovePatient(id)
+
+		if err != nil {
+			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Status", result))
+	}
+}
+
+func (h *CounselingSessionHandler) RejectPatient() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		role := h.jwt.CheckRole(c)
+
+		fmt.Println(role)
+		if role != "Doctor" {
+			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
+		}
+
+		var paramID = c.Param("id")
+		id, err := strconv.Atoi(paramID)
+		if err != nil {
+			c.Logger().Error("Handler : Param ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid Param ID", nil))
+		}
+
+		var input = new(RequestStatusUpdate)
+		if err := c.Bind(input); err != nil {
+			c.Logger().Error("Handler : Bind Input Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
+		}
+
+		var serviceUpdate = new(counselingsession.StatusUpdate)
+		serviceUpdate.Alasan = input.Alasan
+
+		result, err := h.s.RejectPatient(id, *serviceUpdate)
+
+		if err != nil {
+			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
+		}
+
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update Status", result))
 	}
 }
