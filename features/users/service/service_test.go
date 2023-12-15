@@ -120,6 +120,21 @@ func TestLogin(t *testing.T) {
 		assert.Nil(t, result)
 	})
 
+	t.Run("Not Found", func(t *testing.T) {
+		userFail := users.User{
+			Email:    "irvanhau",
+			Password: "vanhau123",
+		}
+
+		data.On("Login", userFail.Email, userFail.Password).Return(nil, errors.New("User Not Found / User Inactive")).Once()
+
+		result, err := service.Login(userFail.Email, userFail.Password)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "User Not Found / User Inactive")
+		assert.Nil(t, result)
+	})
+
 	t.Run("Server Error", func(t *testing.T) {
 		userFail := users.User{
 			Email:    "irvanhau",

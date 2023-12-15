@@ -38,7 +38,15 @@ func (ud *UserData) Login(email, password string) (*users.User, error) {
 	var dbData = new(User)
 	dbData.Email = email
 
-	if err := ud.db.Where("email = ?", dbData.Email).First(dbData).Error; err != nil {
+	var qry = ud.db.Where("email = ? AND status = ?", dbData.Email, "Active").First(dbData)
+
+	var dataCount int64
+	qry.Count(&dataCount)
+	if dataCount == 0 {
+		return nil, errors.New("Not Found")
+	}
+
+	if err := qry.Error; err != nil {
 		logrus.Info("DB Error : ", err.Error())
 		return nil, err
 	}

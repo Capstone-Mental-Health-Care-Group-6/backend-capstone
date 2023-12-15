@@ -6,6 +6,7 @@ import (
 	"FinalProject/helper/enkrip"
 	"FinalProject/utils/cloudinary"
 	"errors"
+	"strings"
 )
 
 type PatientService struct {
@@ -73,6 +74,12 @@ func (psvc *PatientService) UpdatePatient(id int, newData patients.UpdateProfile
 func (psvc *PatientService) LoginPatient(email, password string) (*patients.PatientCredential, error) {
 	result, err := psvc.data.LoginPatient(email, password)
 	if err != nil {
+		if strings.Contains(err.Error(), "Incorrect Password") {
+			return nil, errors.New("Incorrect Password")
+		}
+		if strings.Contains(err.Error(), "Not Found") {
+			return nil, errors.New("User Not Found / User Inactive")
+		}
 		return nil, errors.New("Login Process Failed")
 	}
 
@@ -127,16 +134,6 @@ func (psvc *PatientService) InactivateAccount(id int) (bool, error) {
 
 	if err != nil {
 		return false, errors.New("Inactivate Account Process Failed")
-	}
-
-	return result, nil
-}
-
-func (psvc *PatientService) ActivateAccount(id int) (bool, error) {
-	result, err := psvc.data.ActivateAccount(id)
-
-	if err != nil {
-		return false, errors.New("Activate Account Process Failed")
 	}
 
 	return result, nil

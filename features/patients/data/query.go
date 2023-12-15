@@ -89,7 +89,15 @@ func (pdata *PatientData) LoginPatient(email, password string) (*patients.Patien
 	var dbData = new(PatientAccount)
 	dbData.Email = email
 
-	if err := pdata.db.Where("email = ? AND status = 'Active'", dbData.Email).First(dbData).Error; err != nil {
+	var qry = pdata.db.Where("email = ? AND status = ?", dbData.Email, "Active").First(dbData)
+
+	var dataCount int64
+	qry.Count(&dataCount)
+	if dataCount == 0 {
+		return nil, errors.New("Not Found")
+	}
+
+	if err := qry.Error; err != nil {
 		logrus.Info("DB Error : ", err.Error())
 		return nil, err
 	}

@@ -170,8 +170,8 @@ func (mdl *PatientHandler) LoginPatient() echo.HandlerFunc {
 
 		if err != nil {
 			c.Logger().Error("Handler: Login process error: ", err.Error())
-			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, helper.FormatResponse("Data Not Found", nil))
+			if strings.Contains(err.Error(), "Not Found") {
+				return c.JSON(http.StatusNotFound, helper.FormatResponse("User Not Found / User Inactive", nil))
 			}
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Login Patient Error", nil))
 		}
@@ -309,27 +309,5 @@ func (mdl *PatientHandler) InactivateAccount() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Inactivate Account", result))
-	}
-}
-
-func (mdl *PatientHandler) ActivateAccount() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		role := mdl.jwt.CheckRole(c)
-		fmt.Println(role)
-		if role != "Patient" {
-			return c.JSON(http.StatusUnauthorized, helper.FormatResponse("Unauthorized", nil))
-		}
-
-		id := mdl.jwt.CheckID(c)
-		userIdInt := int(id.(float64))
-
-		result, err := mdl.svc.ActivateAccount(userIdInt)
-
-		if err != nil {
-			c.Logger().Info("Handler : Activate Account Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Activate Account Process Failed", nil))
-		}
-
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success Activate Account", result))
 	}
 }
