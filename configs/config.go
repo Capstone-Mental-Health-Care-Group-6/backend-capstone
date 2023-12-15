@@ -179,7 +179,7 @@ func loadConfig() (*ProgrammingConfig, error) {
 		error = errors.New("OAuth Google Redirect URL undefined")
 	}
 
-	if val, found := os.LookupEnv("Cloud_URL"); found {
+	if val, found := os.LookupEnv("CloudURL"); found {
 		res.CloudinaryURL = val
 	} else {
 		permit = false

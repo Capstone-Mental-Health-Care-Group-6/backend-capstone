@@ -52,3 +52,10 @@ type ManageResponse struct {
 	Topic       string `json:"topic"`
 	Layanan     string `json:"layanan"`
 }
+
+type DashboardAdminResponse struct {
+	TotalDoctor        int `json:"total_doctor"`
+	TotalDoctorBaru    int `json:"total_new_doctor"`
+	TotalDoctorActive  int `json:"total_active_doctor"`
+	TotalDoctorPending int `json:"total_pending_doctor"`
+}

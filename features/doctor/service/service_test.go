@@ -1001,3 +1001,118 @@ func TestDoctorDashboardPatient(t *testing.T) {
 		data.AssertExpectations(t)
 	})
 }
+
+func TestDashboardDoctorAdmin(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	var dashboard doctor.DoctorDashboardAdmin
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("DoctorDashboardAdmin").Return(dashboard, errors.New("Process Failed")).Once()
+
+		res, err := service.DoctorDashboardAdmin()
+
+		assert.Error(t, err)
+		assert.NotNil(t, res)
+		assert.EqualError(t, err, "Process Failed")
+	})
+
+	t.Run("Success Get", func(t *testing.T) {
+		data.On("DoctorDashboardAdmin").Return(dashboard, nil).Once()
+
+		res, err := service.DoctorDashboardAdmin()
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+		data.AssertExpectations(t)
+	})
+}
+
+func TestDenyDoctor(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	var doctor doctor.DoctorAll
+
+	t.Run("Get By ID Error", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(nil, errors.New("Get Doctor By User ID Error")).Once()
+
+		result, err := service.DenyDoctor(1)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Get Doctor By User ID Error")
+		assert.Equal(t, false, result)
+	})
+
+	t.Run("Success Deny", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(&doctor, nil).Once()
+		data.On("DenyDoctor", int(doctor.ID)).Return(true, nil).Once()
+
+		result, err := service.DenyDoctor(1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, true, result)
+		data.AssertExpectations(t)
+		cld.AssertExpectations(t)
+	})
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(&doctor, nil).Once()
+		data.On("DenyDoctor", int(doctor.ID)).Return(false, errors.New("Deny Process Failed")).Once()
+
+		result, err := service.DenyDoctor(1)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Deny Process Failed")
+		assert.Equal(t, false, result)
+	})
+}
+
+func TestApproveDoctor(t *testing.T) {
+	data := mocks.NewDoctorDataInterface(t)
+	cld := mockUtil.NewCloudinaryInterface(t)
+	email := mockHelper.NewEmailInterface(t)
+	meet := mockHelper.NewMeetInterface(t)
+	service := NewDoctor(data, cld, email, meet)
+	var doctor doctor.DoctorAll
+
+	t.Run("Get By ID Error", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(nil, errors.New("Get Doctor By User ID Error")).Once()
+
+		result, err := service.ApproveDoctor(1)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Get Doctor By User ID Error")
+		assert.Equal(t, false, result)
+	})
+
+	t.Run("Success Approve", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(&doctor, nil).Once()
+		data.On("ApproveDoctor", int(doctor.ID)).Return(true, nil).Once()
+
+		result, err := service.ApproveDoctor(1)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, true, result)
+		data.AssertExpectations(t)
+		cld.AssertExpectations(t)
+	})
+
+	t.Run("Server Error", func(t *testing.T) {
+		data.On("GetDoctorByUserId", 1).Return(&doctor, nil).Once()
+		data.On("ApproveDoctor", int(doctor.ID)).Return(false, errors.New("Approve Process Failed")).Once()
+
+		result, err := service.ApproveDoctor(1)
+
+		assert.Error(t, err)
+		assert.EqualError(t, err, "Approve Process Failed")
+		assert.Equal(t, false, result)
+	})
+}
