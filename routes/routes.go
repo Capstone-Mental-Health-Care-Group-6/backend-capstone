@@ -101,14 +101,20 @@ func RouteWithdraw(e *echo.Echo, wh withdraw.WithdrawHandlerInterface, cfg confi
 }
 
 func RoutePatient(e *echo.Echo, ph patients.PatientHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/patient", ph.GetPatients(), echojwt.JWT([]byte(cfg.Secret)))
-	e.GET("/patient/account/:id", ph.GetPatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/patient/register", ph.CreatePatient())
 	e.POST("/patient/login", ph.LoginPatient())
+
+	e.GET("/patient", ph.GetPatients(), echojwt.JWT([]byte(cfg.Secret)))
+	e.GET("/patient/account/:id", ph.GetPatient(), echojwt.JWT([]byte(cfg.Secret)))
+
+	// PATIENT
 	e.PUT("/patient/account/update", ph.UpdatePatient(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/patient/account/update/password", ph.UpdatePassword(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/patient/activate", ph.ActivateAccount(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/patient/inactivate", ph.InactivateAccount(), echojwt.JWT([]byte(cfg.Secret)))
+
+	// ADMIN
 	e.PUT("/patient/update/:id/status", ph.UpdateStatus(), echojwt.JWT([]byte(cfg.Secret)))
-	e.DELETE("/patient/delete", ph.Delete(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/patient/dashboard", ph.PatientDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 

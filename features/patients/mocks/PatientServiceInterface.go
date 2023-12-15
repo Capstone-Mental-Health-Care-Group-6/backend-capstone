@@ -13,6 +13,30 @@ type PatientServiceInterface struct {
 	mock.Mock
 }
 
+// ActivateAccount provides a mock function with given fields: id
+func (_m *PatientServiceInterface) ActivateAccount(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreatePatient provides a mock function with given fields: newData
 func (_m *PatientServiceInterface) CreatePatient(newData patients.Patiententity) (*patients.Patiententity, error) {
 	ret := _m.Called(newData)
@@ -32,30 +56,6 @@ func (_m *PatientServiceInterface) CreatePatient(newData patients.Patiententity)
 
 	if rf, ok := ret.Get(1).(func(patients.Patiententity) error); ok {
 		r1 = rf(newData)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Delete provides a mock function with given fields: id
-func (_m *PatientServiceInterface) Delete(id int) (bool, error) {
-	ret := _m.Called(id)
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
-		return rf(id)
-	}
-	if rf, ok := ret.Get(0).(func(int) bool); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(int) error); ok {
-		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -106,6 +106,30 @@ func (_m *PatientServiceInterface) GetPatients(status string, name string) ([]pa
 
 	if rf, ok := ret.Get(1).(func(string, string) error); ok {
 		r1 = rf(status, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// InactivateAccount provides a mock function with given fields: id
+func (_m *PatientServiceInterface) InactivateAccount(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
 	}
