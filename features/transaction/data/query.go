@@ -98,7 +98,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = transaction.DurationID
-		newData.Alasan = ""
+		newData.Alasan = "other"
 		newData.Status = "pending"
 		// MASUKIN DATA
 
@@ -444,7 +444,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = existingData.DurationID
-		newData.Alasan = ""
+		newData.Alasan = "other"
 		newData.Status = "pending"
 
 		// MASUKIN DATA
@@ -545,7 +545,7 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = existingData.DurationID
-		newData.Alasan = ""
+		newData.Alasan = "other"
 		newData.Status = "pending"
 		// MASUKIN DATA
 

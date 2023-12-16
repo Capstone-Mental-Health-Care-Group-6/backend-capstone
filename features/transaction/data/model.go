@@ -21,9 +21,9 @@ type Transaction struct {
 	PriceCounseling uint `gorm:"default:null;column:price_counseling"`
 	PriceResult     uint `gorm:"column:price_result"`
 
-	PaymentProof  string `gorm:"default:null;column:payment_proof"`
+	PaymentProof  string `gorm:"default:null;column:payment_proof;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"`
 	PaymentStatus uint   `gorm:"column:payment_status"`
-	PaymentType   string `gorm:"column:payment_type"`
+	PaymentType   string `gorm:"column:payment_type;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"`
 }
 
 func (Transaction) TableName() string {
