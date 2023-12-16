@@ -17,11 +17,11 @@ type PatientRequest struct {
 }
 
 type UpdateProfile struct {
-	Name        string         `json:"name" form:"name"`
-	Email       string         `json:"email" form:"email"`
-	DateOfBirth string         `json:"date_of_birth" form:"date_of_birth"`
-	Gender      string         `json:"gender" form:"gender"`
-	Phone       string         `json:"phone_number" form:"phone"`
+	Name        string         `json:"name" form:"name" validate:"omitempty"`
+	Email       string         `json:"email" form:"email" validate:"omitempty"`
+	DateOfBirth string         `json:"date_of_birth" form:"date_of_birth" validate:"omitempty"`
+	Gender      string         `json:"gender" form:"gender" validate:"omitempty"`
+	Phone       string         `json:"phone_number" form:"phone" validate:"omitempty"`
 	Avatar      multipart.File `json:"avatar" form:"avatar" validate:"omitempty"`
 }
 
