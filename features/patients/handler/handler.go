@@ -118,33 +118,31 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 		id := mdl.jwt.CheckID(c)
 		userIdInt := int(id.(float64))
 		var input = new(UpdateProfile)
-		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
-		}
-
-		formHeaderPhoto, err := c.FormFile("avatar")
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
-		}
-
-		formPhoto, err := formHeaderPhoto.Open()
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Server Error Cannot Open Photo", nil))
-		}
-
-		uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Upload Photo Error", nil))
-		}
-
+		c.Bind(input)
 		var serviceUpdate = new(patients.UpdateProfile)
+		formHeaderPhoto, err := c.FormFile("avatar")
+		if err == nil {
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed, Select a File for Upload", nil))
+			}
+
+			formPhoto, err := formHeaderPhoto.Open()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Server Error Cannot Open Photo", nil))
+			}
+
+			uploadUrlPhoto, err := mdl.svc.PhotoUpload(patients.AvatarPhoto{Avatar: formPhoto})
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Upload Photo Error", nil))
+			}
+			serviceUpdate.Avatar = uploadUrlPhoto
+		}
+
 		serviceUpdate.Name = input.Name
 		serviceUpdate.Email = input.Email
 		serviceUpdate.DateOfBirth = input.DateOfBirth
 		serviceUpdate.Gender = input.Gender
 		serviceUpdate.Phone = input.Phone
-		serviceUpdate.Avatar = uploadUrlPhoto
 
 		result, err := mdl.svc.UpdatePatient(userIdInt, *serviceUpdate)
 
