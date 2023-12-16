@@ -12,8 +12,10 @@ type User struct {
 
 type Response struct {
 	ID        int       `json:"message_id"`
-	Sender    *User     `json:"sender"`
+	Sender    int       `json:"sender"`
+	Role      string    `json:"role"`
 	Text      string    `json:"text"`
 	Blob      string    `json:"blob"`
 	Timestamp time.Time `json:"timestamp"`
+	// Sender    *User     `json:"sender"`
 }

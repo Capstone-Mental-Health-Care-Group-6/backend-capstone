@@ -31,11 +31,19 @@ func (h *ChatHandler) Establish() echo.HandlerFunc {
 			}
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
-		if h.srv.SocketEstablish(ctx, user) != nil {
-			fmt.Printf("INFO: user#%d connected\n", user)
-			return nil
+		role := ctx.Param("role")
+		if role != "doctor" && role != "patient" {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "invalid role user",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
 		}
-		return ctx.JSON(http.StatusInternalServerError, nil)
+		h.srv.SocketEstablish(ctx, user, role)
+		if client := ctx.Get("ws.connect"); client != nil {
+			fmt.Println("[ws.handler]:", client, "connected")
+		}
+		return nil
 	}
 }
 
@@ -50,7 +58,7 @@ func (h *ChatHandler) Index() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.GetChats(ctx, user)
-		if ctx.Get("ws.conn.error") != nil {
+		if ctx.Get("ws.connect.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -68,15 +76,8 @@ func (h *ChatHandler) Index() echo.HandlerFunc {
 
 func (h *ChatHandler) Store() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		if ctx.Get("jwt.token.error") != nil {
-			response := helper.ApiResponse[any]{
-				Status:  http.StatusBadRequest,
-				Message: "jwt token invalid",
-			}
-			return ctx.JSON(http.StatusBadRequest, response)
-		}
 		request := &dto.CreateChatRequest{}
-		if err := ctx.Bind(request); err != nil || request.Patient == request.Doctor {
+		if err := ctx.Bind(request); err != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusBadRequest,
 				Message: "invalid create chat data payload",
@@ -84,7 +85,14 @@ func (h *ChatHandler) Store() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.CreateChat(ctx, request)
-		if ctx.Get("ws.conn.error") != nil {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
+		if ctx.Get("ws.connect.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -105,13 +113,6 @@ func (h *ChatHandler) Store() echo.HandlerFunc {
 
 func (h *ChatHandler) Edit() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		if ctx.Get("jwt.token.error") != nil {
-			response := helper.ApiResponse[any]{
-				Status:  http.StatusBadRequest,
-				Message: "jwt token invalid",
-			}
-			return ctx.JSON(http.StatusBadRequest, response)
-		}
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			response := helper.ApiResponse[any]{
@@ -129,7 +130,14 @@ func (h *ChatHandler) Edit() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.UpdateChat(ctx, chat, request)
-		if ctx.Get("ws.conn.error") != nil {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
+		if ctx.Get("ws.connect.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",
@@ -150,13 +158,6 @@ func (h *ChatHandler) Edit() echo.HandlerFunc {
 
 func (h *ChatHandler) Destroy() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		if ctx.Get("jwt.token.error") != nil {
-			response := helper.ApiResponse[any]{
-				Status:  http.StatusBadRequest,
-				Message: "jwt token invalid",
-			}
-			return ctx.JSON(http.StatusBadRequest, response)
-		}
 		chat, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			response := helper.ApiResponse[any]{
@@ -166,7 +167,14 @@ func (h *ChatHandler) Destroy() echo.HandlerFunc {
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
 		result := h.srv.DeleteChat(ctx, chat)
-		if ctx.Get("ws.conn.error") != nil {
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
+		if ctx.Get("ws.connect.error") != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusUpgradeRequired,
 				Message: "websocket connection not yet established",

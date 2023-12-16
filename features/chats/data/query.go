@@ -22,16 +22,19 @@ func New(db *gorm.DB) root.ChatDataInterface {
 	}
 }
 
-func (r *ChatData) Get(user int, query url.Values) (model []*root.Chat) {
+func (r *ChatData) Get(user int, role string, query url.Values) (model []*root.Chat) {
 	table := r.db.Table("chats").
 		Preload("Patient").
 		Preload("Doctor").
 		Where(func() string {
-			format := "(%s = %d OR %s = %d) AND deleted_at IS NULL"
-			return fmt.Sprintf(format, []any{
-				"patient_user_id", user,
-				"doctor_user_id", user,
-			}...)
+			format, result := "%s = %d AND deleted_at IS NULL", ""
+			switch role {
+			case "patient":
+				result = fmt.Sprintf(format, "patient_user_id", user)
+			case "doctor":
+				result = fmt.Sprintf(format, "doctor_user_id", user)
+			}
+			return result
 		}())
 	helper.QueryPagination(table, query)
 	helper.QuerySorting(table, query)

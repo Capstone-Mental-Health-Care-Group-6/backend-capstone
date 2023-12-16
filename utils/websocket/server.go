@@ -5,18 +5,21 @@ import (
 )
 
 type Server struct {
-	clients map[int]*Client
-	rooms   map[int]*Room
+	clients     map[string]*Client
+	client_refs map[string]string
+	rooms       map[int]*Room
 }
 
 func NewServer() *Server {
 	return &Server{
-		clients: make(map[int]*Client),
-		rooms:   make(map[int]*Room),
+		clients:     make(map[string]*Client),
+		client_refs: make(map[string]string),
+		rooms:       make(map[int]*Room),
 	}
 }
 
-func (s *Server) FindClient(sign int) *Client {
+func (s *Server) FindClient(ref string) *Client {
+	sign := s.client_refs[ref]
 	return s.clients[sign]
 }
 
@@ -24,17 +27,19 @@ func (s *Server) FindRoom(sign int) *Room {
 	return s.rooms[sign]
 }
 
-func (s *Server) CreateClient(ctx echo.Context, sign int) *Client {
-	s.clients[sign] = NewClient(ctx, s, sign)
-	go s.clients[sign].Send()
-	go s.clients[sign].Recv()
-	return s.clients[sign]
+func (s *Server) CreateClient(ctx echo.Context, user int, role string) string {
+	ref, client := NewClient(ctx, s, user, role)
+	s.clients[client.sign] = client
+	s.client_refs[ref] = client.sign
+	go s.clients[client.sign].Send()
+	go s.clients[client.sign].Recv()
+	return client.sign
 }
 
-func (s *Server) CreateRoom(sign int, users ...int) *Room {
+func (s *Server) CreateRoom(sign int, refs ...string) *Room {
 	clients := func() (buffer []*Client) {
-		for _, user := range users {
-			buffer = append(buffer, s.FindClient(user))
+		for _, ref := range refs {
+			buffer = append(buffer, s.FindClient(ref))
 		}
 		return buffer
 	}()
@@ -43,11 +48,11 @@ func (s *Server) CreateRoom(sign int, users ...int) *Room {
 	return s.rooms[sign]
 }
 
-func (s *Server) JoinRoom(sign int, a int) {
-	s.rooms[sign].join <- s.FindClient(a)
+func (s *Server) JoinRoom(sign int, ref string) {
+	s.rooms[sign].join <- s.FindClient(ref)
 }
 
-func (s *Server) DeleteClient(sign int) {
+func (s *Server) DeleteClient(sign string) {
 	delete(s.clients, sign)
 }
 

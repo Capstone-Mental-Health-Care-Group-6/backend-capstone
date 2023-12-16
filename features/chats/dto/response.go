@@ -6,8 +6,6 @@ type User struct {
 	ID    int    `json:"user_id"`
 	Name  string `json:"name"`
 	Email string `json:"email,omitempty"`
-	Phone string `json:"phone,omitempty"`
-	Photo string `json:"photo"`
 }
 
 type GetChatResponse struct {
