@@ -31,14 +31,6 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		var notificationPayload map[string]interface{}
 
 		err := json.NewDecoder(c.Request().Body).Decode(&notificationPayload)
-		if err != nil {
-			return err
-		}
-
-		if err != nil {
-			logrus.Info("Handler : Input Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
-		}
 
 		fmt.Println("Notification Payload:", notificationPayload)
 
@@ -47,7 +39,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Order ID Not Found", nil))
 			}
 
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Midtrans POST method error", nil))
 		}
 
 		var serviceUpdate = new(transaction.UpdateTransaction)
@@ -55,7 +47,7 @@ func (th *TransactionHandler) NotifTransaction() echo.HandlerFunc {
 		res, err := th.s.UpdateTransaction(notificationPayload, *serviceUpdate)
 
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Midtrans cannot update the database", nil))
 		}
 
 		return c.JSON(http.StatusOK, helper.FormatResponse("Success Update", res))
@@ -72,7 +64,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		var input = new(InputRequest)
 		if err := c.Bind(input); err != nil {
 			logrus.Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to bind request", nil))
 		}
 
 		var serviceInput = new(transaction.Transaction)
@@ -111,7 +103,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 
 			uploadUrlPaymentProof, err := th.s.PaymentProofUpload(transaction.PaymentProofDataModel{PaymentProofPhoto: formPaymentProof})
 			if err != nil {
-				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed Upload Upload Payment Proof", nil))
+				return c.JSON(http.StatusBadRequest, helper.FormatResponse("Failed to Upload Payment Proof", nil))
 			}
 
 			serviceInput.PaymentProof = uploadUrlPaymentProof
@@ -121,7 +113,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 			result, err := th.s.CreateManualTransaction(*serviceInput)
 
 			if err != nil {
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Failed to create manual transaction", nil))
 			}
 
 			var response = new(ManualTransactionResponse)
@@ -143,7 +135,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 				return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 			}
 
-			return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Transaction", response))
+			return c.JSON(http.StatusCreated, helper.FormatResponse("Success Create Midtrans Transaction", response))
 
 		}
 
@@ -160,10 +152,14 @@ func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 
 			if err != nil {
 				logrus.Info("Handler : Get All Process Error : ", err.Error())
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to retrieve transaction sorted data", nil))
 			}
 
-			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
+			if len(result) == 0 {
+				return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
+			}
+
+			return c.JSON(http.StatusOK, helper.FormatResponse("Success to retrieve data", result))
 
 		}
 
@@ -172,7 +168,7 @@ func (th *TransactionHandler) GetTransactions() echo.HandlerFunc {
 
 		if err != nil {
 			logrus.Info("Handler : Get All Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to retrieve transaction data", nil))
 		}
 
 		if len(result) == 0 {
@@ -189,17 +185,23 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 		var paramID = c.Param("id")
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
-			logrus.Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			logrus.Info("Handler : Param User ID Error : ", err.Error())
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get user id", nil))
 		}
 
 		if sortByPaymentType != "" {
 
+			//BASED ON USER ID
+
 			result, err := th.s.GetTransaction(id, sortByPaymentType)
 
 			if err != nil {
-				logrus.Info("Handler : Get All Process Error : ", err.Error())
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+				logrus.Info("Handler : Get transactions by User ID Process Error : ", err.Error())
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to retrieve transaction sorted data", nil))
+			}
+
+			if len(result) == 0 {
+				return c.JSON(http.StatusOK, helper.FormatResponse("Success no data", nil))
 			}
 
 			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))
@@ -211,8 +213,8 @@ func (th *TransactionHandler) GetTransaction() echo.HandlerFunc {
 		result, err := th.s.GetTransaction(id, blank)
 
 		if err != nil {
-			logrus.Info("Handler : Get By ID Process Error : ", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+			logrus.Info("Handler : Get By User ID Process Error : ", err.Error())
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to retrieve transactions data", nil))
 		}
 
 		if len(result) == 0 {
@@ -230,7 +232,7 @@ func (th *TransactionHandler) GetTransactionByPatientID() echo.HandlerFunc {
 		id, err := strconv.Atoi(paramID)
 		if err != nil {
 			logrus.Info("Handler : Param ID Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail", nil))
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Fail to get patientID", nil))
 		}
 
 		if sortByPaymentType != "" {
@@ -239,7 +241,11 @@ func (th *TransactionHandler) GetTransactionByPatientID() echo.HandlerFunc {
 
 			if err != nil {
 				logrus.Info("Handler : Get All Process Error : ", err.Error())
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail", nil))
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Fail to retrieve transaction sorted data", nil))
+			}
+
+			if len(result) == 0 {
+				return c.JSON(http.StatusBadGateway, helper.FormatResponse("Success no data", nil))
 			}
 
 			return c.JSON(http.StatusOK, helper.FormatResponse("Success", result))

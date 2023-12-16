@@ -3,6 +3,9 @@ package data
 import (
 	counselingsession "FinalProject/features/counseling_session"
 	"FinalProject/features/doctor/data"
+	_doctor "FinalProject/features/doctor/data"
+
+	_patient "FinalProject/features/patients/data"
 	"FinalProject/features/transaction"
 	"errors"
 	"fmt"
@@ -41,21 +44,26 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		return false, nil
 	}
 
-	if err := qry.Error; err != nil {
-		return false, err
-	}
-
 	if newData.PaymentStatus == 2 {
 		if transaction.DoctorID == 0 {
 			return false, errors.New("Doctor ID not found in transaction")
 		}
 
+		if transaction.PatientID == 0 {
+			return false, errors.New("Patient ID not found in transaction")
+		}
+
 		fmt.Println("This is the existing DoctorID: ", transaction.DoctorID)
 
-		existingDataDoctor := data.Doctor{}
+		existingDataDoctor := _doctor.Doctor{}
 		if err := ad.db.Table("doctors").Where("id = ?", transaction.DoctorID).First(&existingDataDoctor).Error; err != nil {
 			fmt.Printf("Error fetching doctor data: %v\n", err)
 			return false, err
+		}
+
+		existingDataPatient := _patient.PatientAccount{}
+		if err := ad.db.Table("patient_accounts").Where("id = ?", transaction.PatientID).First(&existingDataPatient).Error; err != nil {
+			return false, errors.New("Patient ID not found")
 		}
 
 		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
@@ -110,6 +118,7 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
         patient_accounts.name as patient_name,
         patient_accounts.avatar as patient_avatar,
         doctors.doctor_name as doctor_name,
+        doctors.doctor_avatar as doctor_avatar,
         counseling_methods.name as method_name,
         counseling_durations.name as duration_name,
         transactions.created_at,
@@ -278,11 +287,20 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 		return nil, errors.New("Doctor ID not found")
 	}
 
+	if newData.PatientID == 0 {
+		return nil, errors.New("Patient ID not found")
+	}
+
 	fmt.Println("This is the existing DoctorID: ", newData.DoctorID)
 
-	existingDataDoctor := data.Doctor{}
+	existingDataDoctor := _doctor.Doctor{}
 	if err := ad.db.Table("doctors").Where("id = ?", newData.DoctorID).First(&existingDataDoctor).Error; err != nil {
 		return nil, errors.New("Doctor ID not found")
+	}
+
+	existingDataPatient := _patient.PatientAccount{}
+	if err := ad.db.Table("patient_accounts").Where("id = ?", newData.PatientID).First(&existingDataPatient).Error; err != nil {
+		return nil, errors.New("Patient ID not found")
 	}
 
 	var dbData = new(Transaction)
@@ -377,12 +395,21 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 			return false, errors.New("Doctor ID not found in transaction")
 		}
 
+		if existingData.PatientID == 0 {
+			return false, errors.New("Patient ID not found in transaction")
+		}
+
 		fmt.Println("This is the existing DoctorID: ", existingData.DoctorID)
 
-		existingDataDoctor := data.Doctor{}
+		existingDataDoctor := _doctor.Doctor{}
 		if err := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).First(&existingDataDoctor).Error; err != nil {
 			fmt.Printf("Error fetching doctor data: %v\n", err)
 			return false, err
+		}
+
+		existingDataPatient := _patient.PatientAccount{}
+		if err := ad.db.Table("patient_accounts").Where("id = ?", existingData.PatientID).First(&existingDataPatient).Error; err != nil {
+			return false, errors.New("Patient ID not found")
 		}
 
 		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
@@ -467,12 +494,21 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 			return false, errors.New("Doctor ID not found in transaction")
 		}
 
+		if existingData.PatientID == 0 {
+			return false, errors.New("Patient ID not found in transaction")
+		}
+
 		fmt.Println("This is the existing DoctorID: ", existingData.DoctorID)
 
-		existingDataDoctor := data.Doctor{}
+		existingDataDoctor := _doctor.Doctor{}
 		if err := ad.db.Table("doctors").Where("id = ?", existingData.DoctorID).First(&existingDataDoctor).Error; err != nil {
 			fmt.Printf("Error fetching doctor data: %v\n", err)
 			return false, err
+		}
+
+		existingDataPatient := _patient.PatientAccount{}
+		if err := ad.db.Table("patient_accounts").Where("id = ?", existingData.PatientID).First(&existingDataPatient).Error; err != nil {
+			return false, errors.New("Patient ID not found")
 		}
 
 		existingDataDoctorRelation := data.DoctorExpertiseRelation{}
