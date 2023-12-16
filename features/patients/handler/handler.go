@@ -118,10 +118,7 @@ func (mdl *PatientHandler) UpdatePatient() echo.HandlerFunc {
 		id := mdl.jwt.CheckID(c)
 		userIdInt := int(id.(float64))
 		var input = new(UpdateProfile)
-		if err := c.Bind(input); err != nil {
-			c.Logger().Info("Handler : Bind Input Error : ", err.Error())
-			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input", nil))
-		}
+		c.Bind(input)
 		var serviceUpdate = new(patients.UpdateProfile)
 		formHeaderPhoto, err := c.FormFile("avatar")
 		if err == nil {
