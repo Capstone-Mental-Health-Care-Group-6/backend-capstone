@@ -28,7 +28,7 @@ func (pdata *DoctorData) SearchDoctor(name string) ([]doctor.DoctorAll, error) {
 
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
-		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors_expertise_relation.doctor_id = doctors.id").
 		Where("doctors.deleted_at IS NULL AND doctors.doctor_name LIKE ?", "%"+name+"%").
 		Scan(&doctors)
 
@@ -89,7 +89,7 @@ func (pdata *DoctorData) GetAll(name string) ([]doctor.DoctorAll, error) {
 
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
-		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors_expertise_relation.doctor_id = doctors.id").
 		Where("doctors.deleted_at IS NULL")
 
 	if name != "" {
@@ -136,7 +136,7 @@ func (pdata *DoctorData) GetByID(id int) (*doctor.DoctorAll, error) {
 
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
-		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors_expertise_relation.doctor_id = doctors.id").
 		Where("doctors.id = ?", id).
 		Where("doctors.deleted_at IS NULL").
 		Scan(&doctor)
@@ -177,7 +177,7 @@ func (pdata *DoctorData) GetDoctorByUserId(userId int) (*doctor.DoctorAll, error
 
 	qry := pdata.db.Table("doctors").
 		Select("doctors.*, doctors_expertise_relation.expertise_id AS expertise_id").
-		Joins("LEFT JOIN doctors_expertise_relation ON doctors.id = doctors_expertise_relation.doctor_id").
+		Joins("LEFT JOIN doctors_expertise_relation ON doctors_expertise_relation.doctor_id = doctors.id").
 		Where("doctors.user_id = ?", userId).
 		Where("doctors.deleted_at IS NULL").
 		Scan(&doctor)

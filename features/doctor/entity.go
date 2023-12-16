@@ -32,7 +32,7 @@ type Doctor struct {
 	DoctorBalance uint   `json:"doctor_balance"`
 	DoctorStatus  string `json:"doctor_status"`
 
-	DoctorExpertise uint `json:"expertise_id"`
+	ExpertiseID uint `json:"expertise_id"`
 
 	DoctorWorkday    []DoctorWorkdays   `json:"workday"`
 	DoctorEducation  []DoctorEducation  `json:"education"`
@@ -62,9 +62,9 @@ type DoctorAll struct {
 	DoctorCV       string `json:"doctor_cv"`
 	DoctorIjazah   string `json:"doctor_ijazah"`
 
-	DoctorBalance   uint   `json:"doctor_balance"`
-	DoctorStatus    string `json:"doctor_status"`
-	DoctorExpertise uint   `json:"expertise_id"`
+	DoctorBalance uint   `json:"doctor_balance"`
+	DoctorStatus  string `json:"doctor_status"`
+	ExpertiseID   uint   `json:"expertise_id" gorm:"column:expertise_id"`
 
 	DoctorExperience []DoctorExperience `json:"experience" gorm:"foreignkey:DoctorID"`
 	DoctorEducation  []DoctorEducation  `json:"education" gorm:"foreignkey:DoctorID"`
