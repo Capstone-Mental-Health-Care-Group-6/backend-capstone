@@ -22,7 +22,7 @@ type UpdateProfile struct {
 	DateOfBirth string         `json:"date_of_birth" form:"date_of_birth"`
 	Gender      string         `json:"gender" form:"gender"`
 	Phone       string         `json:"phone_number" form:"phone"`
-	Avatar      multipart.File `json:"avatar" form:"avatar"`
+	Avatar      multipart.File `json:"avatar" form:"avatar" validate:"omitempty"`
 }
 
 type UpdatePassword struct {
