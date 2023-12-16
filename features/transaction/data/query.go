@@ -1,7 +1,7 @@
 package data
 
 import (
-	counselingsession "FinalProject/features/counseling_session"
+	_counselingsession "FinalProject/features/counseling_session/data"
 	"FinalProject/features/doctor/data"
 	_doctor "FinalProject/features/doctor/data"
 
@@ -88,7 +88,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
 
-		var newData = new(counselingsession.CounselingSession)
+		var newData = new(_counselingsession.CounselingSession)
 		newData.TransactionID = transaction.ID
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
@@ -98,6 +98,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = transaction.DurationID
+		newData.Alasan = ""
 		newData.Status = "pending"
 		// MASUKIN DATA
 
@@ -224,7 +225,6 @@ func (ad *TransactionData) GetByID(id int, sort string) ([]transaction.Transacti
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
 		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
-		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.user_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -265,7 +265,6 @@ func (ad *TransactionData) GetByPatientID(id int, sort string) ([]transaction.Tr
 		Joins("LEFT JOIN counseling_methods ON counseling_methods.id = transactions.method_id").
 		Joins("LEFT JOIN counseling_durations ON counseling_durations.id = transactions.duration_id").
 		Joins("LEFT JOIN doctors_rating ON doctors_rating.transaction_id = transactions.midtrans_id").
-		// Joins("LEFT JOIN doctors_rating ON doctors_rating.doctor_id = transactions.doctor_id").
 		Where("transactions.patient_id = ?", id).
 		Where("transactions.deleted_at is null")
 
@@ -435,7 +434,7 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
 
-		var newData = new(counselingsession.CounselingSession)
+		var newData = new(_counselingsession.CounselingSession)
 		newData.TransactionID = existingData.ID
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
@@ -445,7 +444,9 @@ func (ad *TransactionData) Update(newData transaction.UpdateTransactionManual, i
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = existingData.DurationID
+		newData.Alasan = ""
 		newData.Status = "pending"
+
 		// MASUKIN DATA
 
 		if err := ad.db.Table("counseling_session").Create(&newData).Error; err != nil {
@@ -534,7 +535,7 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 			return false, errors.New("Update Data Error, No Data Affected")
 		}
 
-		var newData = new(counselingsession.CounselingSession)
+		var newData = new(_counselingsession.CounselingSession)
 		newData.TransactionID = existingData.ID
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
@@ -544,6 +545,7 @@ func (ad *TransactionData) UpdateWithTrxID(newData transaction.UpdateTransaction
 		newData.Date = time.Now()
 		newData.Time = time.Now()
 		newData.Duration = existingData.DurationID
+		newData.Alasan = ""
 		newData.Status = "pending"
 		// MASUKIN DATA
 
