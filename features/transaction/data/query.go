@@ -93,7 +93,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 		newData.DoctorAvatar = existingDataDoctor.DoctorAvatar
 		newData.DoctorExpertise = existingDataDoctorRelation.ExpertiseID
 		newData.DoctorName = existingDataDoctor.DoctorName
-		newData.UserID = transaction.UserID
+		newData.UserID = transaction.PatientID
 		newData.DoctorMeetLink = existingDataDoctor.DoctorMeetLink
 		newData.Date = time.Now()
 		newData.Time = time.Now()
@@ -310,7 +310,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 	dbData.MethodID = newData.MethodID
 	dbData.DurationID = newData.DurationID
 	dbData.CounselingID = newData.CounselingID
-	dbData.UserID = newData.UserID
+	dbData.UserID = newData.PatientID
 	dbData.CounselingSession = newData.CounselingSession
 	dbData.CounselingType = newData.CounselingType
 
