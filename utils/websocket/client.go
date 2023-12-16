@@ -1,6 +1,8 @@
 package websocket
 
 import (
+	"encoding/base64"
+	"fmt"
 	"time"
 
 	"FinalProject/utils/websocket/packet"
@@ -15,16 +17,20 @@ type Client struct {
 	handler *websocket.Conn
 	rooms   map[int]*Room
 	message chan *packet.Message
-	sign    int
+	sign    string
 }
 
-func NewClient(context echo.Context, server *Server, id int) *Client {
-	return &Client{
+func NewClient(context echo.Context, server *Server, user int, role string) (string, *Client) {
+	var (
+		format = fmt.Sprintf("%s@%d", role, user)
+		sign   = base64.RawStdEncoding.EncodeToString([]byte(format))
+	)
+	return format, &Client{
 		server:  server,
 		handler: NewProtocol().Switch(context),
 		rooms:   make(map[int]*Room),
 		message: make(chan *packet.Message),
-		sign:    id,
+		sign:    sign,
 	}
 }
 
@@ -59,7 +65,11 @@ func (c *Client) Send() {
 			break
 		}
 		packet.Time = time.Now()
-		c.rooms[packet.Room].message <- packet
+		if c.rooms[packet.Room] != nil {
+			c.rooms[packet.Room].message <- packet
+		} else {
+			fmt.Println("Chat Room", packet.Room, "belum ada")
+		}
 	}
 }
 

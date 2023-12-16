@@ -2,7 +2,6 @@ package chats
 
 import (
 	"FinalProject/features/chats/dto"
-	"FinalProject/utils/websocket"
 	"net/url"
 
 	"github.com/labstack/echo/v4"
@@ -17,7 +16,7 @@ type ChatHandlerInterface interface {
 }
 
 type ChatServiceInterface interface {
-	SocketEstablish(ctx echo.Context, user int) *websocket.Client
+	SocketEstablish(ctx echo.Context, user int, role string)
 	GetChats(ctx echo.Context, user int) []*dto.GetChatResponse
 	CreateChat(ctx echo.Context, request *dto.CreateChatRequest) *dto.CreateChatResponse
 	UpdateChat(ctx echo.Context, chat int, request *dto.UpdateChatRequest) *dto.UpdateChatResponse
@@ -25,7 +24,7 @@ type ChatServiceInterface interface {
 }
 
 type ChatDataInterface interface {
-	Get(user int, query url.Values) []*Chat
+	Get(user int, role string, query url.Values) []*Chat
 	Find(chat int) *Chat
 	Create(data *Chat) *Chat
 	Update(data *Chat) *Chat

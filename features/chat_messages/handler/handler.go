@@ -85,7 +85,15 @@ func (h *MessageHandler) Store() echo.HandlerFunc {
 			}
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
-		if result := h.srv.CreateMessage(ctx, chat, request); result != nil {
+		result := h.srv.CreateMessage(ctx, chat, request)
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
+		if result != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusCreated,
 				Message: "success",
@@ -123,7 +131,15 @@ func (h *MessageHandler) Edit() echo.HandlerFunc {
 			}
 			return ctx.JSON(http.StatusBadRequest, response)
 		}
-		if result := h.srv.UpdateMessage(ctx, chat, message, request); result != nil {
+		result := h.srv.UpdateMessage(ctx, chat, message, request)
+		if ctx.Get("jwt.token.error") != nil {
+			response := helper.ApiResponse[any]{
+				Status:  http.StatusBadRequest,
+				Message: "jwt token invalid",
+			}
+			return ctx.JSON(http.StatusBadRequest, response)
+		}
+		if result != nil {
 			response := helper.ApiResponse[any]{
 				Status:  http.StatusOK,
 				Message: "success",
