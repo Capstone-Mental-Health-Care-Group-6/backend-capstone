@@ -23,7 +23,6 @@ func New(db *gorm.DB) root.MessageDataInterface {
 
 func (r *MessageData) Get(chat int, query url.Values) (model []*root.Message) {
 	table := r.db.Table("chat_messages").
-		Preload("User").
 		Where(func() string {
 			format := "%s = %d AND deleted_at IS NULL"
 			return fmt.Sprintf(format, []any{
@@ -42,7 +41,6 @@ func (r *MessageData) Get(chat int, query url.Values) (model []*root.Message) {
 
 func (r *MessageData) Find(chat, message int) (model *root.Message) {
 	table := r.db.Table("chat_messages").
-		Preload("User").
 		Where(func() string {
 			format := "%s = %d AND deleted_at IS NULL"
 			return fmt.Sprintf(format, []any{
@@ -66,8 +64,7 @@ func (r *MessageData) Create(data *root.Message) *root.Message {
 }
 
 func (r *MessageData) Update(data *root.Message) *root.Message {
-	table := r.db.Table("chat_messages").
-		Preload("User")
+	table := r.db.Table("chat_messages")
 	search := &root.Message{ChatID: data.ChatID, ID: data.ID}
 	if err := table.Find(&search).Error; err != nil {
 		logrus.Error("[message.repository]: ", err.Error())

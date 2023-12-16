@@ -153,7 +153,7 @@ func RouteCounselingTopic(e *echo.Echo, mh counselingtopics.CounselingTopicHandl
 }
 
 func RouteChat(e *echo.Echo, h ChatHandlerInterface, cfg configs.ProgrammingConfig) {
-	e.GET("/api/socket/:id", h.Establish())
+	e.GET("/api/socket/:role/:id", h.Establish())
 	group := e.Group("/api/chats")
 	group.GET("/users/:id", h.Index(), echojwt.JWT([]byte(cfg.Secret)))
 	group.POST("", h.Store(), echojwt.JWT([]byte(cfg.Secret)))

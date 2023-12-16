@@ -1,6 +1,12 @@
 package websocket
 
-import "FinalProject/utils/websocket/packet"
+import (
+	"FinalProject/utils/websocket/packet"
+	"encoding/base64"
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 type Room struct {
 	clients map[*Client]bool
@@ -35,7 +41,15 @@ func (r *Room) Join(client *Client) {
 
 func (r *Room) Foward(message *packet.Message) {
 	for client := range r.clients {
-		if message.To == client.sign {
+		result, err := base64.RawStdEncoding.DecodeString(client.sign)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		sign, err := strconv.Atoi(strings.Split(string(result), "@")[1])
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		if message.To == sign {
 			client.message <- message
 		}
 	}
