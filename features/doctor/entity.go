@@ -139,9 +139,11 @@ type DoctorWorkdays struct {
 
 type DoctorRating struct {
 	ID               uint   `json:"id"`
-	DoctorID         uint   `json:"doctor_name"`
+	DoctorID         uint   `json:"doctor_id"`
+	DoctorName       string `json:"doctor_name"`
 	DoctorAvatar     string `json:"doctor_avatar"`
-	PatientID        uint   `json:"patient_name"`
+	PatientID        uint   `json:"patient_id"`
+	PatientName      string `json:"patient_name"`
 	PatientAvatar    string `json:"patient_avatar"`
 	TransactionID    string `json:"transaction_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
