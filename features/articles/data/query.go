@@ -106,8 +106,8 @@ func (ad *ArticleData) Update(newData articles.UpdateArticle, id int) (bool, err
 	return true, nil
 }
 
-func (ad *ArticleData) Deny(id int) (bool, error) {
-	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Status: "Inactive"})
+func (ad *ArticleData) Reject(id int) (bool, error) {
+	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Status: "Reject"})
 
 	if err := qry.Error; err != nil {
 		return false, err
@@ -120,8 +120,8 @@ func (ad *ArticleData) Deny(id int) (bool, error) {
 	return true, nil
 }
 
-func (ad *ArticleData) Approve(id int) (bool, error) {
-	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Status: "Active"})
+func (ad *ArticleData) Publish(id int) (bool, error) {
+	var qry = ad.db.Table("articles").Where("id = ?", id).Updates(Article{Status: "Publish"})
 
 	if err := qry.Error; err != nil {
 		return false, err

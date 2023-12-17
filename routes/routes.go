@@ -53,8 +53,8 @@ func RouteArticle(e *echo.Echo, ah articles.ArticleHandlerInterface, cfg configs
 	e.GET("/doctor/articles", ah.GetArticlesByDoctorID(), echojwt.JWT([]byte(cfg.Secret)))
 	e.POST("/articles", ah.CreateArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.PUT("/articles/:id", ah.UpdateArticle(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/articles/:id/deny", ah.DenyArticle(), echojwt.JWT([]byte(cfg.Secret)))
-	e.PUT("/articles/:id/approve", ah.ApproveArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/reject", ah.RejectArticle(), echojwt.JWT([]byte(cfg.Secret)))
+	e.PUT("/articles/:id/publish", ah.PublishArticle(), echojwt.JWT([]byte(cfg.Secret)))
 	e.GET("/articles/dashboard", ah.ArticleDashboard(), echojwt.JWT([]byte(cfg.Secret)))
 }
 

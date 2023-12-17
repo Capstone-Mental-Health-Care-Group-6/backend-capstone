@@ -203,7 +203,7 @@ func (ah *ArticleHandler) UpdateArticle() echo.HandlerFunc {
 	}
 }
 
-func (ah *ArticleHandler) DenyArticle() echo.HandlerFunc {
+func (ah *ArticleHandler) RejectArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := ah.jwt.CheckRole(c)
 
@@ -218,18 +218,18 @@ func (ah *ArticleHandler) DenyArticle() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
-		_, err = ah.s.DenyArticle(id)
+		_, err = ah.s.RejectArticle(id)
 
 		if err != nil {
-			c.Logger().Error("Handler : Deny Article Error : ", err.Error())
+			c.Logger().Error("Handler : Reject Article Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success Denny Article", nil))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Reject Article", nil))
 	}
 }
 
-func (ah *ArticleHandler) ApproveArticle() echo.HandlerFunc {
+func (ah *ArticleHandler) PublishArticle() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := ah.jwt.CheckRole(c)
 
@@ -244,14 +244,14 @@ func (ah *ArticleHandler) ApproveArticle() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponse("Invalid User Input Param ID", nil))
 		}
 
-		_, err = ah.s.ApproveArticle(id)
+		_, err = ah.s.PublishArticle(id)
 
 		if err != nil {
-			c.Logger().Error("Handler : Approve Article Error : ", err.Error())
+			c.Logger().Error("Handler : Publish Article Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse(err.Error(), nil))
 		}
 
-		return c.JSON(http.StatusOK, helper.FormatResponse("Success Approve Article", nil))
+		return c.JSON(http.StatusOK, helper.FormatResponse("Success Publish Article", nil))
 	}
 }
 
