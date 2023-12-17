@@ -65,21 +65,21 @@ func (as *ArticleService) UpdateArticle(newData articles.UpdateArticle, id int) 
 	return result, nil
 }
 
-func (as *ArticleService) DenyArticle(id int) (bool, error) {
-	result, err := as.d.Deny(id)
+func (as *ArticleService) RejectArticle(id int) (bool, error) {
+	result, err := as.d.Reject(id)
 
 	if err != nil {
-		return false, errors.New("Deny Process Failed")
+		return false, errors.New("Reject Process Failed")
 	}
 
 	return result, nil
 }
 
-func (as *ArticleService) ApproveArticle(id int) (bool, error) {
-	result, err := as.d.Approve(id)
+func (as *ArticleService) PublishArticle(id int) (bool, error) {
+	result, err := as.d.Publish(id)
 
 	if err != nil {
-		return false, errors.New("Approve Process Failed")
+		return false, errors.New("Publish Process Failed")
 	}
 
 	return result, nil

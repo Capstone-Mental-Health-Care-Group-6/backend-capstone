@@ -163,16 +163,16 @@ func TestUpdateArticle(t *testing.T) {
 	})
 }
 
-func TestDenyArticle(t *testing.T) {
+func TestRejectArticle(t *testing.T) {
 	data := mocks.NewArticleDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	slug := mockHelper.NewSlugInterface(t)
 	service := New(data, slug, cld)
 
-	t.Run("Success Deny", func(t *testing.T) {
-		data.On("Deny", 1).Return(true, nil).Once()
+	t.Run("Success Reject", func(t *testing.T) {
+		data.On("Reject", 1).Return(true, nil).Once()
 
-		result, err := service.DenyArticle(1)
+		result, err := service.RejectArticle(1)
 
 		assert.Nil(t, err)
 		assert.NotNil(t, result)
@@ -183,26 +183,26 @@ func TestDenyArticle(t *testing.T) {
 	})
 
 	t.Run("Server Error", func(t *testing.T) {
-		data.On("Deny", 1).Return(false, errors.New("Deny Process Failed")).Once()
+		data.On("Reject", 1).Return(false, errors.New("Reject Process Failed")).Once()
 
-		result, err := service.DenyArticle(1)
+		result, err := service.RejectArticle(1)
 
 		assert.Error(t, err)
-		assert.EqualError(t, err, "Deny Process Failed")
+		assert.EqualError(t, err, "Reject Process Failed")
 		assert.Equal(t, false, result)
 	})
 }
 
-func TestApproveArticle(t *testing.T) {
+func TestPublishArticle(t *testing.T) {
 	data := mocks.NewArticleDataInterface(t)
 	cld := mockUtil.NewCloudinaryInterface(t)
 	slug := mockHelper.NewSlugInterface(t)
 	service := New(data, slug, cld)
 
-	t.Run("Success Approve", func(t *testing.T) {
-		data.On("Approve", 1).Return(true, nil).Once()
+	t.Run("Success Publish", func(t *testing.T) {
+		data.On("Publish", 1).Return(true, nil).Once()
 
-		result, err := service.ApproveArticle(1)
+		result, err := service.PublishArticle(1)
 
 		assert.Nil(t, err)
 		assert.NotNil(t, result)
@@ -213,12 +213,12 @@ func TestApproveArticle(t *testing.T) {
 	})
 
 	t.Run("Server Error", func(t *testing.T) {
-		data.On("Approve", 1).Return(false, errors.New("Approve Process Failed")).Once()
+		data.On("Publish", 1).Return(false, errors.New("Publish Process Failed")).Once()
 
-		result, err := service.ApproveArticle(1)
+		result, err := service.PublishArticle(1)
 
 		assert.Error(t, err)
-		assert.EqualError(t, err, "Approve Process Failed")
+		assert.EqualError(t, err, "Publish Process Failed")
 		assert.Equal(t, false, result)
 	})
 }
