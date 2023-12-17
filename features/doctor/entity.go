@@ -139,12 +139,25 @@ type DoctorWorkdays struct {
 
 type DoctorRating struct {
 	ID               uint   `json:"id"`
-	DoctorID         uint   `json:"doctor_id"`
-	PatientID        uint   `json:"patient_id"`
+	DoctorID         uint   `json:"doctor_name"`
+	DoctorAvatar     string `json:"doctor_avatar"`
+	PatientID        uint   `json:"patient_name"`
+	PatientAvatar    string `json:"patient_avatar"`
 	TransactionID    string `json:"transaction_id"`
 	DoctorStarRating uint   `json:"doctor_star_rating"`
 	DoctorReview     string `json:"doctor_review"`
 }
+
+// type DoctorRatingInfo struct {
+// 	ID               uint   `json:"id"`
+// 	DoctorID         uint   `json:"doctor_name"`
+// 	DoctorAvatar     string `json:"doctor_avatar"`
+// 	PatientID        uint   `json:"patient_name"`
+// 	PatientAvatar    string `json:"patient_avatar"`
+// 	TransactionID    string `json:"transaction_id"`
+// 	DoctorStarRating uint   `json:"doctor_star_rating"`
+// 	DoctorReview     string `json:"doctor_review"`
+// }
 
 type DoctorEducation struct {
 	ID                 uint      `json:"id"`

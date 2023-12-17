@@ -3,25 +3,27 @@ package handler
 import "time"
 
 type DoctorRequest struct {
-	UserID            uint   `json:"user_id" form:"user_id" validate:"required"`
-	DoctorName        string `json:"doctor_name" form:"doctor_name" validate:"required"`
-	DoctorNIK         string `json:"doctor_nik" form:"doctor_nik" validate:"required"`
-	DoctorDOB         string `json:"doctor_dob" form:"doctor_dob" validate:"required"`
-	DoctorProvinsi    string `json:"doctor_provinsi" form:"doctor_provinsi" validate:"required"`
-	DoctorKota        string `json:"doctor_kota" form:"doctor_kota" validate:"required"`
+	UserID uint `json:"user_id" form:"user_id" validate:"required"`
+
+	DoctorName string `json:"doctor_name" form:"doctor_name" validate:"required"`
+	DoctorNIK  string `json:"doctor_nik" form:"doctor_nik" validate:"required"`
+	DoctorDOB  string `json:"doctor_dob" form:"doctor_dob" validate:"required"`
+
+	DoctorProvinsi string `json:"doctor_provinsi" form:"doctor_provinsi" validate:"required"`
+	DoctorKota     string `json:"doctor_kota" form:"doctor_kota" validate:"required"`
+
 	DoctorNumberPhone string `json:"doctor_number_phone" form:"doctor_number_phone" validate:"required"`
 	DoctorGender      string `json:"doctor_gender" form:"doctor_gender" validate:"required"`
 	DoctorAvatar      string `json:"doctor_avatar" form:"doctor_avatar" validate:"required"`
 	DoctorDescription string `json:"doctor_description" form:"doctor_description" validate:"required"`
-	DoctorMeetLink    string `json:"doctor_meet_link" form:"doctor_meet_link" validate:"required"`
-	DoctorSIPP        string `json:"doctor_sipp" form:"doctor_sipp" validate:"required"`
-	DoctorSIPPFile    string `json:"doctor_sipp_file" form:"doctor_sipp_file" validate:"required"`
-	DoctorSTR         string `json:"doctor_str" form:"doctor_str" validate:"required"`
-	DoctorSTRFile     string `json:"doctor_str_file" form:"doctor_str_file" validate:"required"`
-	DoctorCV          string `json:"doctor_cv" form:"doctor_cv" validate:"required"`
-	DoctorIjazah      string `json:"doctor_ijazah" form:"doctor_ijazah" validate:"required"`
-	DoctorBalance     uint   `json:"doctor_balance" form:"doctor_balance" validate:"required"`
-	DoctorStatus      string `json:"doctor_status" form:"doctor_status" validate:"required"`
+
+	DoctorSIPP string `json:"doctor_sipp" form:"doctor_sipp" validate:"required"`
+	DoctorSTR  string `json:"doctor_str" form:"doctor_str" validate:"required"`
+
+	DoctorSIPPFile string `json:"doctor_sipp_file" form:"doctor_sipp_file" validate:"required"`
+	DoctorSTRFile  string `json:"doctor_str_file" form:"doctor_str_file" validate:"required"`
+	DoctorCV       string `json:"doctor_cv" form:"doctor_cv" validate:"required"`
+	DoctorIjazah   string `json:"doctor_ijazah" form:"doctor_ijazah" validate:"required"`
 
 	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id" validate:"required"`
 
@@ -45,45 +47,45 @@ type DoctorRequest struct {
 }
 
 type DoctorRequestDatapokok struct {
-	UserID            uint   `json:"user_id" form:"user_id"`
-	DoctorName        string `json:"doctor_name" form:"doctor_name"`
-	DoctorNIK         string `json:"doctor_nik" form:"doctor_nik"`
-	DoctorDOB         string `json:"doctor_dob" form:"doctor_dob"`
-	DoctorProvinsi    string `json:"doctor_provinsi" form:"doctor_provinsi"`
-	DoctorKota        string `json:"doctor_kota" form:"doctor_kota"`
-	DoctorNumberPhone string `json:"doctor_number_phone" form:"doctor_number_phone"`
-	DoctorGender      string `json:"doctor_gender" form:"doctor_gender"`
-	DoctorAvatar      string `json:"doctor_avatar" form:"doctor_avatar"`
-	DoctorDescription string `json:"doctor_description" form:"doctor_description"`
-	DoctorMeetLink    string `json:"doctor_meet_link" form:"doctor_meet_link"`
-	DoctorSIPP        string `json:"doctor_sipp" form:"doctor_sipp"`
-	DoctorSIPPFile    string `json:"doctor_sipp_file" form:"doctor_sipp_file"`
-	DoctorSTR         string `json:"doctor_str" form:"doctor_str"`
-	DoctorSTRFile     string `json:"doctor_str_file" form:"doctor_str_file"`
-	DoctorCV          string `json:"doctor_cv" form:"doctor_cv"`
-	DoctorIjazah      string `json:"doctor_ijazah" form:"doctor_ijazah"`
-	DoctorBalance     uint   `json:"doctor_balance" form:"doctor_balance"`
-	DoctorStatus      string `json:"doctor_status" form:"doctor_status"`
+	UserID            uint   `json:"user_id" form:"user_id" validate:"required"`
+	DoctorName        string `json:"doctor_name" form:"doctor_name" validate:"required"`
+	DoctorNIK         string `json:"doctor_nik" form:"doctor_nik" validate:"required"`
+	DoctorDOB         string `json:"doctor_dob" form:"doctor_dob" validate:"required"`
+	DoctorProvinsi    string `json:"doctor_provinsi" form:"doctor_provinsi" validate:"required"`
+	DoctorKota        string `json:"doctor_kota" form:"doctor_kota" validate:"required"`
+	DoctorNumberPhone string `json:"doctor_number_phone" form:"doctor_number_phone" validate:"required"`
+	DoctorGender      string `json:"doctor_gender" form:"doctor_gender" validate:"required"`
+	DoctorAvatar      string `json:"doctor_avatar" form:"doctor_avatar" validate:"required"`
+	DoctorDescription string `json:"doctor_description" form:"doctor_description" validate:"required"`
+	DoctorMeetLink    string `json:"doctor_meet_link" form:"doctor_meet_link" validate:"required"`
+	DoctorSIPP        string `json:"doctor_sipp" form:"doctor_sipp" validate:"required"`
+	DoctorSIPPFile    string `json:"doctor_sipp_file" form:"doctor_sipp_file" validate:"required"`
+	DoctorSTR         string `json:"doctor_str" form:"doctor_str" validate:"required"`
+	DoctorSTRFile     string `json:"doctor_str_file" form:"doctor_str_file" validate:"required"`
+	DoctorCV          string `json:"doctor_cv" form:"doctor_cv" validate:"required"`
+	DoctorIjazah      string `json:"doctor_ijazah" form:"doctor_ijazah" validate:"required"`
+	DoctorBalance     uint   `json:"doctor_balance" form:"doctor_balance" validate:"required"`
+	DoctorStatus      string `json:"doctor_status" form:"doctor_status" validate:"required"`
 
 	//FOR DOCTOR EXPERTISE
-	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id"`
+	DoctorExpertiseID uint `json:"expertise_id" form:"expertise_id" validate:"required"`
 }
 
 type DoctorWorkdays struct {
 	ID        uint      `json:"id"`
 	DoctorID  uint      `json:"doctor_id"`
-	WorkdayID uint      `json:"workday_id"`
-	StartTime time.Time `json:"start_time"`
-	EndTime   time.Time `json:"end_time"`
+	WorkdayID uint      `json:"workday_id" validate:"required"`
+	StartTime time.Time `json:"start_time" validate:"required"`
+	EndTime   time.Time `json:"end_time" validate:"required"`
 }
 
 type DoctorEducation struct {
-	ID                 uint      `json:"id"`
+	ID                 uint      `json:"id" `
 	DoctorID           uint      `json:"doctor_id"`
-	DoctorUniversity   string    `json:"doctor_university"`
-	DoctorStudyProgram string    `json:"doctor_study_program"`
-	DoctorEnrollYear   time.Time `json:"doctor_enroll_year"`
-	DoctorGraduateYear time.Time `json:"doctor_graduate_year"`
+	DoctorUniversity   string    `json:"doctor_university" validate:"required"`
+	DoctorStudyProgram string    `json:"doctor_study_program" validate:"required"`
+	DoctorEnrollYear   time.Time `json:"doctor_enroll_year" validate:"required"`
+	DoctorGraduateYear time.Time `json:"doctor_graduate_year" validate:"required"`
 }
 
 type DoctorExperience struct {
