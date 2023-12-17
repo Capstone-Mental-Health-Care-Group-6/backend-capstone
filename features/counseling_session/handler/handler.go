@@ -228,7 +228,6 @@ func (h *CounselingSessionHandler) DeleteCounseling() echo.HandlerFunc {
 	}
 }
 
-// MASIH BUG BIND ID //
 func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		role := h.jwt.CheckRole(c)
@@ -251,8 +250,16 @@ func (h *CounselingSessionHandler) ApprovePatient() echo.HandlerFunc {
 		result, err := h.s.ApprovePatient(id, doctorID)
 
 		if err != nil {
-			if strings.Contains(err.Error(), "Data Not Found") {
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Dokter Tidak Memiliki Berhak Untuk Counseling Session Ini", nil))
+			if strings.Contains(err.Error(), "No data counseling found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("No data counseling found", nil))
+			}
+
+			if strings.Contains(err.Error(), "No transaction data found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("No transaction data found", nil))
+			}
+
+			if strings.Contains(err.Error(), "Unauthorized permission for this doctor") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unauthorized permission for this doctor", nil))
 			}
 			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
@@ -293,8 +300,16 @@ func (h *CounselingSessionHandler) RejectPatient() echo.HandlerFunc {
 		result, err := h.s.RejectPatient(id, doctorID, *serviceUpdate)
 
 		if err != nil {
-			if strings.Contains(err.Error(), "Data Not Found") {
-				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Dokter Tidak Memiliki Berhak Untuk Counseling Session Ini", nil))
+			if strings.Contains(err.Error(), "No data counseling found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("No data counseling found", nil))
+			}
+
+			if strings.Contains(err.Error(), "No transaction data found") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("No transaction data found", nil))
+			}
+
+			if strings.Contains(err.Error(), "Unauthorized permission for this doctor") {
+				return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Unauthorized permission for this doctor", nil))
 			}
 			c.Logger().Info("Handler : Update Status Process Error : ", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("Update Status Process Failed", nil))
