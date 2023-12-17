@@ -255,18 +255,40 @@ func (pdata *DoctorData) GetByIDWorkadays(id int) ([]doctor.DoctorWorkdays, erro
 	return doctorInfoWorkday, nil
 }
 
+// func (pdata *DoctorData) GetByIDRating(id int) ([]doctor.DoctorRating, error) {
+// 	var doctorInfoRating []doctor.DoctorRating
+
+// 	qry := pdata.db.Table("doctors_rating").
+// 		Select("doctors_rating.*").Where("doctors_rating.doctor_id = ?", id).Where("doctors_rating.deleted_at IS NULL").
+// 		Scan(&doctorInfoRating)
+
+// 	if err := qry.Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	return doctorInfoRating, nil
+// }
+
 func (pdata *DoctorData) GetByIDRating(id int) ([]doctor.DoctorRating, error) {
-	var doctorInfoRating []doctor.DoctorRating
+	var doctorInfoDetailRating []doctor.DoctorRating
 
 	qry := pdata.db.Table("doctors_rating").
-		Select("doctors_rating.*").Where("doctors_rating.doctor_id = ?", id).Where("doctors_rating.deleted_at IS NULL").
-		Scan(&doctorInfoRating)
+		Select(`doctors_rating.*, 
+		patient_accounts.name as patient_name,
+        patient_accounts.avatar as patient_avatar,
+        doctors.doctor_name as doctor_name,
+        doctors.doctor_avatar as doctor_avatar`).
+		Joins("LEFT JOIN patient_accounts ON patient_accounts.id = doctors_rating.patient_id").
+		Joins("LEFT JOIN doctors ON doctors.id = doctors_rating.doctor_id").
+		Where("doctors_rating.doctor_id = ?", id).
+		Where("doctors_rating.deleted_at IS NULL").
+		Scan(&doctorInfoDetailRating)
 
 	if err := qry.Error; err != nil {
 		return nil, err
 	}
 
-	return doctorInfoRating, nil
+	return doctorInfoDetailRating, nil
 }
 
 // CREATE DATA QUERY \\

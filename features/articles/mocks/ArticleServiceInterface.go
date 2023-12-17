@@ -13,30 +13,6 @@ type ArticleServiceInterface struct {
 	mock.Mock
 }
 
-// ApproveArticle provides a mock function with given fields: id
-func (_m *ArticleServiceInterface) ApproveArticle(id int) (bool, error) {
-	ret := _m.Called(id)
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
-		return rf(id)
-	}
-	if rf, ok := ret.Get(0).(func(int) bool); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(int) error); ok {
-		r1 = rf(id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // ArticleDashboard provides a mock function with given fields:
 func (_m *ArticleServiceInterface) ArticleDashboard() (articles.ArticleDashboard, error) {
 	ret := _m.Called()
@@ -80,30 +56,6 @@ func (_m *ArticleServiceInterface) CreateArticle(newData articles.Article) (*art
 
 	if rf, ok := ret.Get(1).(func(articles.Article) error); ok {
 		r1 = rf(newData)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// DenyArticle provides a mock function with given fields: id
-func (_m *ArticleServiceInterface) DenyArticle(id int) (bool, error) {
-	ret := _m.Called(id)
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
-		return rf(id)
-	}
-	if rf, ok := ret.Get(0).(func(int) bool); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(int) error); ok {
-		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -182,6 +134,54 @@ func (_m *ArticleServiceInterface) GetArticles(name string, kategori string, tim
 
 	if rf, ok := ret.Get(1).(func(string, string, int, int) error); ok {
 		r1 = rf(name, kategori, timePublication, limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// PublishArticle provides a mock function with given fields: id
+func (_m *ArticleServiceInterface) PublishArticle(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RejectArticle provides a mock function with given fields: id
+func (_m *ArticleServiceInterface) RejectArticle(id int) (bool, error) {
+	ret := _m.Called(id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) (bool, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(int) bool); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(id)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -280,15 +280,20 @@ func (bc *CounselingSessionData) RejectPatient(id int, newData counselingsession
 }
 
 func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
-	var listCounselingSession = []counselingsession.CounselingSession{}
-	var qry = bc.db.Table("counseling_session").Where("id = ? AND user_id = ?", id, doctorID).Scan(&listCounselingSession)
+	var listCounselingSession = counselingsession.CounselingSession{}
 
-	var count int64
-	qry.Count(&count)
-
-	if count > 0 {
-		return nil
+	if err := bc.db.Table("counseling_session").Where("id = ?", id).First(&listCounselingSession).Error; err != nil {
+		return errors.New("No data counseling found")
 	}
 
-	return errors.New("Data Not Found")
+	existingDataPatient := transaction.Transaction{}
+	if err := bc.db.Table("transactions").Where("id = ?", listCounselingSession.TransactionID).First(&existingDataPatient).Error; err != nil {
+		return errors.New("No transaction data found")
+	}
+
+	if existingDataPatient.DoctorID == uint(doctorID) {
+		return nil
+	} else {
+		return errors.New("Unauthorized permission for this doctor")
+	}
 }

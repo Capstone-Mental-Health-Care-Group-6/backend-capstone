@@ -31,7 +31,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 	// db := ad.db
 
 	ad.db.Where("midtrans_id = ?", id).First(&transaction)
-	fmt.Println("This is the id: ", transaction.ID)
+	fmt.Println("This is the id: ", &transaction.ID)
 	transactionID := transaction.ID
 
 	fmt.Println("This is the new payment status: ", newData.PaymentStatus)

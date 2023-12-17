@@ -15,7 +15,7 @@ type Transaction struct {
 	DurationID   uint   `json:"duration_id"`
 	CounselingID uint   `json:"counseling_id"`
 	UserID       uint   `json:"user_id"`
-	MidtransID   string `json:"transaction_id"`
+	MidtransID   string `json:"transaction_id" gorm:"column:midtrans_id"`
 
 	CounselingSession uint   `json:"counseling_session"`
 	CounselingType    string `json:"counseling_type"`
@@ -43,7 +43,7 @@ type TransactionInfo struct {
 	CounselingType string `json:"counseling_type"`
 
 	UserID     uint   `json:"user_id"`
-	MidtransID string `json:"transaction_id"`
+	MidtransID string `json:"transaction_id" gorm:"column:midtrans_id"`
 
 	PriceMethod     uint `json:"price_method"`
 	PriceDuration   uint `json:"price_duration"`
