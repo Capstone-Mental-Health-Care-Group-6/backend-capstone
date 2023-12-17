@@ -92,7 +92,7 @@ func (j *JWT) GenerateToken(id uint, role, status string) string {
 	claims["role"] = role
 	claims["status"] = status
 	claims["iat"] = time.Now().Unix()
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	var sign = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	validToken, err := sign.SignedString([]byte(j.signKey))

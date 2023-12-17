@@ -1,4 +1,4 @@
-# Instruction
+# Instructions
 
 ## Library yang dipakai
 ```go

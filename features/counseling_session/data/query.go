@@ -284,7 +284,6 @@ func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
 
 	if err := bc.db.Table("counseling_session").Where("id = ?", id).First(&listCounselingSession).Error; err != nil {
 		return errors.New("No data counseling found")
-
 	}
 
 	existingDataPatient := transaction.Transaction{}

@@ -12,22 +12,6 @@ type ArticleHandlerInterface struct {
 	mock.Mock
 }
 
-// ApproveArticle provides a mock function with given fields:
-func (_m *ArticleHandlerInterface) ApproveArticle() echo.HandlerFunc {
-	ret := _m.Called()
-
-	var r0 echo.HandlerFunc
-	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(echo.HandlerFunc)
-		}
-	}
-
-	return r0
-}
-
 // ArticleDashboard provides a mock function with given fields:
 func (_m *ArticleHandlerInterface) ArticleDashboard() echo.HandlerFunc {
 	ret := _m.Called()
@@ -46,22 +30,6 @@ func (_m *ArticleHandlerInterface) ArticleDashboard() echo.HandlerFunc {
 
 // CreateArticle provides a mock function with given fields:
 func (_m *ArticleHandlerInterface) CreateArticle() echo.HandlerFunc {
-	ret := _m.Called()
-
-	var r0 echo.HandlerFunc
-	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(echo.HandlerFunc)
-		}
-	}
-
-	return r0
-}
-
-// DenyArticle provides a mock function with given fields:
-func (_m *ArticleHandlerInterface) DenyArticle() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc
@@ -110,6 +78,38 @@ func (_m *ArticleHandlerInterface) GetArticles() echo.HandlerFunc {
 
 // GetArticlesByDoctorID provides a mock function with given fields:
 func (_m *ArticleHandlerInterface) GetArticlesByDoctorID() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// PublishArticle provides a mock function with given fields:
+func (_m *ArticleHandlerInterface) PublishArticle() echo.HandlerFunc {
+	ret := _m.Called()
+
+	var r0 echo.HandlerFunc
+	if rf, ok := ret.Get(0).(func() echo.HandlerFunc); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(echo.HandlerFunc)
+		}
+	}
+
+	return r0
+}
+
+// RejectArticle provides a mock function with given fields:
+func (_m *ArticleHandlerInterface) RejectArticle() echo.HandlerFunc {
 	ret := _m.Called()
 
 	var r0 echo.HandlerFunc

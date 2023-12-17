@@ -53,8 +53,8 @@ type ArticleHandlerInterface interface {
 	CreateArticle() echo.HandlerFunc
 	UpdateArticle() echo.HandlerFunc
 	ArticleDashboard() echo.HandlerFunc
-	DenyArticle() echo.HandlerFunc
-	ApproveArticle() echo.HandlerFunc
+	RejectArticle() echo.HandlerFunc
+	PublishArticle() echo.HandlerFunc
 	GetArticlesByDoctorID() echo.HandlerFunc
 }
 
@@ -64,8 +64,8 @@ type ArticleServiceInterface interface {
 	CreateArticle(newData Article) (*Article, error)
 	UpdateArticle(newData UpdateArticle, id int) (bool, error)
 	ArticleDashboard() (ArticleDashboard, error)
-	DenyArticle(id int) (bool, error)
-	ApproveArticle(id int) (bool, error)
+	RejectArticle(id int) (bool, error)
+	PublishArticle(id int) (bool, error)
 	GetArticleByDoctor(id int) ([]ArticleInfo, error)
 }
 
@@ -75,7 +75,7 @@ type ArticleDataInterface interface {
 	Insert(newData Article) (*Article, error)
 	Update(newData UpdateArticle, id int) (bool, error)
 	ArticleDashboard() (ArticleDashboard, error)
-	Deny(id int) (bool, error)
-	Approve(id int) (bool, error)
+	Reject(id int) (bool, error)
+	Publish(id int) (bool, error)
 	GetByIDDoctor(id int) ([]ArticleInfo, error)
 }
