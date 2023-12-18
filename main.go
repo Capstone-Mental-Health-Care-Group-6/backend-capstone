@@ -77,7 +77,6 @@ import (
 	"FinalProject/routes"
 	"FinalProject/utils/cloudinary"
 	"FinalProject/utils/database"
-	"FinalProject/utils/database/seeds"
 	"FinalProject/utils/midtrans"
 	"FinalProject/utils/oauth"
 	"FinalProject/utils/openai"
@@ -111,11 +110,12 @@ func main() {
 
 	database.Migrate(db)
 
-	for _, seed := range seeds.All() {
-		if err := seed.Run(db); err != nil {
-			fmt.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
-		}
-	}
+	// HANYA 1x SAJA
+	// for _, seed := range seeds.All() {
+	// 	if err := seed.Run(db); err != nil {
+	// 		fmt.Printf("Running seed '%s', failed with error: %s", seed.Name, err)
+	// 	}
+	// }
 
 	oauth := oauth.NewOauthGoogleConfig(*config)
 	jwtInterface := helper.New(config.Secret, config.RefSecret)

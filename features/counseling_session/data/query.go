@@ -2,7 +2,9 @@ package data
 
 import (
 	counselingsession "FinalProject/features/counseling_session"
+	"FinalProject/features/doctor"
 	"errors"
+	"fmt"
 
 	transaction "FinalProject/features/transaction"
 
@@ -291,7 +293,15 @@ func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
 		return errors.New("No transaction data found")
 	}
 
-	if existingDataPatient.DoctorID == uint(doctorID) {
+	dataDoctor := doctor.Doctor{}
+	if err := bc.db.Table("doctors").Where("user_id = ?", doctorID).First(&dataDoctor).Error; err != nil {
+		return errors.New("No data doctor found")
+	}
+
+	fmt.Println(existingDataPatient.DoctorID)
+	fmt.Println(dataDoctor.ID)
+
+	if existingDataPatient.DoctorID == dataDoctor.ID {
 		return nil
 	} else {
 		return errors.New("Unauthorized permission for this doctor")
