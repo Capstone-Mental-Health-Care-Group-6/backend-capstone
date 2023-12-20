@@ -61,9 +61,12 @@ func (r *ChatData) Find(chat int) (model *root.Chat) {
 func (r *ChatData) Create(data *root.Chat) *root.Chat {
 	table := r.db.Table("chats")
 	var search *root.Chat
-	err := table.Where(fmt.Sprintf(
-		"(patient_user_id = %d AND doctor_user_id = %d) AND deleted_at IS NULL",
-		data.PatientUserID, data.DoctorUserID)).First(&search).Error
+	err := table.
+		Preload("Patient").
+		Preload("Doctor").
+		Where(fmt.Sprintf(
+			"(patient_user_id = %d AND doctor_user_id = %d) AND deleted_at IS NULL",
+			data.PatientUserID, data.DoctorUserID)).First(&search).Error
 	if err != nil {
 		logrus.Error("[chat.repository]: ", err.Error())
 		return nil
