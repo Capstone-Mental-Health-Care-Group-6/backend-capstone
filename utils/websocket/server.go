@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
@@ -53,11 +54,20 @@ func (s *Server) JoinRoom(sign int, ref string) {
 }
 
 func (s *Server) DeleteClient(sign string) {
+	for i, room := range s.clients[sign].rooms {
+		logrus.Infof("[ws.server]: client@%s keluar dari room %d", sign, i)
+		room.leave <- s.clients[sign]
+	}
 	delete(s.clients, sign)
 }
 
 func (s *Server) DeleteRoom(sign int) {
+	for client := range s.rooms[sign].clients {
+		logrus.Infof("[ws.server]: client@%s keluar dari room %d", client.sign, sign)
+		s.rooms[sign].leave <- client
+	}
 	// close(s.rooms[sign].join)
-	// close(s.rooms[sign].message)
+	// close(s.rooms[sign].leave)
+	close(s.rooms[sign].message)
 	delete(s.rooms, sign)
 }

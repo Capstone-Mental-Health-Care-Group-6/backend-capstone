@@ -3,55 +3,87 @@ package service
 import (
 	root "FinalProject/features/chats"
 	"FinalProject/features/chats/dto"
+	"FinalProject/features/patients"
+	"FinalProject/features/users"
 	"FinalProject/helper"
 	"FinalProject/utils/websocket"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/fatih/structs"
 	"github.com/labstack/echo/v4"
 )
 
 type ChatService struct {
-	jwt  helper.JWTInterface
-	sock *websocket.Server
-	data root.ChatDataInterface
+	jwt     helper.JWTInterface
+	socket  *websocket.Server
+	chat    root.ChatDataInterface
+	patient patients.PatientDataInterface
+	doctor  users.UserDataInterface
 }
 
-func New(data root.ChatDataInterface, sock *websocket.Server, jwt helper.JWTInterface) root.ChatServiceInterface {
+func New(
+	dataChat root.ChatDataInterface,
+	dataPatient patients.PatientDataInterface,
+	dataDoctor users.UserDataInterface,
+	socket *websocket.Server,
+	jwt helper.JWTInterface,
+) root.ChatServiceInterface {
 	return &ChatService{
-		jwt:  jwt,
-		sock: sock,
-		data: data,
+		jwt:     jwt,
+		socket:  socket,
+		chat:    dataChat,
+		patient: dataPatient,
+		doctor:  dataDoctor,
 	}
 }
 
 func (s *ChatService) SocketEstablish(ctx echo.Context, user int, role string) {
-	ref := s.sock.CreateClient(ctx, user, role)
-	for _, data := range s.data.Get(user, role, nil) {
-		if s.sock.FindRoom(data.ID) == nil {
-			s.sock.CreateRoom(data.ID, ref)
+	res, err := func() (res any, err error) {
+		switch role {
+		case "patient":
+			res, err = s.patient.GetByID(user)
+		case "doctor":
+			res, err = s.doctor.GetByID(user)
+		}
+		return
+	}()
+	if err != nil || structs.IsZero(res) {
+		ctx.Set("ws.client.error", "user not found")
+		return
+	}
+	sign := s.socket.CreateClient(ctx, user, role)
+	ref := fmt.Sprintf("%s@%d", role, user)
+	for _, data := range s.chat.Get(user, role, nil) {
+		if s.socket.FindRoom(data.ID) == nil {
+			s.socket.CreateRoom(data.ID, ref)
 		} else {
-			s.sock.JoinRoom(data.ID, ref)
+			s.socket.JoinRoom(data.ID, ref)
 		}
 	}
-	ctx.Set("ws.connect", ref)
+	ctx.Set("ws.connect", sign)
 }
 
-func (s *ChatService) GetChats(ctx echo.Context, user int) []*dto.GetChatResponse {
+func (s *ChatService) GetChats(ctx echo.Context) []*dto.GetChatResponse {
+	user, err := s.jwt.GetID(ctx)
+	if err != nil {
+		ctx.Set("jwt.token.error", true)
+		return nil
+	}
 	role := strings.ToLower(s.jwt.CheckRole(ctx).(string))
 	ref := fmt.Sprintf("%s@%d", role, user)
-	if s.sock.FindClient(ref) == nil {
+	if s.socket.FindClient(ref) == nil {
 		ctx.Set("ws.connect.error", true)
 		return nil
 	}
 	query := ctx.QueryParams()
 	responses := []*dto.GetChatResponse{}
-	for _, data := range s.data.Get(user, role, query) {
-		if s.sock.FindRoom(data.ID) == nil {
-			s.sock.CreateRoom(data.ID, ref)
+	for _, data := range s.chat.Get(int(user), role, query) {
+		if s.socket.FindRoom(data.ID) == nil {
+			s.socket.CreateRoom(data.ID, ref)
 		} else {
-			s.sock.JoinRoom(data.ID, ref)
+			s.socket.JoinRoom(data.ID, ref)
 		}
 		response := &dto.GetChatResponse{
 			ID: data.ID,
@@ -76,34 +108,45 @@ func (s *ChatService) GetChats(ctx echo.Context, user int) []*dto.GetChatRespons
 }
 
 func (s *ChatService) CreateChat(ctx echo.Context, request *dto.CreateChatRequest) *dto.CreateChatResponse {
-	user, err := s.jwt.GetID(ctx)
-	if err != nil {
-		ctx.Set("jwt.token.error", true)
+	var res, err any
+	res, err = s.patient.GetByID(request.Patient)
+	if err != nil || structs.IsZero(res) {
+		ctx.Set("ws.client.error", fmt.Sprintf("patient@%d not found", request.Patient))
 		return nil
 	}
-	role := strings.ToLower(s.jwt.CheckRole(ctx).(string))
-	ref := fmt.Sprintf("%s@%d", role, user)
-	if s.sock.FindClient(ref) == nil {
-		ctx.Set("ws.connect.error", true)
+	res, err = s.doctor.GetByID(request.Doctor)
+	if err != nil || structs.IsZero(res) {
+		ctx.Set("ws.client.error", fmt.Sprintf("doctor@%d not found", request.Doctor))
+		return nil
+	}
+	// user, err := s.jwt.GetID(ctx)
+	// if err != nil {
+	// 	ctx.Set("jwt.token.error", true)
+	// 	return nil
+	// }
+	// role := strings.ToLower(s.jwt.CheckRole(ctx).(string))
+	// ref := fmt.Sprintf("%s@%d", role, user)
+	// if s.socket.FindClient(ref) == nil {
+	// 	ctx.Set("ws.connect.error", true)
+	// 	return nil
+	// }
+	patient_ref := fmt.Sprintf("patient@%d", request.Patient)
+	if s.socket.FindClient(patient_ref) == nil {
+		ctx.Set("ws.connect.error", fmt.Sprintf("%s not connected yet", patient_ref))
+		return nil
+	}
+	doctor_ref := fmt.Sprintf("doctor@%d", request.Doctor)
+	if s.socket.FindClient(doctor_ref) == nil {
+		ctx.Set("ws.connect.error", fmt.Sprintf("%s not connected yet", doctor_ref))
 		return nil
 	}
 	data := &root.Chat{
 		PatientUserID: request.Patient,
 		DoctorUserID:  request.Doctor,
 	}
-	patient_ref := fmt.Sprintf("patient@%d", request.Patient)
-	if s.sock.FindClient(patient_ref) == nil {
-		ctx.Set("ws.connect.error", true)
-		return nil
-	}
-	doctor_ref := fmt.Sprintf("doctor@%d", request.Doctor)
-	if s.sock.FindClient(doctor_ref) == nil {
-		ctx.Set("ws.connect.error", true)
-		return nil
-	}
-	if result := s.data.Create(data); result != nil {
-		if room := s.sock.FindRoom(result.ID); room == nil {
-			s.sock.CreateRoom(result.ID, patient_ref, doctor_ref)
+	if result := s.chat.Create(data); result != nil {
+		if room := s.socket.FindRoom(result.ID); room == nil {
+			s.socket.CreateRoom(result.ID, patient_ref, doctor_ref)
 		}
 		return &dto.CreateChatResponse{
 			ID: result.ID,
@@ -130,8 +173,8 @@ func (s *ChatService) UpdateChat(ctx echo.Context, chat int, request *dto.Update
 	}
 	role := strings.ToLower(s.jwt.CheckRole(ctx).(string))
 	ref := fmt.Sprintf("%s@%d", role, user)
-	if s.sock.FindClient(ref) == nil {
-		ctx.Set("ws.connect.error", true)
+	if s.socket.FindClient(ref) == nil {
+		ctx.Set("ws.connect.error", fmt.Sprintf("%s not connected yet", ref))
 		return nil
 	}
 	data := &root.Chat{
@@ -141,7 +184,7 @@ func (s *ChatService) UpdateChat(ctx echo.Context, chat int, request *dto.Update
 		LastMessageSentByID: request.SentBy,
 		LastMessageSeenByID: request.SeenBy,
 	}
-	if result := s.data.Update(data); result != nil {
+	if result := s.chat.Update(data); result != nil {
 		return &dto.UpdateChatResponse{
 			ID:                result.ID,
 			LastMessage:       result.LastMessage,
@@ -161,12 +204,12 @@ func (s *ChatService) DeleteChat(ctx echo.Context, chat int) bool {
 	}
 	role := strings.ToLower(s.jwt.CheckRole(ctx).(string))
 	ref := fmt.Sprintf("%s@%d", role, user)
-	if s.sock.FindClient(ref) == nil {
-		ctx.Set("ws.connect.error", true)
+	if s.socket.FindClient(ref) == nil {
+		ctx.Set("ws.connect.error", fmt.Sprintf("%s not connected yet", ref))
 		return false
 	}
-	if s.sock.FindRoom(chat) != nil {
-		s.sock.DeleteRoom(chat)
+	if s.socket.FindRoom(chat) != nil {
+		s.socket.DeleteRoom(chat)
 	}
-	return s.data.Delete(chat)
+	return s.chat.Delete(chat)
 }

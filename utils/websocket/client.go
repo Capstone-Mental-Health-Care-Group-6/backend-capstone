@@ -37,11 +37,13 @@ func NewClient(context echo.Context, server *Server, user int, role string) (str
 func (c *Client) disconnect() {
 	c.handler.Close()
 	c.server.DeleteClient(c.sign)
+	close(c.message)
+	logrus.Infof("[ws.establish]: client@%s disconnected", c.sign)
 }
 
 func (c *Client) Send() {
 	var (
-		duration time.Duration = time.Second * 60
+		duration time.Duration = time.Second * 10
 		packet   *packet.Message
 		err      error
 	)
@@ -75,11 +77,11 @@ func (c *Client) Send() {
 
 func (c *Client) Recv() {
 	var (
-		duration time.Duration = time.Second * 55
+		duration time.Duration = time.Second * 9
 		ticker   *time.Ticker  = time.NewTicker(duration)
 		err      error
 	)
-	defer c.disconnect()
+	defer c.handler.Close()
 	defer ticker.Stop()
 	for {
 		duration := time.Second * 15

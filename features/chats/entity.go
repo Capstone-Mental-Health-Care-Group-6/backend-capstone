@@ -17,7 +17,7 @@ type ChatHandlerInterface interface {
 
 type ChatServiceInterface interface {
 	SocketEstablish(ctx echo.Context, user int, role string)
-	GetChats(ctx echo.Context, user int) []*dto.GetChatResponse
+	GetChats(ctx echo.Context) []*dto.GetChatResponse
 	CreateChat(ctx echo.Context, request *dto.CreateChatRequest) *dto.CreateChatResponse
 	UpdateChat(ctx echo.Context, chat int, request *dto.UpdateChatRequest) *dto.UpdateChatResponse
 	DeleteChat(ctx echo.Context, chat int) bool

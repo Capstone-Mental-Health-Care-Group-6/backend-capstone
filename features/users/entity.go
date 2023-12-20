@@ -64,6 +64,7 @@ type UserServiceInterface interface {
 type UserDataInterface interface {
 	Register(newData User) (*User, error)
 	Login(email string, password string) (*User, error)
+	GetByID(id int) (User, error)
 	GetByEmail(email string) (*User, error)
 	InsertCode(email string, code string) error
 	DeleteCode(email string) error
