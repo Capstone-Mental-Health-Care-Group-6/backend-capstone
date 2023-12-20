@@ -175,7 +175,7 @@ func main() {
 	chatController := handlerChat.New(chatServices)
 
 	messageModel := dataMessage.New(db)
-	messageServices := serviceMessage.New(messageModel)
+	messageServices := serviceMessage.New(messageModel, jwtInterface)
 	messageController := handlerMessage.New(messageServices)
 
 	chatbotModel := dataChatbot.New(mongo)

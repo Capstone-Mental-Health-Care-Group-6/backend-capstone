@@ -15,9 +15,10 @@ type MessageService struct {
 	data root.MessageDataInterface
 }
 
-func New(data root.MessageDataInterface) root.MessageServiceInterface {
+func New(data root.MessageDataInterface, jwt helper.JWTInterface) root.MessageServiceInterface {
 	return &MessageService{
 		data: data,
+		jwt:  jwt,
 	}
 }
 
@@ -27,12 +28,7 @@ func (s *MessageService) GetMessages(ctx echo.Context, chat int) []*dto.Response
 	responses := []*dto.Response{}
 	for _, data := range s.data.Get(chat, query) {
 		response := &dto.Response{
-			ID: data.ID,
-			// Sender: &dto.User{
-			// 	ID:    int(data.User.ID),
-			// 	Name:  data.User.Name,
-			// 	Email: data.User.Email,
-			// },
+			ID:        data.ID,
 			Sender:    data.UserID,
 			Role:      data.Role,
 			Text:      data.Text,
@@ -118,6 +114,5 @@ func (s *MessageService) UpdateMessage(ctx echo.Context, chat int, message int, 
 }
 
 func (s *MessageService) DeleteMessage(ctx echo.Context, chat int, message int) bool {
-	// TODO: implement jwt authorization
 	return s.data.Delete(chat, message)
 }
