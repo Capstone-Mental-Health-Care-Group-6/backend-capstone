@@ -21,10 +21,10 @@ import (
 )
 
 func Migrate(db *gorm.DB) {
-	db.Migrator().DropTable(DataArticleCategory.ArticleCategory{})
-	db.Migrator().DropTable(DataCounselingMethod.CounselingMethod{})
-	db.Migrator().DropTable(DataCounselingDuration.CounselingDuration{})
-	db.Migrator().DropTable(DataCounselingTopic.CounselingTopic{})
+	// db.Migrator().DropTable(DataArticleCategory.ArticleCategory{})
+	// db.Migrator().DropTable(DataCounselingMethod.CounselingMethod{})
+	// db.Migrator().DropTable(DataCounselingDuration.CounselingDuration{})
+	// db.Migrator().DropTable(DataCounselingTopic.CounselingTopic{})
 
 	db.AutoMigrate(DataUser.User{})
 	db.AutoMigrate(DataArticleCategory.ArticleCategory{})
