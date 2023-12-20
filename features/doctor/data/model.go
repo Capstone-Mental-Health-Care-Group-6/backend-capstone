@@ -11,7 +11,7 @@ type Doctor struct {
 	UserID     uint   `gorm:"column:user_id"`
 	DoctorName string `gorm:"column:doctor_name;type:varchar(255)"`
 
-	DoctorNIK         string `gorm:"column:doctor_nik;type:varchar(255)"`
+	DoctorNIK         string `gorm:"column:doctor_nik;type:varchar(255);unique"`
 	DoctorDOB         string `gorm:"column:doctor_dob;type:varchar(255)"`
 	DoctorProvinsi    string `gorm:"column:doctor_provinsi;type:varchar(255)"`
 	DoctorKota        string `gorm:"column:doctor_kota;type:varchar(255)"`
