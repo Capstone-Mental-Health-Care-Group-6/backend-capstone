@@ -68,9 +68,9 @@ func (r *ChatData) Create(data *root.Chat) *root.Chat {
 }
 
 func (r *ChatData) Update(data *root.Chat) *root.Chat {
-	table := r.db.Table("chats").
-		Preload("Patient").
-		Preload("Doctor")
+	table := r.db.Table("chats")
+	// Preload("Patient").
+	// Preload("Doctor")
 	search := &root.Chat{ID: data.ID}
 	if err := table.Find(&search).Error; err != nil {
 		logrus.Error("[chat.repository]: ", err.Error())
