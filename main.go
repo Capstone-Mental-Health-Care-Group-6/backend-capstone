@@ -171,7 +171,7 @@ func main() {
 	counselingTopicController := handlerCounselingTopic.NewHandler(counselingTopicServices)
 
 	chatData := dataChat.New(db)
-	chatServices := serviceChat.New(chatData, socket, jwtInterface)
+	chatServices := serviceChat.New(chatData, patientModel, userModel, socket, jwtInterface)
 	chatController := handlerChat.New(chatServices)
 
 	messageModel := dataMessage.New(db)

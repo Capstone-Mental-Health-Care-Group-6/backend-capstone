@@ -69,6 +69,19 @@ func (ud *UserData) Login(email, password string) (*users.User, error) {
 	return result, nil
 }
 
+func (ud *UserData) GetByID(id int) (users.User, error) {
+	var listUser users.User
+	var qry = ud.db.Table("users").Select("users.*").
+		Where("users.id = ?", id).
+		Where("users.deleted_at is null").
+		Scan(&listUser)
+
+	if err := qry.Error; err != nil {
+		return listUser, err
+	}
+	return listUser, nil
+}
+
 func (ud *UserData) GetByEmail(email string) (*users.User, error) {
 	var dbData = new(User)
 	dbData.Email = email
