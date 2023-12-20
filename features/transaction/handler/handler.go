@@ -79,7 +79,7 @@ func (th *TransactionHandler) CreateTransaction() echo.HandlerFunc {
 		serviceInput.PaymentStatus = 5
 
 		serviceInput.TopicID = input.TopicID
-		serviceInput.PatientID = input.PatientID
+		serviceInput.PatientID = getID
 		serviceInput.DoctorID = input.DoctorID
 		serviceInput.MethodID = input.MethodID
 		serviceInput.DurationID = input.DurationID

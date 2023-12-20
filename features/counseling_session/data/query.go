@@ -289,7 +289,7 @@ func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
 	}
 
 	existingDataPatient := transaction.Transaction{}
-	if err := bc.db.Table("transactions").Where("id = ?", listCounselingSession.TransactionID).First(&existingDataPatient).Error; err != nil {
+	if err := bc.db.Table("transactions").Where("id = ?", listCounselingSession.TransactionID).Scan(&existingDataPatient).Error; err != nil {
 		return errors.New("No transaction data found")
 	}
 
@@ -303,7 +303,8 @@ func (bc *CounselingSessionData) CheckPatient(id, doctorID int) error {
 
 	if existingDataPatient.DoctorID == dataDoctor.ID {
 		return nil
-	} else {
-		return errors.New("Unauthorized permission for this doctor")
 	}
+
+	return errors.New("Unauthorized permission for this doctor")
+
 }

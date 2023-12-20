@@ -31,10 +31,10 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 	// db := ad.db
 
 	ad.db.Where("midtrans_id = ?", id).First(&transaction)
-	fmt.Println("This is the id: ", &transaction.ID)
+	// fmt.Println("This is the id: ", &transaction.ID)
 	transactionID := transaction.ID
 
-	fmt.Println("This is the new payment status: ", newData.PaymentStatus)
+	// fmt.Println("This is the new payment status: ", newData.PaymentStatus)
 
 	qry := ad.db.Table("transactions").Where("id = ?", transactionID).Updates(Transaction{
 		PaymentStatus: newData.PaymentStatus,
@@ -53,7 +53,7 @@ func (ad *TransactionData) GetAndUpdate(newData transaction.UpdateTransaction, i
 			return false, errors.New("Patient ID not found in transaction")
 		}
 
-		fmt.Println("This is the existing DoctorID: ", transaction.DoctorID)
+		// fmt.Println("This is the existing DoctorID: ", transaction.DoctorID)
 
 		existingDataDoctor := _doctor.Doctor{}
 		if err := ad.db.Table("doctors").Where("id = ?", transaction.DoctorID).First(&existingDataDoctor).Error; err != nil {
@@ -147,7 +147,7 @@ func (ad *TransactionData) GetByIDMidtrans(id string) ([]transaction.Transaction
 		return nil, qry.Error
 	}
 
-	fmt.Println("Json Response for query:", transactionInfos)
+	// fmt.Println("Json Response for query:", transactionInfos)
 
 	return transactionInfos, nil
 }
@@ -290,7 +290,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 		return nil, errors.New("Patient ID not found")
 	}
 
-	fmt.Println("This is the existing DoctorID: ", newData.DoctorID)
+	// fmt.Println("This is the existing DoctorID: ", newData.DoctorID)
 
 	existingDataDoctor := _doctor.Doctor{}
 	if err := ad.db.Table("doctors").Where("id = ?", newData.DoctorID).First(&existingDataDoctor).Error; err != nil {
@@ -329,7 +329,7 @@ func (ad *TransactionData) Insert(newData transaction.Transaction) (*transaction
 		dbData.MidtransID = newData.MidtransID
 	}
 
-	fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
+	// fmt.Println("Ive succeed create payment status", newData.PaymentStatus)
 
 	if err := ad.db.Create(dbData).Error; err != nil {
 		return nil, err
