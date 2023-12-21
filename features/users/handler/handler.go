@@ -38,6 +38,11 @@ func (uh *UserHandler) Register() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
 		}
 
+		if !helper.PasswordWithCombination(input.Password) {
+			errors := []string{"Password must contain a combination of letters, symbols, and numbers"}
+			return c.JSON(http.StatusBadRequest, helper.FormatResponseValidation("Invalid Format Request", errors))
+		}
+
 		var serviceInput = new(users.User)
 		serviceInput.Name = input.Name
 		serviceInput.Email = input.Email

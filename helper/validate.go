@@ -2,6 +2,7 @@ package helper
 
 import (
 	"mime/multipart"
+	"unicode"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -62,4 +63,22 @@ func ValidateFile(file *multipart.FileHeader, maxSize int64, allowedTypes ...str
 	}
 
 	return true, ""
+}
+
+func PasswordWithCombination(password string) bool {
+	hasLetter := false
+	hasDigit := false
+	hasSymbol := false
+
+	for _, char := range password {
+		if unicode.IsLetter(char) {
+			hasLetter = true
+		} else if unicode.IsDigit(char) {
+			hasDigit = true
+		} else if unicode.IsPunct(char) || unicode.IsSymbol(char) {
+			hasSymbol = true
+		}
+	}
+
+	return hasLetter && hasDigit && hasSymbol
 }
